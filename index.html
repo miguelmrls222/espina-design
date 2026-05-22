@@ -14,17 +14,23 @@
           <a href="/" class="block" data-nav>
             <img src="/LOGO%20ED.png" alt="Espina Design" class="h-8 md:h-10 w-auto" />
           </a>
-          <nav class="hidden md:flex items-center gap-8 text-sm tracking-wide">
+          <nav class="hidden md:flex items-center gap-10 text-base tracking-wide">
             <a href="/" data-nav class="hover:text-gray-600 transition-colors">Inicio</a>
             <a href="/tienda" data-nav class="hover:text-gray-600 transition-colors">Tienda</a>
             <a href="/nosotros" data-nav class="hover:text-gray-600 transition-colors">Nosotros</a>
             <a href="/contacto" data-nav class="hover:text-gray-600 transition-colors">Contacto</a>
           </nav>
-          <button id="menu-btn" class="md:hidden flex flex-col gap-1.5 p-2" aria-label="Menú">
-            <span class="block w-6 h-px bg-black"></span>
-            <span class="block w-6 h-px bg-black"></span>
-            <span class="block w-6 h-px bg-black"></span>
+          <button id="menu-btn" class="md:hidden flex flex-col gap-1.5 p-2 z-50" aria-label="Menú">
+            <span class="block w-6 h-px bg-black transition-transform duration-300"></span>
+            <span class="block w-6 h-px bg-black transition-opacity duration-300"></span>
+            <span class="block w-6 h-px bg-black transition-transform duration-300"></span>
           </button>
+          <div id="menu-mobile" class="fixed inset-0 bg-white flex flex-col items-center justify-center gap-8 text-xl tracking-wider hidden md:hidden">
+            <a href="/" data-nav class="hover:text-gray-600 transition-colors uppercase">Inicio</a>
+            <a href="/tienda" data-nav class="hover:text-gray-600 transition-colors uppercase">Tienda</a>
+            <a href="/nosotros" data-nav class="hover:text-gray-600 transition-colors uppercase">Nosotros</a>
+            <a href="/contacto" data-nav class="hover:text-gray-600 transition-colors uppercase">Contacto</a>
+          </div>
         </div>
       </header>
 

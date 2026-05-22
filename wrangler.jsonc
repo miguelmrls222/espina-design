@@ -1,0 +1,5 @@
+{
+  "name": "espina-design-auth",
+  "compatibility_date": "2026-05-22",
+  "main": "functions/auth.js"
+}

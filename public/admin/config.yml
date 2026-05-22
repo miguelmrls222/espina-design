@@ -1,0 +1,47 @@
+backend:
+  name: github
+  repo: miguelmrls222/espina-design
+  branch: main
+  base_url: https://espina-design-auth.pages.dev
+  auth_endpoint: api/auth
+  squash_merges: true
+
+publish_mode: editorial_workflow
+
+media_folder: "public/images/products"
+public_folder: "/images/products"
+
+collections:
+  - name: "productos"
+    label: "Productos"
+    label_singular: "Producto"
+    folder: "src/data/productos"
+    create: true
+    format: "json"
+    slug: "{{slug}}"
+    sort: "precio:asc"
+    fields:
+      - { label: "Nombre del producto", name: "nombre", widget: "string" }
+      - { label: "Slug", name: "slug", widget: "string", hint: "Se genera automáticamente. Ej: billetera-clasica" }
+      - label: "Categoría"
+        name: "categoria"
+        widget: "select"
+        options:
+          - { label: "Billeteras y Tarjeteros", value: "billeteras" }
+          - { label: "Bolsos y Carteras", value: "bolsos" }
+          - { label: "Mochilas y Bolsas", value: "mochilas" }
+          - { label: "Accesorios", value: "accesorios" }
+      - { label: "Precio (MXN)", name: "precio", widget: "number", value_type: "float", min: 0 }
+      - { label: "Descripción", name: "descripcion", widget: "text" }
+      - { label: "Materiales", name: "materiales", widget: "string" }
+      - { label: "Tiempo de fabricación", name: "tiempo_fabricacion", widget: "string", required: false }
+      - { label: "Fotos", name: "fotos", widget: "image", multiple: true }
+      - label: "Stock"
+        name: "stock"
+        widget: "select"
+        options:
+          - { label: "Disponible", value: "disponible" }
+          - { label: "Agotado", value: "agotado" }
+          - { label: "Bajo pedido", value: "bajo-pedido" }
+      - { label: "Destacado en inicio", name: "destacado", widget: "boolean", default: false }
+      - { label: "Activo", name: "activo", widget: "boolean", default: true }

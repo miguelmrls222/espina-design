@@ -11,14 +11,14 @@
     <div id="app">
       <header class="fixed top-0 left-0 w-full bg-white/95 backdrop-blur-sm z-50 border-b border-gray-100">
         <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <a href="/" class="block">
+          <a href="/" class="block" data-nav>
             <img src="/LOGO%20ED.png" alt="Espina Design" class="h-8 md:h-10 w-auto" />
           </a>
           <nav class="hidden md:flex items-center gap-8 text-sm tracking-wide">
-            <a href="/" class="hover:text-gray-600 transition-colors">Inicio</a>
-            <a href="/tienda" class="hover:text-gray-600 transition-colors">Tienda</a>
-            <a href="/nosotros" class="hover:text-gray-600 transition-colors">Nosotros</a>
-            <a href="/contacto" class="hover:text-gray-600 transition-colors">Contacto</a>
+            <a href="/" data-nav class="hover:text-gray-600 transition-colors">Inicio</a>
+            <a href="/tienda" data-nav class="hover:text-gray-600 transition-colors">Tienda</a>
+            <a href="/nosotros" data-nav class="hover:text-gray-600 transition-colors">Nosotros</a>
+            <a href="/contacto" data-nav class="hover:text-gray-600 transition-colors">Contacto</a>
           </nav>
           <button id="menu-btn" class="md:hidden flex flex-col gap-1.5 p-2" aria-label="Menú">
             <span class="block w-6 h-px bg-black"></span>
@@ -29,21 +29,100 @@
       </header>
 
       <main>
-        <section class="min-h-screen flex flex-col items-center justify-center px-6 text-center">
+        <!-- INICIO -->
+        <section id="page-inicio" class="page-section min-h-screen flex flex-col items-center justify-center px-6 text-center">
           <img src="/LOGO%20ED.png" alt="Espina Design" class="max-w-[280px] md:max-w-[400px] w-full mb-8" />
           <p class="font-body text-base md:text-lg text-gray-600 max-w-md mb-10 leading-relaxed">
             Cuero artesanal hecho a mano en México. Cada pieza es única.
           </p>
-          <a href="/tienda" class="font-heading text-sm tracking-widest uppercase border-2 border-black px-10 py-3 hover:bg-black hover:text-white transition-colors duration-300">
+          <a href="/tienda" data-nav class="font-heading text-sm tracking-widest uppercase border-2 border-black px-10 py-3 hover:bg-black hover:text-white transition-colors duration-300">
             Ver Colección
           </a>
+        </section>
+
+        <!-- TIENDA -->
+        <section id="page-tienda" class="page-section min-h-screen px-6 pt-24 hidden">
+          <div class="max-w-6xl mx-auto">
+            <h1 class="font-heading text-4xl md:text-5xl tracking-wider uppercase mb-12 text-center">Tienda</h1>
+            <div id="productos-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            </div>
+          </div>
+        </section>
+
+        <!-- SOBRE NOSOTROS -->
+        <section id="page-nosotros" class="page-section min-h-screen px-6 pt-24 hidden">
+          <div class="max-w-3xl mx-auto">
+            <h1 class="font-heading text-4xl md:text-5xl tracking-wider uppercase mb-16 text-center">Sobre Nosotros</h1>
+
+            <div class="space-y-16">
+              <div>
+                <h2 class="font-heading text-lg tracking-widest uppercase mb-4">Nuestra Historia</h2>
+                <p class="font-body text-base leading-relaxed text-gray-700">
+                  Somos de Hermosillo, Sonora, México. Comenzamos este proyecto en 2016 a raíz de que siempre hemos tenido la inquietud de crear con las manos y ofrecer productos de calidad, duraderos y únicos. Con el fin de crear historia.
+                </p>
+              </div>
+
+              <div>
+                <h2 class="font-heading text-lg tracking-widest uppercase mb-4">Nuestro Propósito</h2>
+                <p class="font-body text-base leading-relaxed text-gray-700">
+                  Cada pieza de cuero que creamos está pensada para acompañarte por años. Creemos en la herencia artesanal, en el valor de lo hecho a mano y en la belleza de los materiales naturales que envejecen con carácter.
+                </p>
+              </div>
+
+              <div>
+                <h2 class="font-heading text-lg tracking-widest uppercase mb-4">Hecho en México</h2>
+                <p class="font-body text-base leading-relaxed text-gray-700">
+                  Desde Sonora, trabajamos el cuero con técnicas tradicionales combinadas con diseño contemporáneo. Cada producto es único, cuidadosamente elaborado para ofrecer piezas que trascienden modas.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="page-faq" class="page-section min-h-screen px-6 pt-24 hidden">
+          <div class="max-w-3xl mx-auto">
+            <h1 class="font-heading text-4xl md:text-5xl tracking-wider uppercase mb-16 text-center">Preguntas Frecuentes</h1>
+            <div class="space-y-8">
+              <div>
+                <h3 class="font-heading text-sm tracking-widest uppercase mb-2">¿Hacen envíos a todo México?</h3>
+                <p class="font-body text-sm leading-relaxed text-gray-600">Sí, realizamos envíos a toda la República Mexicana.</p>
+              </div>
+              <div>
+                <h3 class="font-heading text-sm tracking-widest uppercase mb-2">¿Cuánto tarda la fabricación?</h3>
+                <p class="font-body text-sm leading-relaxed text-gray-600">Cada pieza se elabora a mano, por lo que el tiempo de fabricación puede variar entre 3 a 10 días hábiles, dependiendo del producto.</p>
+              </div>
+              <div>
+                <h3 class="font-heading text-sm tracking-widest uppercase mb-2">¿Cómo cuido mi producto de cuero?</h3>
+                <p class="font-body text-sm leading-relaxed text-gray-600">Recomendamos limpiar con un paño seco, evitar la exposición prolongada al sol y aplicar acondicionador de cuero cada 3-6 meses.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CONTACTO -->
+        <section id="page-contacto" class="page-section min-h-screen px-6 pt-24 hidden">
+          <div class="max-w-3xl mx-auto">
+            <h1 class="font-heading text-4xl md:text-5xl tracking-wider uppercase mb-16 text-center">Contacto</h1>
+            <div class="flex flex-col items-center gap-6 text-center">
+              <p class="font-body text-base text-gray-600 max-w-md leading-relaxed">
+                Escríbenos por WhatsApp o síguenos en Instagram para ver nuestro trabajo.
+              </p>
+              <a href="https://wa.me/521" target="_blank" class="font-heading text-sm tracking-widest uppercase border-2 border-black px-10 py-3 hover:bg-black hover:text-white transition-colors duration-300">
+                WhatsApp
+              </a>
+              <a href="https://instagram.com/espinadesign" target="_blank" class="font-heading text-sm tracking-widest uppercase text-gray-600 hover:text-black transition-colors">
+                @espinadesign
+              </a>
+            </div>
+          </div>
         </section>
       </main>
 
       <footer class="border-t border-gray-100 py-10 px-6">
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
           <p class="font-heading tracking-wider uppercase text-xs">Espina Design © 2026</p>
-          <p class="text-xs">Cuero hecho a mano — México</p>
+          <p class="text-xs">Cuero hecho a mano — Hermosillo, Sonora, México</p>
         </div>
       </footer>
     </div>

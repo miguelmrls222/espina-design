@@ -1,1 +1,31 @@
 @import "tailwindcss";
+
+@font-face {
+  font-family: "Futura";
+  src: url("/fonts/Futura.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Libertinage-a";
+  src: url("/fonts/Libertinage-a.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --font-heading: "Futura", sans-serif;
+  --font-body: "Libertinage-a", serif;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-body);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+}

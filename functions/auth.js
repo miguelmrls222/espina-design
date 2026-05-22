@@ -6,53 +6,48 @@ export default {
     const path = url.pathname;
 
     if (!env.GITHUB_CLIENT_ID || !env.GITHUB_CLIENT_SECRET) {
-      return new Response("GitHub OAuth credentials not configured", { status: 500 });
+      return new Response("Missing GitHub OAuth credentials", { status: 500 });
     }
 
-    if (path === "/api/auth" && request.method === "GET") {
-      const provider = url.searchParams.get("provider") || "github";
-      return Response.redirect(
-        `https://github.com/login/oauth/authorize?client_id=${env.GITHUB_CLIENT_ID}&redirect_uri=${url.origin}/api/callback&scope=${SCOPES}&provider=${provider}`,
-        302
-      );
+    if (path === "/api/auth") {
+      const redirectUri = `${url.origin}/api/callback`;
+      const githubUrl = `https://github.com/login/oauth/authorize?client_id=${env.GITHUB_CLIENT_ID}&redirect_uri=${redirectUri}&scope=${SCOPES}&response_type=code`;
+      return Response.redirect(githubUrl, 302);
     }
 
-    if (path === "/api/callback" && request.method === "GET") {
+    if (path === "/api/callback") {
       const code = url.searchParams.get("code");
       if (!code) {
-        return new Response("No code provided", { status: 400 });
+        return new Response("Missing authorization code", { status: 400 });
       }
 
-      const tokenResponse = await fetch(
-        "https://github.com/login/oauth/access_token",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            client_id: env.GITHUB_CLIENT_ID,
-            client_secret: env.GITHUB_CLIENT_SECRET,
-            code,
-          }),
-        }
-      );
+      const res = await fetch("https://github.com/login/oauth/access_token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          client_id: env.GITHUB_CLIENT_ID,
+          client_secret: env.GITHUB_CLIENT_SECRET,
+          code,
+        }),
+      });
 
-      const data = await tokenResponse.json();
+      const data = await res.json();
       const token = data.access_token;
 
       if (!token) {
-        return new Response(JSON.stringify(data), { status: 400 });
+        return new Response(JSON.stringify(data), { status: 400, headers: { "content-type": "application/json" } });
       }
 
-      const html = `<!doctype html><html><head><meta charset="utf-8"><title>Autenticación exitosa</title></head><body><script>(function(){function receiveMessage(e){window.opener.postMessage('authorization:github:${token}:${JSON.stringify(data)}', e.origin);window.close();}window.addEventListener("message",receiveMessage,false);window.opener.postMessage("authorizing:github","*");})();</script><p>Autenticación exitosa. Cerrando ventana...</p></body></html>`;
+      const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Autenticación exitosa</title></head><body><script>window.opener.postMessage('authorization:github:${token}:${JSON.stringify(data)}','*');window.close()</script></body></html>`;
 
       return new Response(html, {
-        headers: { "Content-Type": "text/html; charset=utf-8" },
+        headers: {
+          "content-type": "text/html;charset=utf-8",
+          "cache-control": "no-cache, no-store, must-revalidate",
+        },
       });
     }
 
     return new Response("Not found", { status: 404 });
-  }
+  },
 };

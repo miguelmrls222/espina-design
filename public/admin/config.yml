@@ -3,8 +3,6 @@ backend:
   repo: miguelmrls222/espina-design
   branch: main
   base_url: https://espina-design-auth.miguelmrls222.workers.dev
-  auth_endpoint: api/auth
-  squash_merges: true
 
 publish_mode: editorial_workflow
 

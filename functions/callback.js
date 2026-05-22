@@ -24,8 +24,20 @@ export async function onRequest(context) {
     return new Response(JSON.stringify(data), { status: 400, headers: { "content-type": "application/json" } });
   }
 
-  const payload = JSON.stringify(data);
-  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Success</title></head><body><script>window.opener.postMessage('authorization:github:success:${payload}','https://espina-design.pages.dev');window.close()</script></body></html>`;
+  const payload = JSON.stringify({ token });
+
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Authorizing...</title></head><body>
+<script>
+  function receiveMessage(event) {
+    window.opener.postMessage('authorization:github:success:${payload}', '*');
+    window.removeEventListener('message', receiveMessage, false);
+    window.close();
+  }
+  window.addEventListener('message', receiveMessage, false);
+  window.opener.postMessage('authorizing:github', '*');
+</script>
+<p>Authorizing Decap CMS...</p>
+</body></html>`;
 
   return new Response(html, {
     headers: {

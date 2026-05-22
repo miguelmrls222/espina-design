@@ -8,7 +8,7 @@ export async function onRequest(context) {
     return new Response("Missing credentials", { status: 500 });
   }
 
-  const redirectUri = `${url.origin}/api/callback`;
+  const redirectUri = `${url.origin}/callback`;
   const githubUrl = `https://github.com/login/oauth/authorize?client_id=${env.GITHUB_CLIENT_ID}&redirect_uri=${redirectUri}&scope=${SCOPES}&response_type=code`;
 
   return Response.redirect(githubUrl, 302);

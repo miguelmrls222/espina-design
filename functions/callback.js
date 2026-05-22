@@ -7,10 +7,6 @@ export async function onRequest(context) {
     return new Response("Missing code", { status: 400 });
   }
 
-  if (!env.GITHUB_CLIENT_ID || !env.GITHUB_CLIENT_SECRET) {
-    return new Response("Missing credentials", { status: 500 });
-  }
-
   const res = await fetch("https://github.com/login/oauth/access_token", {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },

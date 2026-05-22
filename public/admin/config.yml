@@ -2,7 +2,7 @@ backend:
   name: github
   repo: miguelmrls222/espina-design
   branch: main
-  base_url: https://espina-design-auth.miguelmrls222.workers.dev
+  base_url: https://espina-design.pages.dev
   auth_endpoint: api/auth
 
 publish_mode: editorial_workflow

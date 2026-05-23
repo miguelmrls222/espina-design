@@ -1,0 +1,13 @@
+{
+  "precio": 789,
+  "destacado": false,
+  "nombre": "Billetera Sahuaro",
+  "slug": "Billetera Clasica",
+  "descripcion": "Diseño simple y elegante muy practico para quienes llevan consigo sus billetes y tarjetas esenciales.",
+  "fotos": "/images/products/billetera-sahuaro.jpg",
+  "activo": true,
+  "categoria": "billeteras",
+  "materiales": "Cuero ",
+  "stock": "disponible",
+  "tiempo_fabricacion": "4-5 días hábiles"
+}

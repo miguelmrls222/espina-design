@@ -1,10 +1,12 @@
 {
   "precio": 489,
   "destacado": true,
-  "nombre": "Tarjetero Cactus ",
+  "nombre": "Tarjetero Cactus",
   "slug": "tarjetero-cactus",
   "descripcion": "Ideal para cargar ligero, practico, sencillo y con mucho estilo.",
-  "fotos": "/images/products/img_5063.jpg",
+  "fotos": [
+    "/images/products/img_5063.jpg"
+  ],
   "activo": true,
   "categoria": "billeteras",
   "materiales": "Cuero",

@@ -8,6 +8,8 @@ const pages = {
   'contacto': 'contacto',
 }
 
+const menu = document.getElementById('menu-mobile')
+
 function navigate(path) {
   const page = pages[path.replace(/^\//, '')] || 'inicio'
   document.querySelectorAll('.page-section').forEach(s => s.classList.add('hidden'))
@@ -20,11 +22,12 @@ function navigate(path) {
 }
 
 function closeMenu() {
-  document.getElementById('menu-mobile')?.classList.add('hidden')
+  if (menu) menu.style.display = 'none'
 }
 
 function toggleMenu() {
-  document.getElementById('menu-mobile')?.classList.toggle('hidden')
+  if (!menu) return
+  menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex'
 }
 
 document.addEventListener('click', e => {

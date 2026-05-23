@@ -1,0 +1,13 @@
+{
+  "nombre": "Billetera Sahuaro",
+  "slug": "billetera-sahuaro",
+  "categoria": "billeteras",
+  "precio": 789,
+  "descripcion": "Diseño simple y elegante, muy práctico para quienes llevan consigo sus billetes y tarjetas esenciales.",
+  "materiales": "Cuero vegetal 100%",
+  "tiempo_fabricacion": "3-5 días",
+  "fotos": [],
+  "stock": "disponible",
+  "destacado": true,
+  "activo": true
+}

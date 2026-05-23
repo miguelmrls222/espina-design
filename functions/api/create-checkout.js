@@ -31,6 +31,7 @@ export async function onRequest(context) {
     params.set('success_url', `${origin}/?exito=1`)
     params.set('cancel_url', `${origin}/tienda?cancelado=1`)
     params.set('shipping_address_collection[allowed_countries][0]', 'MX')
+    params.set('custom_text[submit][message]', '🔥 Incluye un llavero totalmente GRATIS 🔥')
 
     items.forEach((item, i) => {
       const prefix = `line_items[${i}]`

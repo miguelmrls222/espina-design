@@ -1,13 +1,15 @@
 {
+  "precio": 589,
+  "destacado": true,
   "nombre": "Tarjetero Cardón",
   "slug": "tarjetero-cardon",
-  "categoria": "billeteras",
-  "precio": 589,
   "descripcion": "Diseño minimalista, súper práctico para quienes andan ligeros. Especial para tarjetas esenciales y pocos billetes.",
+  "fotos": [
+    "/images/products/tarjetero-cardon.jpg"
+  ],
+  "activo": true,
+  "categoria": "billeteras",
   "materiales": "Cuero vegetal 100%",
-  "tiempo_fabricacion": "3-5 días",
-  "fotos": [],
   "stock": "disponible",
-  "destacado": true,
-  "activo": true
+  "tiempo_fabricacion": "3-5 días"
 }

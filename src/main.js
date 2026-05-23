@@ -451,3 +451,41 @@ if (params.get('cancelado') === '1') {
 }
 
 navigate(window.location.pathname)
+
+// ─── Promo Timer ───
+
+function updatePromoTimer() {
+  const bar = document.getElementById('promo-bar')
+  const timer = document.getElementById('promo-timer')
+  const fill = document.getElementById('promo-fill')
+  const text = document.getElementById('promo-text')
+  if (!bar) return
+
+  const now = new Date()
+  const h = now.getHours()
+  const m = now.getMinutes()
+  const s = now.getSeconds()
+  const start = 6
+  const end = 18
+  const total = 12 * 3600
+
+  if (h >= start && h < end) {
+    const elapsed = (h - start) * 3600 + m * 60 + s
+    const remaining = total - elapsed
+    const hrs = Math.floor(remaining / 3600)
+    const mins = Math.floor((remaining % 3600) / 60)
+    const secs = remaining % 60
+    timer.textContent = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+    fill.style.width = `${(remaining / total) * 100}%`
+    text.textContent = '🔥 20% OFF HOY'
+    bar.classList.remove('hidden')
+  } else {
+    timer.textContent = '00:00:00'
+    fill.style.width = '0%'
+    text.textContent = '🔥 20% OFF — Vuelve mañana a las 6:00 AM'
+    bar.classList.remove('hidden')
+  }
+}
+
+updatePromoTimer()
+setInterval(updatePromoTimer, 1000)

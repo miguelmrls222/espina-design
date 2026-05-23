@@ -44,6 +44,16 @@
   </head>
   <body class="bg-white text-black">
     <div id="app">
+
+      <div id="promo-bar" class="fixed top-0 left-0 w-full bg-[#DC2626] z-[60] hidden">
+        <div class="max-w-6xl mx-auto px-6 h-11 flex items-center justify-between">
+          <span id="promo-text" class="font-heading text-xs sm:text-sm tracking-wider text-white">🔥 20% OFF HOY</span>
+          <span id="promo-timer" class="font-body text-sm sm:text-base tracking-widest text-white font-bold">12:00:00</span>
+        </div>
+        <div id="promo-progress" class="h-[3px] bg-white/30 w-full">
+          <div id="promo-fill" class="h-full bg-white transition-all duration-1000" style="width:100%"></div>
+        </div>
+      </div>
       <header class="fixed top-0 left-0 w-full bg-white/95 backdrop-blur-sm z-50 border-b border-gray-100">
         <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <a href="/" class="block" data-nav>
@@ -73,7 +83,7 @@
 
       <main>
         <!-- INICIO -->
-        <section id="page-inicio" class="page-section flex flex-col items-center px-6 pt-32 pb-16">
+        <section id="page-inicio" class="page-section flex flex-col items-center px-6 pt-[172px] pb-16">
           <img src="/LOGO%20ED.png" alt="Espina Design" class="max-w-[280px] md:max-w-[400px] w-full mb-8" />
           <p class="font-body text-base md:text-lg text-gray-600 max-w-md mb-10 leading-relaxed text-center">
             Objetos cotidianos elaborados en cuero con un estilo minimalista.
@@ -111,7 +121,7 @@
         </section>
 
         <!-- TIENDA -->
-        <section id="page-tienda" class="page-section min-h-screen px-6 pt-24 hidden">
+        <section id="page-tienda" class="page-section min-h-screen px-6 pt-[140px] hidden">
           <div class="max-w-6xl mx-auto">
             <h1 class="font-heading text-3xl sm:text-4xl md:text-5xl tracking-wider uppercase mb-12 text-center">Tienda</h1>
             <div id="productos-grid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
@@ -120,7 +130,7 @@
         </section>
 
         <!-- SOBRE NOSOTROS -->
-        <section id="page-nosotros" class="page-section min-h-screen px-6 pt-24 hidden">
+        <section id="page-nosotros" class="page-section min-h-screen px-6 pt-[140px] hidden">
           <div class="max-w-3xl mx-auto">
             <h1 class="font-heading text-3xl sm:text-4xl md:text-5xl tracking-wider uppercase mb-16 text-center">Sobre Nosotros</h1>
 
@@ -150,7 +160,7 @@
         </section>
 
         <!-- FAQ -->
-        <section id="page-faq" class="page-section min-h-screen px-6 pt-24 hidden">
+        <section id="page-faq" class="page-section min-h-screen px-6 pt-[140px] hidden">
           <div class="max-w-3xl mx-auto">
             <h1 class="font-heading text-3xl sm:text-4xl md:text-5xl tracking-wider uppercase mb-16 text-center">Preguntas Frecuentes</h1>
             <div class="space-y-8">
@@ -183,7 +193,7 @@
         </section>
 
         <!-- CONTACTO -->
-        <section id="page-contacto" class="page-section min-h-screen px-6 pt-24 hidden">
+        <section id="page-contacto" class="page-section min-h-screen px-6 pt-[140px] hidden">
           <div class="max-w-3xl mx-auto">
             <h1 class="font-heading text-3xl sm:text-4xl md:text-5xl tracking-wider uppercase mb-16 text-center">Contacto</h1>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-xl mx-auto">

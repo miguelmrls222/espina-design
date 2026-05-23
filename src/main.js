@@ -130,6 +130,7 @@ function renderDestacados() {
           Agregar
         </button>` : ''}
       </div>
+      </div>
     `
   }).join('')
 

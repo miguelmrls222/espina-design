@@ -542,7 +542,31 @@ function updatePromoTimer() {
   const promoActual = isPromoActiva()
   if (promoActual !== promoActivaAnterior) {
     promoActivaAnterior = promoActual
-    updateCartUI()
+updateCartUI()
+
+// ─── Scroll header ───
+
+let ticking = false
+window.addEventListener('scroll', () => {
+  if (!ticking) {
+    requestAnimationFrame(() => {
+      const header = document.getElementById('site-header')
+      const inner = document.getElementById('header-inner')
+      const logo = document.getElementById('header-logo')
+      if (window.scrollY > 80) {
+        header?.classList.add('scrolled')
+        inner?.classList.add('scrolled')
+        logo?.classList.add('scrolled')
+      } else {
+        header?.classList.remove('scrolled')
+        inner?.classList.remove('scrolled')
+        logo?.classList.remove('scrolled')
+      }
+      ticking = false
+    })
+    ticking = true
+  }
+})
   }
 }
 

@@ -97,14 +97,14 @@ function renderDestacados() {
   if (!container || container.dataset.rendered) return
   container.dataset.rendered = '1'
 
-  const destacados = productos.filter(p => p.destacado)
+  const top = productos.slice(0, 4)
 
-  if (destacados.length === 0) {
+  if (top.length === 0) {
     container.closest('.max-w-6xl').classList.add('hidden')
     return
   }
 
-  container.innerHTML = destacados.map((p, i) => {
+  container.innerHTML = top.map((p, i) => {
     const prodIndex = productos.indexOf(p)
     const img = p.fotos?.[0] ? p.fotos[0] : ''
     const agotado = p.stock === 'agotado'

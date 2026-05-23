@@ -253,6 +253,28 @@ function updateCartUI() {
     </div>`
 
   cartFooter.querySelector('.cart-totals').innerHTML = html
+
+  // ─── Envío gratis ───
+  const envioMeta = 999
+  const envioProgreso = Math.min(subtotal / envioMeta, 1)
+  const envioBar = document.getElementById('envio-progress')
+  const envioIcon = document.getElementById('envio-icon')
+  const envioTexto = document.getElementById('envio-texto')
+
+  envioBar.style.width = `${envioProgreso * 100}%`
+
+  if (subtotal >= envioMeta) {
+    envioIcon.className = 'w-7 h-7 flex items-center justify-center rounded-full bg-green-500 border-2 border-green-500 flex-shrink-0 transition-all duration-500 scale-110'
+    envioIcon.innerHTML = '<svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>'
+    envioTexto.textContent = '🎉 ¡Envío gratis!'
+    envioTexto.className = 'font-heading text-xs tracking-widest uppercase text-green-600 mt-2'
+  } else {
+    const falta = envioMeta - subtotal
+    envioIcon.className = 'w-7 h-7 flex items-center justify-center rounded-full border-2 border-gray-300 flex-shrink-0 transition-all duration-500'
+    envioIcon.innerHTML = `<svg class="w-3.5 h-3.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`
+    envioTexto.textContent = `Falta $${falta.toLocaleString('es-MX')} MXN para envío gratis`
+    envioTexto.className = 'font-body text-xs text-gray-500 mt-2'
+  }
 }
 
 function openCart() {

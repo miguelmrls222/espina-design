@@ -297,6 +297,19 @@
         </div>
         <div id="cart-footer" class="border-t border-gray-100 px-6 py-6 hidden">
           <div class="cart-totals"></div>
+          <div class="envio-gratis mb-4 pb-4 border-b border-gray-100">
+            <div class="flex items-center gap-2">
+              <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div id="envio-progress" class="h-full bg-green-500 rounded-full transition-all duration-700 ease-out" style="width:0%"></div>
+              </div>
+              <div id="envio-icon" class="w-7 h-7 flex items-center justify-center rounded-full border-2 border-gray-300 flex-shrink-0 transition-all duration-500">
+                <svg class="w-3.5 h-3.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+                </svg>
+              </div>
+            </div>
+            <p id="envio-texto" class="font-body text-xs text-gray-500 mt-2"></p>
+          </div>
           <div class="flex items-center gap-2 mb-5 pb-4 border-b border-gray-100">
             <span class="text-sm">🔥</span>
             <p class="font-body text-xs sm:text-sm text-gray-500 leading-tight">Incluye un llavero totalmente <span class="font-heading text-sm sm:text-base tracking-wider uppercase text-black">GRATIS</span></p>

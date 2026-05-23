@@ -1,0 +1,13 @@
+{
+  "nombre": "Billetera Clásica",
+  "slug": "billetera-clasica",
+  "categoria": "billeteras",
+  "precio": 650,
+  "descripcion": "Billetera minimalista elaborada en cuero vegetal. Cuenta con 6 ranuras para tarjetas y dos compartimentos para billetes. Diseño atemporal que mejora con el uso.",
+  "materiales": "Cuero vegetal 100%",
+  "tiempo_fabricacion": "3-5 días",
+  "fotos": [],
+  "stock": "disponible",
+  "destacado": true,
+  "activo": true
+}

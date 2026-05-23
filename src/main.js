@@ -10,6 +10,8 @@ const pages = {
 
 const menu = document.getElementById('menu-mobile')
 
+// ─── Routing ───
+
 function navigate(path) {
   const page = pages[path.replace(/^\//, '')] || 'inicio'
   document.querySelectorAll('.page-section').forEach(s => s.classList.add('hidden'))
@@ -19,6 +21,7 @@ function navigate(path) {
     ? 'Espina Design — Cuero Hecho a Mano'
     : `Espina Design — ${page.charAt(0).toUpperCase() + page.slice(1)}`
   closeMenu()
+  if (page === 'tienda') renderProductos()
 }
 
 function closeMenu() {
@@ -45,3 +48,214 @@ document.addEventListener('click', e => {
 window.addEventListener('popstate', () => navigate(window.location.pathname))
 
 navigate(window.location.pathname)
+
+// ─── Productos ───
+
+const productosModules = import.meta.glob('/src/data/productos/*.json', { eager: true })
+const productos = Object.values(productosModules)
+  .map(m => m.default || m)
+  .filter(p => p.activo !== false)
+
+function renderProductos() {
+  const grid = document.getElementById('productos-grid')
+  if (!grid || grid.dataset.rendered) return
+  grid.dataset.rendered = '1'
+
+  if (productos.length === 0) {
+    grid.innerHTML = '<p class="col-span-full text-center text-gray-500 py-20">Próximamente productos disponibles.</p>'
+    return
+  }
+
+  grid.innerHTML = productos.map(p => {
+    const img = p.fotos?.[0] ? p.fotos[0] : ''
+    const agotado = p.stock === 'agotado'
+
+    return `
+      <div class="group flex flex-col ${agotado ? 'opacity-50' : ''}">
+        <div class="aspect-[4/5] bg-[#F5F5F5] mb-4 overflow-hidden relative">
+          ${img ? `<img src="${img}" alt="${p.nombre}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />` : ''}
+          ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
+        </div>
+        <h3 class="font-heading text-sm tracking-widest uppercase mb-1">${p.nombre}</h3>
+        <p class="font-body text-sm text-gray-500 mb-3">$${p.precio.toLocaleString('es-MX')} MXN</p>
+        ${!agotado ? `<button class="add-to-cart font-heading text-xs tracking-widest uppercase border border-black px-6 py-2 hover:bg-black hover:text-white transition-colors duration-300 self-start"
+          data-nombre="${p.nombre}"
+          data-precio="${p.precio}"
+          data-imagen="${img}"
+          data-descripcion="${p.descripcion || ''}">
+          Agregar
+        </button>` : ''}
+      </div>
+    `
+  }).join('')
+}
+
+// ─── Carrito ───
+
+let cart = JSON.parse(localStorage.getItem('espina-cart') || '[]')
+
+const cartPanel = document.getElementById('cart-panel')
+const cartOverlay = document.getElementById('cart-overlay')
+const cartItems = document.getElementById('cart-items')
+const cartFooter = document.getElementById('cart-footer')
+const cartTotal = document.getElementById('cart-total')
+const cartCount = document.getElementById('cart-count')
+const cartBtn = document.getElementById('cart-btn')
+const cartClose = document.getElementById('cart-close')
+const checkoutBtn = document.getElementById('checkout-btn')
+
+function saveCart() {
+  localStorage.setItem('espina-cart', JSON.stringify(cart))
+  updateCartUI()
+}
+
+function updateCartUI() {
+  const count = cart.reduce((s, i) => s + i.cantidad, 0)
+  cartCount.textContent = count
+  cartCount.classList.toggle('hidden', count === 0)
+
+  if (cart.length === 0) {
+    cartItems.innerHTML = '<p class="text-sm text-gray-500 text-center py-10">Tu carrito está vacío</p>'
+    cartFooter.classList.add('hidden')
+    return
+  }
+
+  cartFooter.classList.remove('hidden')
+  cartItems.innerHTML = cart.map((item, i) => `
+    <div class="flex gap-4 pb-4 border-b border-gray-100">
+      ${item.imagen ? `<img src="${item.imagen}" alt="${item.nombre}" class="w-20 h-20 object-cover bg-[#F5F5F5]" />` : ''}
+      <div class="flex-1 min-w-0">
+        <h4 class="font-heading text-xs tracking-widest uppercase truncate">${item.nombre}</h4>
+        <p class="text-sm text-gray-500 mt-1">$${(item.precio * item.cantidad).toLocaleString('es-MX')} MXN</p>
+        <div class="flex items-center gap-3 mt-2">
+          <button class="qty-minus text-xs border border-gray-300 w-6 h-6 rounded" data-index="${i}">−</button>
+          <span class="text-sm">${item.cantidad}</span>
+          <button class="qty-plus text-xs border border-gray-300 w-6 h-6 rounded" data-index="${i}">+</button>
+          <button class="ml-auto text-xs text-gray-400 hover:text-black transition-colors remove-item" data-index="${i}">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  `).join('')
+
+  const total = cart.reduce((s, i) => s + i.precio * i.cantidad, 0)
+  cartTotal.textContent = `$${total.toLocaleString('es-MX')} MXN`
+}
+
+function openCart() {
+  cartPanel.style.display = 'flex'
+  cartOverlay.style.display = 'block'
+  requestAnimationFrame(() => {
+    cartPanel.classList.remove('translate-x-full')
+  })
+}
+
+function closeCart() {
+  cartPanel.classList.add('translate-x-full')
+  cartOverlay.style.display = 'none'
+  setTimeout(() => { cartPanel.style.display = 'none' }, 300)
+}
+
+function addToCart(nombre, precio, imagen, descripcion) {
+  const exist = cart.find(i => i.nombre === nombre)
+  if (exist) {
+    exist.cantidad++
+  } else {
+    cart.push({ nombre, precio, imagen, descripcion, cantidad: 1 })
+  }
+  saveCart()
+  openCart()
+}
+
+document.addEventListener('click', e => {
+  if (e.target.closest('#cart-btn')) {
+    openCart()
+  }
+
+  if (e.target.closest('#cart-close') || e.target.closest('#cart-overlay')) {
+    closeCart()
+  }
+
+  if (e.target.closest('#checkout-btn')) {
+    checkoutBtn.disabled = true
+    checkoutBtn.textContent = 'Procesando…'
+    iniciarCheckout()
+  }
+
+  const addBtn = e.target.closest('.add-to-cart')
+  if (addBtn) {
+    addToCart(
+      addBtn.dataset.nombre,
+      parseFloat(addBtn.dataset.precio),
+      addBtn.dataset.imagen,
+      addBtn.dataset.descripcion
+    )
+  }
+
+  const minus = e.target.closest('.qty-minus')
+  if (minus) {
+    const i = parseInt(minus.dataset.index)
+    cart[i].cantidad--
+    if (cart[i].cantidad <= 0) cart.splice(i, 1)
+    saveCart()
+  }
+
+  const plus = e.target.closest('.qty-plus')
+  if (plus) {
+    const i = parseInt(plus.dataset.index)
+    cart[i].cantidad++
+    saveCart()
+  }
+
+  const remove = e.target.closest('.remove-item')
+  if (remove) {
+    const i = parseInt(remove.dataset.index)
+    cart.splice(i, 1)
+    saveCart()
+  }
+})
+
+async function iniciarCheckout() {
+  try {
+    const res = await fetch('/api/create-checkout', {
+      method: 'POST',
+      body: JSON.stringify({
+        items: cart.map(i => ({
+          nombre: i.nombre,
+          precio: i.precio,
+          descripcion: i.descripcion,
+          imagen: i.imagen?.startsWith('http') ? i.imagen : `https://espinadesign.com${i.imagen || ''}`,
+          cantidad: i.cantidad,
+        })),
+      }),
+    })
+
+    const data = await res.json()
+
+    if (data.url) {
+      window.location.href = data.url
+    } else {
+      throw new Error(data.error || 'Error al crear el pago')
+    }
+  } catch (err) {
+    alert('Error al procesar el pago: ' + err.message)
+    checkoutBtn.disabled = false
+    checkoutBtn.textContent = 'Pagar ahora'
+  }
+}
+
+updateCartUI()
+
+// ─── Éxito / Cancelado ───
+
+const params = new URLSearchParams(window.location.search)
+if (params.get('exito') === '1') {
+  cart = []
+  saveCart()
+  alert('¡Gracias por tu compra! Recibirás un correo con los detalles de tu pedido.')
+  window.history.replaceState({}, '', '/')
+}
+
+if (params.get('cancelado') === '1') {
+  alert('El pago fue cancelado. Puedes intentar de nuevo cuando quieras.')
+  window.history.replaceState({}, '', '/tienda')
+}

@@ -20,7 +20,14 @@
             <a href="/nosotros" data-nav class="hover:text-gray-600 transition-colors">Nosotros</a>
             <a href="/contacto" data-nav class="hover:text-gray-600 transition-colors">Contacto</a>
           </nav>
-          <button id="menu-btn" class="md:hidden flex flex-col gap-1.5 p-2 z-50" aria-label="Menú">
+          <div class="flex items-center gap-4">
+            <button id="cart-btn" class="relative p-2" aria-label="Carrito">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M3 1h3l1.5 7M7 8h14l-2 8H7L5 4H1m14 12a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm-8 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/>
+              </svg>
+              <span id="cart-count" class="absolute -top-1 -right-1 bg-black text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full hidden">0</span>
+            </button>
+            <button id="menu-btn" class="md:hidden flex flex-col gap-1.5 p-2 z-50" aria-label="Menú">
             <span class="block w-6 h-px bg-black transition-transform duration-300"></span>
             <span class="block w-6 h-px bg-black transition-opacity duration-300"></span>
             <span class="block w-6 h-px bg-black transition-transform duration-300"></span>
@@ -125,6 +132,31 @@
           <p class="text-xs">Cuero hecho a mano — Hermosillo, Sonora, México</p>
         </div>
       </footer>
+      <!-- CARRITO -->
+      <div id="cart-panel" class="fixed top-0 right-0 w-full max-w-md h-full bg-white z-[70] shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col" style="display:none">
+        <div class="flex items-center justify-between px-6 h-16 border-b border-gray-100">
+          <h2 class="font-heading text-sm tracking-widest uppercase">Carrito</h2>
+          <button id="cart-close" class="p-2" aria-label="Cerrar">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <div id="cart-items" class="flex-1 overflow-y-auto px-6 py-6 space-y-4">
+          <p class="text-sm text-gray-500 text-center py-10">Tu carrito está vacío</p>
+        </div>
+        <div id="cart-footer" class="border-t border-gray-100 px-6 py-6 hidden">
+          <div class="flex justify-between mb-4 text-sm">
+            <span class="font-heading tracking-wider uppercase">Total</span>
+            <span id="cart-total" class="font-heading">$0 MXN</span>
+          </div>
+          <button id="checkout-btn" class="w-full font-heading text-sm tracking-widest uppercase border-2 border-black px-10 py-3 hover:bg-black hover:text-white transition-colors duration-300">
+            Pagar ahora
+          </button>
+        </div>
+      </div>
+      <div id="cart-overlay" class="fixed inset-0 bg-black/20 z-[65]" style="display:none"></div>
+
       <!-- MENÚ MÓVIL -->
       <div id="menu-mobile" class="fixed top-0 left-0 w-screen h-dvh bg-white flex-col items-center justify-center gap-10 hidden z-[60] md:!hidden" style="display:none">
         <a href="/" data-nav class="block text-3xl tracking-[0.15em] uppercase hover:text-gray-500 transition-colors">Inicio</a>

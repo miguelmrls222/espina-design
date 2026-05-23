@@ -1,0 +1,13 @@
+{
+  "precio": 589,
+  "destacado": false,
+  "nombre": "Tarjetero Agave",
+  "slug": "tarjetero-agave",
+  "descripcion": "Tarjetero muy practico y sencillo para billetes doblados y 8-10 tarjetas cómodamente. Ideal para personas prácticas.",
+  "fotos": "/images/products/img_7196-2.jpg",
+  "activo": true,
+  "categoria": "billeteras",
+  "materiales": "Cuero ",
+  "stock": "disponible",
+  "tiempo_fabricacion": "3-10 días hábiles"
+}

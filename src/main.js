@@ -47,8 +47,6 @@ document.addEventListener('click', e => {
 
 window.addEventListener('popstate', () => navigate(window.location.pathname))
 
-navigate(window.location.pathname)
-
 // ─── Productos ───
 
 const productosModules = import.meta.glob('/src/data/productos/*.json', { eager: true })
@@ -259,3 +257,5 @@ if (params.get('cancelado') === '1') {
   alert('El pago fue cancelado. Puedes intentar de nuevo cuando quieras.')
   window.history.replaceState({}, '', '/tienda')
 }
+
+navigate(window.location.pathname)

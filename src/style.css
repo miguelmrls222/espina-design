@@ -29,3 +29,20 @@
     font-family: var(--font-heading);
   }
 }
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+#testimonios-track {
+  animation: scroll-left 40s linear infinite;
+}
+
+#testimonios-track:hover {
+  animation-play-state: paused;
+}

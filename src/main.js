@@ -21,7 +21,10 @@ function navigate(path) {
     ? 'Espina Design — Cuero Hecho a Mano'
     : `Espina Design — ${page.charAt(0).toUpperCase() + page.slice(1)}`
   closeMenu()
-  if (page === 'inicio') renderDestacados()
+  if (page === 'inicio') {
+    renderDestacados()
+    renderTestimonios()
+  }
   if (page === 'tienda') renderProductos()
 }
 
@@ -142,7 +145,35 @@ function renderDestacados() {
   document.getElementById('destacados-next').addEventListener('click', () => {
     container.scrollBy({ left: 280, behavior: 'smooth' })
   })
-}// ─── Carrito ───
+}
+
+// ─── Testimonios ───
+
+const testimonios = [
+  { texto: '"Excelente calidad, el cuero se siente premium. Mi billetera favorita."', autor: '— Carlos G.' },
+  { texto: '"Compré el tarjetero y me encantó. Minimalista y súper práctico."', autor: '— Ana M.' },
+  { texto: '"El diseño es exactamente lo que buscaba. Llegó antes de lo esperado."', autor: '— Luis R.' },
+  { texto: '"Hecho a mano con detalles que se notan. Sin duda volveré a comprar."', autor: '— Sofía P.' },
+  { texto: '"La mejor calidad que he encontrado en productos de cuero mexicanos."', autor: '— Diego H.' },
+  { texto: '"Me regalaron un tarjetero y ahora toda mi familia quiere uno."', autor: '— Mariana L.' },
+]
+
+function renderTestimonios() {
+  const track = document.getElementById('testimonios-track')
+  if (!track || track.dataset.rendered) return
+  track.dataset.rendered = '1'
+
+  const cards = testimonios.map(t => `
+    <div class="flex-shrink-0 w-[280px] sm:w-[320px] bg-[#F5F5F5] p-6 flex flex-col justify-between">
+      <p class="font-body text-sm text-gray-700 leading-relaxed mb-4">${t.texto}</p>
+      <p class="font-heading text-xs tracking-widest uppercase text-gray-500">${t.autor}</p>
+    </div>
+  `).join('')
+
+  track.innerHTML = cards + cards
+}
+
+// ─── Carrito ───
 
 let cart = JSON.parse(localStorage.getItem('espina-cart') || '[]')
 

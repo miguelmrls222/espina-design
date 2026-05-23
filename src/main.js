@@ -78,15 +78,17 @@ function renderProductos() {
           </div>
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
         </div>
-        <h3 class="font-heading text-sm tracking-widest uppercase mb-1 cursor-pointer open-detail" data-index="${i}">${p.nombre}</h3>
-        <p class="font-body text-sm text-gray-500 mb-3">$${p.precio.toLocaleString('es-MX')} MXN</p>
-        ${!agotado ? `<button class="add-to-cart font-heading text-xs tracking-widest uppercase border border-black px-6 py-2 hover:bg-black hover:text-white transition-colors duration-300 self-start"
-          data-nombre="${p.nombre}"
-          data-precio="${p.precio}"
-          data-imagen="${img}"
-          data-descripcion="${p.descripcion || ''}">
-          Agregar
-        </button>` : ''}
+        <div class="flex flex-col flex-1">
+          <h3 class="font-heading text-sm tracking-widest uppercase mb-1 cursor-pointer open-detail" data-index="${i}">${p.nombre}</h3>
+          <p class="font-body text-sm text-gray-500 mb-3">$${p.precio.toLocaleString('es-MX')} MXN</p>
+          ${!agotado ? `<button class="add-to-cart font-heading text-xs tracking-widest uppercase border border-black px-6 py-2 hover:bg-black hover:text-white transition-colors duration-300 mt-auto self-start"
+            data-nombre="${p.nombre}"
+            data-precio="${p.precio}"
+            data-imagen="${img}"
+            data-descripcion="${p.descripcion || ''}">
+            Agregar
+          </button>` : ''}
+        </div>
       </div>
     `
   }).join('')
@@ -109,7 +111,7 @@ function renderDestacados() {
     const img = p.fotos?.[0] ? p.fotos[0] : ''
     const agotado = p.stock === 'agotado'
     return `
-      <div class="flex-shrink-0 w-[220px] sm:w-[260px] group ${agotado ? 'opacity-50' : ''}">
+      <div class="flex-shrink-0 w-[220px] sm:w-[260px] group flex flex-col ${agotado ? 'opacity-50' : ''}">
         <div class="aspect-[4/5] bg-[#F5F5F5] mb-4 overflow-hidden relative cursor-pointer open-detail" data-index="${prodIndex}">
           ${img ? `<img src="${img}" alt="${p.nombre}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />` : '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>'}
           <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
@@ -117,10 +119,11 @@ function renderDestacados() {
           </div>
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
         </div>
-        <h3 class="font-heading text-sm tracking-widest uppercase mb-1 truncate cursor-pointer open-detail" data-index="${prodIndex}">${p.nombre}</h3>
-        <p class="font-body text-sm text-gray-500 mb-3">$${p.precio.toLocaleString('es-MX')} MXN</p>
-        ${!agotado ? `<button class="add-to-cart font-heading text-xs tracking-widest uppercase border border-black px-5 py-2 hover:bg-black hover:text-white transition-colors duration-300"
-          data-nombre="${p.nombre}"
+        <div class="flex flex-col flex-1">
+          <h3 class="font-heading text-sm tracking-widest uppercase mb-1 truncate cursor-pointer open-detail" data-index="${prodIndex}">${p.nombre}</h3>
+          <p class="font-body text-sm text-gray-500 mb-3">$${p.precio.toLocaleString('es-MX')} MXN</p>
+          ${!agotado ? `<button class="add-to-cart font-heading text-xs tracking-widest uppercase border border-black px-5 py-2 hover:bg-black hover:text-white transition-colors duration-300 mt-auto"
+            data-nombre="${p.nombre}"
           data-precio="${p.precio}"
           data-imagen="${img}"
           data-descripcion="${p.descripcion || ''}">

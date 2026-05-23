@@ -65,17 +65,20 @@ function renderProductos() {
     return
   }
 
-  grid.innerHTML = productos.map(p => {
+  grid.innerHTML = productos.map((p, i) => {
     const img = p.fotos?.[0] ? p.fotos[0] : ''
     const agotado = p.stock === 'agotado'
 
     return `
       <div class="group flex flex-col ${agotado ? 'opacity-50' : ''}">
-        <div class="aspect-[4/5] bg-[#F5F5F5] mb-4 overflow-hidden relative">
+        <div class="aspect-[4/5] bg-[#F5F5F5] mb-4 overflow-hidden relative cursor-pointer open-detail" data-index="${i}">
           ${img ? `<img src="${img}" alt="${p.nombre}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />` : ''}
+          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
+            <span class="text-white text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 px-4 py-2">Ver más</span>
+          </div>
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
         </div>
-        <h3 class="font-heading text-sm tracking-widest uppercase mb-1">${p.nombre}</h3>
+        <h3 class="font-heading text-sm tracking-widest uppercase mb-1 cursor-pointer open-detail" data-index="${i}">${p.nombre}</h3>
         <p class="font-body text-sm text-gray-500 mb-3">$${p.precio.toLocaleString('es-MX')} MXN</p>
         ${!agotado ? `<button class="add-to-cart font-heading text-xs tracking-widest uppercase border border-black px-6 py-2 hover:bg-black hover:text-white transition-colors duration-300 self-start"
           data-nombre="${p.nombre}"
@@ -101,16 +104,20 @@ function renderDestacados() {
     return
   }
 
-  container.innerHTML = destacados.map(p => {
+  container.innerHTML = destacados.map((p, i) => {
+    const prodIndex = productos.indexOf(p)
     const img = p.fotos?.[0] ? p.fotos[0] : ''
     const agotado = p.stock === 'agotado'
     return `
       <div class="flex-shrink-0 w-[220px] sm:w-[260px] group ${agotado ? 'opacity-50' : ''}">
-        <div class="aspect-[4/5] bg-[#F5F5F5] mb-4 overflow-hidden relative">
+        <div class="aspect-[4/5] bg-[#F5F5F5] mb-4 overflow-hidden relative cursor-pointer open-detail" data-index="${prodIndex}">
           ${img ? `<img src="${img}" alt="${p.nombre}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />` : '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>'}
+          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
+            <span class="text-white text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 px-4 py-2">Ver más</span>
+          </div>
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
         </div>
-        <h3 class="font-heading text-sm tracking-widest uppercase mb-1 truncate">${p.nombre}</h3>
+        <h3 class="font-heading text-sm tracking-widest uppercase mb-1 truncate cursor-pointer open-detail" data-index="${prodIndex}">${p.nombre}</h3>
         <p class="font-body text-sm text-gray-500 mb-3">$${p.precio.toLocaleString('es-MX')} MXN</p>
         ${!agotado ? `<button class="add-to-cart font-heading text-xs tracking-widest uppercase border border-black px-5 py-2 hover:bg-black hover:text-white transition-colors duration-300"
           data-nombre="${p.nombre}"
@@ -205,6 +212,59 @@ function addToCart(nombre, precio, imagen, descripcion) {
   openCart()
 }
 
+// ─── Detalle de producto ───
+
+const productModal = document.getElementById('product-modal')
+const productModalOverlay = document.getElementById('product-modal-overlay')
+const productModalClose = document.getElementById('product-modal-close')
+const productModalImage = document.getElementById('product-modal-image')
+const productModalName = document.getElementById('product-modal-name')
+const productModalPrice = document.getElementById('product-modal-price')
+const productModalDesc = document.getElementById('product-modal-desc')
+const productModalMeta = document.getElementById('product-modal-meta')
+const productModalAdd = document.getElementById('product-modal-add')
+
+function openDetail(producto) {
+  const img = producto.fotos?.[0] ? producto.fotos[0] : ''
+  const agotado = producto.stock === 'agotado'
+
+  productModalImage.innerHTML = img
+    ? `<img src="${img}" alt="${producto.nombre}" class="w-full h-full object-cover" />`
+    : '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>'
+
+  productModalName.textContent = producto.nombre
+  productModalPrice.textContent = `$${producto.precio.toLocaleString('es-MX')} MXN`
+  productModalDesc.textContent = producto.descripcion || ''
+
+  let metaHTML = ''
+  if (producto.materiales) metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Materiales:</span> ${producto.materiales}</p>`
+  if (producto.tiempo_fabricacion) metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Fabricación:</span> ${producto.tiempo_fabricacion}</p>`
+  if (producto.stock) {
+    const estados = { disponible: 'Disponible', agotado: 'Agotado', 'bajo-pedido': 'Bajo pedido' }
+    metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Stock:</span> ${estados[producto.stock] || producto.stock}</p>`
+  }
+  productModalMeta.innerHTML = metaHTML
+
+  productModalAdd.disabled = agotado
+  productModalAdd.textContent = agotado ? 'Agotado' : 'Agregar al carrito'
+  productModalAdd.className = `w-full font-heading text-sm tracking-widest uppercase border-2 px-10 py-3 transition-colors duration-300 ${agotado ? 'border-gray-300 text-gray-300 cursor-not-allowed' : 'border-black hover:bg-black hover:text-white cursor-pointer'}`
+
+  productModalAdd.onclick = () => {
+    if (!agotado) {
+      addToCart(producto.nombre, producto.precio, img, producto.descripcion || '')
+      closeDetail()
+    }
+  }
+
+  productModal.style.display = 'flex'
+  document.body.style.overflow = 'hidden'
+}
+
+function closeDetail() {
+  productModal.style.display = 'none'
+  document.body.style.overflow = ''
+}
+
 document.addEventListener('click', e => {
   if (e.target.closest('#cart-btn')) {
     openCart()
@@ -212,6 +272,17 @@ document.addEventListener('click', e => {
 
   if (e.target.closest('#cart-close') || e.target.closest('#cart-overlay')) {
     closeCart()
+  }
+
+  if (e.target.closest('#product-modal-close') || e.target.closest('#product-modal-overlay')) {
+    closeDetail()
+  }
+
+  const detailTrigger = e.target.closest('.open-detail')
+  if (detailTrigger) {
+    const idx = parseInt(detailTrigger.dataset.index)
+    const producto = productos[idx]
+    if (producto) openDetail(producto)
   }
 
   if (e.target.closest('#checkout-btn')) {

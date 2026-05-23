@@ -459,7 +459,6 @@ function updatePromoTimer() {
   const hoursEl = document.getElementById('promo-hours')
   const minsEl = document.getElementById('promo-minutes')
   const secsEl = document.getElementById('promo-seconds')
-  const fill = document.getElementById('promo-fill')
   const text = document.getElementById('promo-text')
   if (!bar) return
 
@@ -480,14 +479,12 @@ function updatePromoTimer() {
     hoursEl.textContent = String(hrs).padStart(2, '0')
     minsEl.textContent = String(mins).padStart(2, '0')
     secsEl.textContent = String(secs).padStart(2, '0')
-    fill.style.width = `${(remaining / total) * 100}%`
     text.textContent = '🔥 20% OFF HOY'
     bar.classList.remove('hidden')
   } else {
     hoursEl.textContent = '00'
     minsEl.textContent = '00'
     secsEl.textContent = '00'
-    fill.style.width = '0%'
     text.textContent = '🔥 20% OFF — Vuelve mañana a las 6:00 AM'
     bar.classList.remove('hidden')
   }

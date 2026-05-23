@@ -7,6 +7,7 @@
   "fotos": [
     "/images/products/billetera-sahuaro.jpg"
   ],
+  "colores": ["verde", "gris", "vino", "cafe oscuro"],
   "activo": true,
   "categoria": "billeteras",
   "materiales": "Cuero vegetal 100%",

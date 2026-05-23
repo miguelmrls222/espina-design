@@ -7,6 +7,7 @@
   "fotos": [
     "/images/products/img_7196-2.jpg"
   ],
+  "colores": ["verde", "gris", "vino", "cafe oscuro"],
   "activo": true,
   "categoria": "billeteras",
   "materiales": "Cuero",

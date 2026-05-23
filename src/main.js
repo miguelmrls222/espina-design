@@ -85,7 +85,8 @@ function renderProductos() {
             data-nombre="${p.nombre}"
             data-precio="${p.precio}"
             data-imagen="${img}"
-            data-descripcion="${p.descripcion || ''}">
+            data-descripcion="${p.descripcion || ''}"
+            data-color="${p.colores?.[0] || ''}">
             Agregar
           </button>` : ''}
         </div>
@@ -124,9 +125,10 @@ function renderDestacados() {
           <p class="font-body text-sm text-gray-500 mb-3">$${p.precio.toLocaleString('es-MX')} MXN</p>
           ${!agotado ? `<button class="add-to-cart font-heading text-xs tracking-widest uppercase border border-black px-5 py-2 hover:bg-black hover:text-white transition-colors duration-300 mt-auto"
             data-nombre="${p.nombre}"
-          data-precio="${p.precio}"
-          data-imagen="${img}"
-          data-descripcion="${p.descripcion || ''}">
+            data-precio="${p.precio}"
+            data-imagen="${img}"
+            data-descripcion="${p.descripcion || ''}"
+            data-color="${p.colores?.[0] || ''}">
           Agregar
         </button>` : ''}
       </div>
@@ -176,6 +178,7 @@ function updateCartUI() {
       ${item.imagen ? `<img src="${item.imagen}" alt="${item.nombre}" class="w-20 h-20 object-cover bg-[#F5F5F5]" />` : ''}
       <div class="flex-1 min-w-0">
         <h4 class="font-heading text-xs tracking-widest uppercase truncate">${item.nombre}</h4>
+        ${item.color ? `<p class="font-body text-xs text-gray-400 mt-0.5">Color: ${item.color}</p>` : ''}
         <p class="text-sm text-gray-500 mt-1">$${(item.precio * item.cantidad).toLocaleString('es-MX')} MXN</p>
         <div class="flex items-center gap-3 mt-2">
           <button class="qty-minus text-xs border border-gray-300 w-6 h-6 rounded" data-index="${i}">−</button>
@@ -205,12 +208,13 @@ function closeCart() {
   setTimeout(() => { cartPanel.style.display = 'none' }, 300)
 }
 
-function addToCart(nombre, precio, imagen, descripcion) {
-  const exist = cart.find(i => i.nombre === nombre)
+function addToCart(nombre, precio, imagen, descripcion, color) {
+  color = color || ''
+  const exist = cart.find(i => i.nombre === nombre && i.color === color)
   if (exist) {
     exist.cantidad++
   } else {
-    cart.push({ nombre, precio, imagen, descripcion, cantidad: 1 })
+    cart.push({ nombre, precio, imagen, descripcion, color, cantidad: 1 })
   }
   saveCart()
   openCart()
@@ -227,10 +231,18 @@ const productModalPrice = document.getElementById('product-modal-price')
 const productModalDesc = document.getElementById('product-modal-desc')
 const productModalMeta = document.getElementById('product-modal-meta')
 const productModalAdd = document.getElementById('product-modal-add')
+let colorSeleccionado = ''
 
 function openDetail(producto) {
   const img = producto.fotos?.[0] ? producto.fotos[0] : ''
   const agotado = producto.stock === 'agotado'
+
+  const colorMap = {
+    'verde': '#4a7c59',
+    'gris': '#8c8c8c',
+    'vino': '#722f37',
+    'cafe oscuro': '#4a3728',
+  }
 
   productModalImage.innerHTML = img
     ? `<img src="${img}" alt="${producto.nombre}" class="w-full h-full object-cover" />`
@@ -239,6 +251,27 @@ function openDetail(producto) {
   productModalName.textContent = producto.nombre
   productModalPrice.textContent = `$${producto.precio.toLocaleString('es-MX')} MXN`
   productModalDesc.textContent = producto.descripcion || ''
+
+  const coloresEl = document.getElementById('product-modal-colores')
+  const swatchesEl = document.getElementById('color-swatches')
+
+  if (producto.colores && producto.colores.length > 0) {
+    coloresEl.classList.remove('hidden')
+    colorSeleccionado = producto.colores[0]
+    swatchesEl.innerHTML = producto.colores.map(c => {
+      const hex = colorMap[c] || '#ccc'
+      return `
+        <button class="color-btn w-8 h-8 rounded-full border-2 transition-all duration-200 ${c === colorSeleccionado ? 'border-black scale-110' : 'border-gray-200 hover:border-gray-400'}"
+          style="background-color:${hex}"
+          data-color="${c}"
+          title="${c}">
+          <span class="sr-only">${c}</span>
+        </button>
+      `
+    }).join('')
+  } else {
+    coloresEl.classList.add('hidden')
+  }
 
   let metaHTML = ''
   if (producto.materiales) metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Materiales:</span> ${producto.materiales}</p>`
@@ -255,7 +288,7 @@ function openDetail(producto) {
 
   productModalAdd.onclick = () => {
     if (!agotado) {
-      addToCart(producto.nombre, producto.precio, img, producto.descripcion || '')
+      addToCart(producto.nombre, producto.precio, img, producto.descripcion || '', colorSeleccionado)
       closeDetail()
     }
   }
@@ -289,6 +322,17 @@ document.addEventListener('click', e => {
     if (producto) openDetail(producto)
   }
 
+  const colorBtn = e.target.closest('.color-btn')
+  if (colorBtn) {
+    document.querySelectorAll('.color-btn').forEach(b => {
+      b.classList.remove('border-black', 'scale-110')
+      b.classList.add('border-gray-200', 'hover:border-gray-400')
+    })
+    colorBtn.classList.remove('border-gray-200', 'hover:border-gray-400')
+    colorBtn.classList.add('border-black', 'scale-110')
+    colorSeleccionado = colorBtn.dataset.color
+  }
+
   if (e.target.closest('#checkout-btn')) {
     checkoutBtn.disabled = true
     checkoutBtn.textContent = 'Procesando…'
@@ -301,7 +345,8 @@ document.addEventListener('click', e => {
       addBtn.dataset.nombre,
       parseFloat(addBtn.dataset.precio),
       addBtn.dataset.imagen,
-      addBtn.dataset.descripcion
+      addBtn.dataset.descripcion,
+      addBtn.dataset.color || ''
     )
   }
 
@@ -334,7 +379,7 @@ async function iniciarCheckout() {
       method: 'POST',
       body: JSON.stringify({
         items: cart.map(i => ({
-          nombre: i.nombre,
+          nombre: i.color ? `${i.nombre} (${i.color})` : i.nombre,
           precio: i.precio,
           descripcion: i.descripcion,
           imagen: i.imagen?.startsWith('http') ? i.imagen : `https://espinadesign.com${i.imagen || ''}`,

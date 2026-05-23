@@ -35,6 +35,15 @@ collections:
       - { label: "Materiales", name: "materiales", widget: "string" }
       - { label: "Tiempo de fabricación", name: "tiempo_fabricacion", widget: "string", required: false }
       - { label: "Fotos", name: "fotos", widget: "image", multiple: true }
+      - label: "Colores disponibles"
+        name: "colores"
+        widget: "select"
+        multiple: true
+        options:
+          - { label: "Verde", value: "verde" }
+          - { label: "Gris", value: "gris" }
+          - { label: "Vino", value: "vino" }
+          - { label: "Café oscuro", value: "cafe oscuro" }
       - label: "Stock"
         name: "stock"
         widget: "select"

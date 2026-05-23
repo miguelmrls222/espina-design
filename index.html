@@ -46,15 +46,18 @@
     <div id="app">
 
       <div id="promo-bar" class="fixed top-0 left-0 w-full bg-[#DC2626] z-[60] hidden">
-        <div class="max-w-6xl mx-auto px-6 h-11 flex items-center justify-between">
-          <span id="promo-text" class="font-heading text-xs sm:text-sm tracking-wider text-white">🔥 20% OFF HOY</span>
-          <span id="promo-timer" class="font-body text-sm sm:text-base tracking-widest text-white font-bold">12:00:00</span>
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-12 sm:h-14 flex items-center justify-between gap-2 sm:gap-4">
+          <span id="promo-text" class="font-heading text-sm sm:text-base md:text-lg tracking-wider text-white font-semibold whitespace-nowrap">🔥 20% OFF HOY</span>
+          <div class="flex items-center gap-1.5 sm:gap-2.5 bg-white rounded-lg px-2.5 sm:px-4 py-1 sm:py-1.5 shadow-sm">
+            <span class="font-body text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider whitespace-nowrap">Termina en</span>
+            <span id="promo-timer" class="font-body text-lg sm:text-2xl md:text-3xl tracking-widest text-black font-bold tabular-nums">12:00:00</span>
+          </div>
         </div>
-        <div id="promo-progress" class="h-[3px] bg-white/30 w-full">
+        <div class="h-[3px] sm:h-[4px] bg-white/30 w-full">
           <div id="promo-fill" class="h-full bg-white transition-all duration-1000" style="width:100%"></div>
         </div>
       </div>
-      <header class="fixed top-0 left-0 w-full bg-white/95 backdrop-blur-sm z-50 border-b border-gray-100">
+      <header class="fixed top-11 sm:top-14 left-0 w-full bg-white/95 backdrop-blur-sm z-50 border-b border-gray-100">
         <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <a href="/" class="block" data-nav>
             <img src="/LOGO%20ED.png" alt="Espina Design" class="h-8 md:h-10 w-auto" />

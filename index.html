@@ -73,14 +73,30 @@
 
       <main>
         <!-- INICIO -->
-        <section id="page-inicio" class="page-section min-h-screen flex flex-col items-center justify-center px-6 text-center">
+        <section id="page-inicio" class="page-section flex flex-col items-center px-6 pt-32 pb-16">
           <img src="/LOGO%20ED.png" alt="Espina Design" class="max-w-[280px] md:max-w-[400px] w-full mb-8" />
-          <p class="font-body text-base md:text-lg text-gray-600 max-w-md mb-10 leading-relaxed">
+          <p class="font-body text-base md:text-lg text-gray-600 max-w-md mb-10 leading-relaxed text-center">
             Objetos cotidianos elaborados en cuero con un estilo minimalista.
           </p>
           <a href="/tienda" data-nav class="font-heading text-sm tracking-widest uppercase border-2 border-black px-10 py-3 hover:bg-black hover:text-white transition-colors duration-300">
             Ver Colección
           </a>
+
+          <div class="w-full max-w-6xl mt-20">
+            <div class="flex items-center justify-between mb-8">
+              <h2 class="font-heading text-sm tracking-[0.2em] uppercase">Productos</h2>
+              <div class="flex gap-2">
+                <button id="destacados-prev" class="w-10 h-10 border border-black flex items-center justify-center hover:bg-black hover:text-white transition-colors duration-300" aria-label="Anterior">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <button id="destacados-next" class="w-10 h-10 border border-black flex items-center justify-center hover:bg-black hover:text-white transition-colors duration-300" aria-label="Siguiente">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+              </div>
+            </div>
+            <div id="destacados-scroll" class="flex gap-6 overflow-x-auto pb-4 scroll-smooth" style="-webkit-overflow-scrolling:touch; scrollbar-width:none; -ms-overflow-style:none">
+            </div>
+          </div>
         </section>
 
         <!-- TIENDA -->

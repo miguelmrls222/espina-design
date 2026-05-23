@@ -31,13 +31,14 @@ export async function onRequest(context) {
     params.set('success_url', `${origin}/?exito=1`)
     params.set('cancel_url', `${origin}/tienda?cancelado=1`)
     params.set('shipping_address_collection[allowed_countries][0]', 'MX')
-    params.set('custom_text[submit][message]', '🔥 Incluye un llavero totalmente GRATIS 🔥')
+    params.set('custom_text[submit][message]', '🎁 Incluye un llavero totalmente GRATIS 🎁')
 
     items.forEach((item, i) => {
       const prefix = `line_items[${i}]`
       params.set(`${prefix}[price_data][currency]`, 'mxn')
       params.set(`${prefix}[price_data][product_data][name]`, item.nombre)
-      if (item.descripcion) params.set(`${prefix}[price_data][product_data][description]`, item.descripcion)
+      const descConPromo = item.descripcion ? `${item.descripcion} — 🎁 Incluye llavero GRATIS` : '🎁 Incluye un llavero totalmente GRATIS'
+      params.set(`${prefix}[price_data][product_data][description]`, descConPromo)
       if (item.imagen) params.set(`${prefix}[price_data][product_data][images][0]`, item.imagen)
       params.set(`${prefix}[price_data][unit_amount]`, String(Math.round(item.precio * 100)))
       params.set(`${prefix}[quantity]`, String(item.cantidad || 1))

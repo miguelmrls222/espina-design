@@ -73,17 +73,16 @@
         </div>
       </div>
       <header class="fixed top-10 sm:top-12 left-0 w-full bg-white/95 backdrop-blur-sm z-50 border-b border-gray-100">
-        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-center relative">
           <a href="/" class="block" data-nav>
             <img src="/LOGO%20ED.png" alt="Espina Design" class="h-8 md:h-10 w-auto" />
           </a>
-          <nav class="hidden md:flex items-center gap-10 text-base tracking-wide">
-            <a href="/" data-nav class="hover:text-gray-600 transition-colors">Inicio</a>
-            <a href="/tienda" data-nav class="hover:text-gray-600 transition-colors">Tienda</a>
-            <a href="/nosotros" data-nav class="hover:text-gray-600 transition-colors">Nosotros</a>
-            <a href="/contacto" data-nav class="hover:text-gray-600 transition-colors">Contacto</a>
-          </nav>
-          <div class="flex items-center gap-4">
+          <div class="absolute right-4 sm:right-6 flex items-center gap-2 sm:gap-4">
+            <button id="menu-btn" class="flex flex-col gap-1.5 p-2 z-50" aria-label="Menú">
+              <span class="block w-6 h-px bg-black transition-transform duration-300"></span>
+              <span class="block w-6 h-px bg-black transition-opacity duration-300"></span>
+              <span class="block w-6 h-px bg-black transition-transform duration-300"></span>
+            </button>
             <button id="cart-btn" class="relative p-2.5" aria-label="Carrito">
               <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M21 8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/>
@@ -91,11 +90,7 @@
               </svg>
               <span id="cart-count" class="absolute -top-1 -right-1 bg-black text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full hidden">0</span>
             </button>
-            <button id="menu-btn" class="md:hidden flex flex-col gap-1.5 p-2 z-50" aria-label="Menú">
-            <span class="block w-6 h-px bg-black transition-transform duration-300"></span>
-            <span class="block w-6 h-px bg-black transition-opacity duration-300"></span>
-            <span class="block w-6 h-px bg-black transition-transform duration-300"></span>
-          </button>
+          </div>
         </div>
       </header>
 
@@ -379,7 +374,7 @@
       </div>
 
       <!-- MENÚ MÓVIL -->
-      <div id="menu-mobile" class="fixed top-0 left-0 w-screen h-dvh bg-white flex-col items-center justify-center gap-10 hidden z-[60] md:!hidden" style="display:none">
+      <div id="menu-mobile" class="fixed top-0 left-0 w-screen h-dvh bg-white flex-col items-center justify-center gap-10 hidden z-[70]" style="display:none">
         <a href="/" data-nav class="block text-3xl tracking-[0.15em] uppercase hover:text-gray-500 transition-colors">Inicio</a>
         <a href="/tienda" data-nav class="block text-3xl tracking-[0.15em] uppercase hover:text-gray-500 transition-colors">Tienda</a>
         <a href="/nosotros" data-nav class="block text-3xl tracking-[0.15em] uppercase hover:text-gray-500 transition-colors">Nosotros</a>

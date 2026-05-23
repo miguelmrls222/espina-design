@@ -192,6 +192,12 @@ function saveCart() {
   updateCartUI()
 }
 
+function isPromoActiva() {
+  const now = new Date()
+  const h = now.getHours()
+  return h >= 6 && h < 18
+}
+
 function updateCartUI() {
   const count = cart.reduce((s, i) => s + i.cantidad, 0)
   cartCount.textContent = count
@@ -221,8 +227,32 @@ function updateCartUI() {
     </div>
   `).join('')
 
-  const total = cart.reduce((s, i) => s + i.precio * i.cantidad, 0)
-  cartTotal.textContent = `$${total.toLocaleString('es-MX')} MXN`
+  const subtotal = cart.reduce((s, i) => s + i.precio * i.cantidad, 0)
+  const promo = isPromoActiva()
+  const descuento = promo ? Math.round(subtotal * 0.2) : 0
+  const total = subtotal - descuento
+
+  let html = `
+    <div class="flex justify-between mb-1 text-sm">
+      <span class="font-heading tracking-wider uppercase">Subtotal</span>
+      <span class="font-body">$${subtotal.toLocaleString('es-MX')} MXN</span>
+    </div>`
+
+  if (promo && descuento > 0) {
+    html += `
+    <div class="flex justify-between mb-1 text-sm text-[#DC2626]">
+      <span class="font-heading tracking-wider uppercase">🔥 20% OFF</span>
+      <span class="font-body">−$${descuento.toLocaleString('es-MX')} MXN</span>
+    </div>`
+  }
+
+  html += `
+    <div class="flex justify-between mb-5 pb-4 border-b border-gray-100 text-sm">
+      <span class="font-heading tracking-wider uppercase">Total</span>
+      <span class="font-heading">$${total.toLocaleString('es-MX')} MXN</span>
+    </div>`
+
+  cartFooter.querySelector('.cart-totals').innerHTML = html
 }
 
 function openCart() {
@@ -406,12 +436,13 @@ document.addEventListener('click', e => {
 
 async function iniciarCheckout() {
   try {
+    const promo = isPromoActiva()
     const res = await fetch('/api/create-checkout', {
       method: 'POST',
       body: JSON.stringify({
         items: cart.map(i => ({
           nombre: i.color ? `${i.nombre} (${i.color})` : i.nombre,
-          precio: i.precio,
+          precio: promo ? Math.round(i.precio * 0.8) : i.precio,
           descripcion: i.descripcion,
           imagen: i.imagen?.startsWith('http') ? i.imagen : `https://espinadesign.com${i.imagen || ''}`,
           cantidad: i.cantidad,
@@ -454,6 +485,8 @@ navigate(window.location.pathname)
 
 // ─── Promo Timer ───
 
+let promoActivaAnterior = null
+
 function updatePromoTimer() {
   const bar = document.getElementById('promo-bar')
   const hoursEl = document.getElementById('promo-hours')
@@ -466,19 +499,14 @@ function updatePromoTimer() {
   const h = now.getHours()
   const m = now.getMinutes()
   const s = now.getSeconds()
-  const start = 6
-  const end = 18
   const total = 12 * 3600
 
-  if (h >= start && h < end) {
-    const elapsed = (h - start) * 3600 + m * 60 + s
+  if (isPromoActiva()) {
+    const elapsed = (h - 6) * 3600 + m * 60 + s
     const remaining = total - elapsed
-    const hrs = Math.floor(remaining / 3600)
-    const mins = Math.floor((remaining % 3600) / 60)
-    const secs = remaining % 60
-    hoursEl.textContent = String(hrs).padStart(2, '0')
-    minsEl.textContent = String(mins).padStart(2, '0')
-    secsEl.textContent = String(secs).padStart(2, '0')
+    hoursEl.textContent = String(Math.floor(remaining / 3600)).padStart(2, '0')
+    minsEl.textContent = String(Math.floor((remaining % 3600) / 60)).padStart(2, '0')
+    secsEl.textContent = String(remaining % 60).padStart(2, '0')
     text.textContent = '🔥 20% OFF HOY'
     bar.classList.remove('hidden')
   } else {
@@ -487,6 +515,12 @@ function updatePromoTimer() {
     secsEl.textContent = '00'
     text.textContent = '🔥 20% OFF — Vuelve mañana a las 6:00 AM'
     bar.classList.remove('hidden')
+  }
+
+  const promoActual = isPromoActiva()
+  if (promoActual !== promoActivaAnterior) {
+    promoActivaAnterior = promoActual
+    updateCartUI()
   }
 }
 

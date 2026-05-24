@@ -200,6 +200,19 @@ const cartCount = document.getElementById('cart-count')
 const cartBtn = document.getElementById('cart-btn')
 const cartClose = document.getElementById('cart-close')
 const checkoutBtn = document.getElementById('checkout-btn')
+const cartEmail = document.getElementById('cart-email')
+
+function loadEmail() {
+  const saved = localStorage.getItem('espina-email')
+  if (saved && cartEmail) cartEmail.value = saved
+}
+
+function saveEmail() {
+  if (cartEmail) localStorage.setItem('espina-email', cartEmail.value.trim())
+}
+
+cartEmail?.addEventListener('input', saveEmail)
+loadEmail()
 
 function saveCart() {
   localStorage.setItem('espina-cart', JSON.stringify(cart))
@@ -644,14 +657,18 @@ function renderGracias() {
   const raw = sessionStorage.getItem('ultimo_pedido')
   const container = document.getElementById('gracias-items')
   const ref = document.getElementById('order-ref')
+  const emailEl = document.getElementById('order-email')
   if (!container) return
   if (!raw) {
     container.innerHTML = ''
     if (ref) ref.textContent = ''
+    if (emailEl) emailEl.textContent = ''
     return
   }
   const pedido = JSON.parse(raw)
-  if (ref) ref.textContent = `Pedido: ${pedido.session_id || '—'}  •  ${pedido.fecha || ''}`
+  const email = pedido.email || ''
+  if (ref) ref.textContent = `${pedido.session_id ? `Pedido: ${pedido.session_id}` : ''}${pedido.fecha ? `  •  ${pedido.fecha}` : ''}`
+  if (emailEl) emailEl.textContent = email ? `📧 ${email}` : ''
   container.innerHTML = pedido.items.map(i => `
     <div class="flex items-center gap-4 text-sm">
       <div class="w-14 h-14 bg-[#F5F5F5] flex-shrink-0 flex items-center justify-center overflow-hidden">
@@ -668,10 +685,21 @@ function renderGracias() {
 
 async function iniciarCheckout() {
   try {
+    const email = cartEmail ? cartEmail.value.trim() : ''
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
+      cartEmail?.focus()
+      cartEmail?.classList.add('border-red-400')
+      setTimeout(() => cartEmail?.classList.remove('border-red-400'), 2000)
+      checkoutBtn.disabled = false
+      checkoutBtn.textContent = 'Pagar ahora'
+      return
+    }
+    saveEmail()
     const promo = isPromoActiva()
     const res = await fetch('/api/create-checkout', {
       method: 'POST',
       body: JSON.stringify({
+        email,
         items: cart.map(i => ({
           nombre: i.color ? `${i.nombre} (${i.color})` : i.nombre,
           precio: promo ? Math.round(i.precio * 0.8) : i.precio,
@@ -708,6 +736,7 @@ if (params.get('exito') === '1') {
     items: [...cart],
     session_id: sesionId,
     fecha: new Date().toLocaleDateString('es-MX'),
+    email: localStorage.getItem('espina-email') || '',
   }))
   cart = []
   saveCart()

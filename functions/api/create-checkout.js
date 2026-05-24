@@ -16,7 +16,7 @@ export async function onRequest(context) {
   }
 
   try {
-    const { items } = await request.json()
+    const { email, items } = await request.json()
 
     if (!items || items.length === 0) {
       return new Response(JSON.stringify({ error: 'Carrito vacío' }), {
@@ -32,6 +32,11 @@ export async function onRequest(context) {
     params.set('cancel_url', `${origin}/tienda?cancelado=1`)
     params.set('shipping_address_collection[allowed_countries][0]', 'MX')
     params.set('custom_text[submit][message]', '🔥 Incluye un llavero totalmente 𝐆𝐑𝐀𝐓𝐈𝐒 🔥')
+    if (email) {
+      params.set('customer_email', email)
+      params.set('metadata[email]', email)
+    }
+    params.set('metadata[items]', items.map(i => `${i.nombre}×${i.cantidad}`).join(', '))
 
     items.forEach((item, i) => {
       const prefix = `line_items[${i}]`

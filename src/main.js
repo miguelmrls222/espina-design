@@ -299,7 +299,7 @@ function lanzarConfetti() {
   const colores = ['#D4A574', '#22c55e', '#3b82f6', '#eab308', '#ec4899', '#a855f7', '#f97316']
   const contenedor = document.getElementById('cart-panel')
   if (!contenedor) return
-  for (let i = 0; i < 60; i++) {
+  for (let i = 0; i < 80; i++) {
     const pieza = document.createElement('div')
     const color = colores[Math.floor(Math.random() * colores.length)]
     const size = Math.random() * 8 + 4
@@ -309,11 +309,11 @@ function lanzarConfetti() {
       width: ${size}px; height: ${isCircle ? size : size * 0.5}px;
       background: ${color};
       border-radius: ${isCircle ? '50%' : '2px'};
-      top: ${Math.random() * 40 + 20}%;
-      left: ${Math.random() * 80 + 10}%;
+      top: ${Math.random() * 40 + 15}%;
+      left: ${Math.random() * 90 + 5}%;
       opacity: 1;
-      animation: confetti-fall ${Math.random() * 1.5 + 0.8}s ease-out forwards;
-      animation-delay: ${Math.random() * 0.4}s;
+      animation: confetti-fall ${Math.random() * 1.2 + 1.2}s ease-out forwards;
+      animation-delay: ${Math.random() * 0.6}s;
       transform: rotate(${Math.random() * 360}deg);
     `
     document.body.appendChild(pieza)
@@ -324,30 +324,40 @@ function lanzarConfetti() {
 function sonidoConfetti() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)()
-    const notas = [523.25, 659.25, 783.99, 1046.5]
+    const notas = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5, 1318.5]
     notas.forEach((freq, i) => {
       const osc = ctx.createOscillator()
       const gain = ctx.createGain()
-      osc.type = 'sine'
+      osc.type = 'triangle'
       osc.frequency.value = freq
-      gain.gain.setValueAtTime(0.08, ctx.currentTime + i * 0.06)
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.06 + 0.4)
+      gain.gain.setValueAtTime(0.12, ctx.currentTime + i * 0.08)
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.08 + 0.5)
       osc.connect(gain)
       gain.connect(ctx.destination)
-      osc.start(ctx.currentTime + i * 0.06)
-      osc.stop(ctx.currentTime + i * 0.06 + 0.4)
+      osc.start(ctx.currentTime + i * 0.08)
+      osc.stop(ctx.currentTime + i * 0.08 + 0.5)
     })
     const ruido = ctx.createBufferSource()
-    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.15, ctx.sampleRate)
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.25, ctx.sampleRate)
     const data = buf.getChannelData(0)
-    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.03))
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.04))
     ruido.buffer = buf
     const gRuido = ctx.createGain()
-    gRuido.gain.setValueAtTime(0.06, ctx.currentTime)
-    gRuido.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15)
+    gRuido.gain.setValueAtTime(0.1, ctx.currentTime)
+    gRuido.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25)
     ruido.connect(gRuido)
     gRuido.connect(ctx.destination)
     ruido.start(ctx.currentTime)
+    const o2 = ctx.createOscillator()
+    const g2 = ctx.createGain()
+    o2.type = 'sine'
+    o2.frequency.value = 1567.98
+    g2.gain.setValueAtTime(0.06, ctx.currentTime + 0.5)
+    g2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8)
+    o2.connect(g2)
+    g2.connect(ctx.destination)
+    o2.start(ctx.currentTime + 0.5)
+    o2.stop(ctx.currentTime + 0.8)
   } catch {}
 }
 

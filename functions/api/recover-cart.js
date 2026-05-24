@@ -8,7 +8,6 @@ export async function onRequest(context) {
     return Response.redirect('https://espinadesign.com/tienda', 302)
   }
 
-  // Modo JSON: devuelve el carrito desde Stripe (para que main.js lo procese)
   if (formatJson) {
     if (!env.STRIPE_SECRET_KEY) {
       return new Response('null', {
@@ -50,6 +49,36 @@ export async function onRequest(context) {
     }
   }
 
-  // Modo normal: redirigir a la página de recuperación del SPA
-  return Response.redirect(`https://espinadesign.com/recuperar?session_id=${sessionId}`, 302)
+  // Obtener el carrito de Stripe y redirigir con el carrito codificado en la URL
+  try {
+    const stripeRes = await fetch(`https://api.stripe.com/v1/checkout/sessions/${sessionId}`, {
+      headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` },
+    })
+
+    if (!stripeRes.ok) {
+      return Response.redirect('https://espinadesign.com/tienda', 302)
+    }
+
+    const session = await stripeRes.json()
+    const cartRaw = session.metadata?.cart
+
+    if (!cartRaw) {
+      return Response.redirect('https://espinadesign.com/tienda', 302)
+    }
+
+    const items = JSON.parse(cartRaw)
+    const cartData = items.map(i => ({
+      nombre: i.n,
+      precio: i.p,
+      cantidad: i.c || 1,
+      imagen: '',
+      descripcion: '',
+      color: i.col || '',
+    }))
+
+    const encoded = encodeURIComponent(JSON.stringify(cartData))
+    return Response.redirect(`https://espinadesign.com/tienda?carrito=${encoded}`, 302)
+  } catch {
+    return Response.redirect('https://espinadesign.com/tienda', 302)
+  }
 }

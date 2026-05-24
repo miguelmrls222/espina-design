@@ -23,7 +23,7 @@ async function processAbandoned(env) {
   const brevoKey = env.BREVO_API_KEY
   if (!stripeKey || !brevoKey) return
 
-  const MINUTOS_ESPERA = 30
+  const MINUTOS_ESPERA = 0
   const ahora = Math.floor(Date.now() / 1000)
   const desde = ahora - 86400 // últimas 24h
 
@@ -100,7 +100,7 @@ async function enviarEmailRecuperacion(session, brevoKey) {
 <h2 style="font-size:15px;color:#000;margin:0 0 6px">¡Tu carrito sigue aquí!</h2>
 <p style="font-size:13px;color:#555;line-height:1.5;margin:0 0 16px">Hace un momento nos visitaste y dejaste estos productos pendientes. ¿Quieres completar tu pedido?</p>
 <div style="background:#f9f9f9;padding:14px;border-radius:4px;margin:0 0 20px;font-size:13px;color:#333;line-height:1.6;white-space:pre-wrap">${listaItems}</div>
-<a href="https://espinadesign.com/recuperar?session_id=${session.id}" style="display:block;text-align:center;background:#000;color:#fff;text-decoration:none;padding:12px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;border-radius:2px">Completar mi pedido</a>
+<a href="https://espinadesign.com/api/recover-cart?session_id=${session.id}" style="display:block;text-align:center;background:#000;color:#fff;text-decoration:none;padding:12px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;border-radius:2px">Completar mi pedido</a>
 </td></tr>
 <tr><td style="text-align:center;padding-top:24px;font-size:11px;color:#999">
 <p style="margin:0">Si tienes dudas, responde a este correo o escríbenos por WhatsApp.</p>

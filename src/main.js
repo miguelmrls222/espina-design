@@ -375,8 +375,8 @@ function initAudio() {
     const g = audioCtx.createGain()
     o.type = 'sine'
     o.frequency.value = 440
-    g.gain.setValueAtTime(0.0001, audioCtx.currentTime)
-    g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.03)
+    g.gain.setValueAtTime(0.001, audioCtx.currentTime)
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.05)
     o.connect(g)
     g.connect(audioCtx.destination)
     o.start()
@@ -389,104 +389,40 @@ function sonidoConfetti() {
   try {
     const ctx = initAudio()
     if (!ctx || ctx.state !== 'running') return
-    const t0 = ctx.currentTime
-
-    function wuuu(inicio, vol) {
-      const dur = 0.7
-      // Fundamental — sweep de "W" a "UUU"
+    const notas = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5, 1318.5]
+    notas.forEach((freq, i) => {
       const osc = ctx.createOscillator()
       const gain = ctx.createGain()
-      osc.type = 'sawtooth'
-      osc.frequency.setValueAtTime(180, inicio)
-      osc.frequency.exponentialRampToValueAtTime(520, inicio + 0.12)
-      osc.frequency.linearRampToValueAtTime(480, inicio + 0.35)
-      osc.frequency.setValueAtTime(480, inicio + 0.35)
-      osc.frequency.linearRampToValueAtTime(420, inicio + dur)
-      gain.gain.setValueAtTime(0, inicio)
-      gain.gain.linearRampToValueAtTime(vol * 0.12, inicio + 0.08)
-      gain.gain.setValueAtTime(vol * 0.12, inicio + 0.3)
-      gain.gain.exponentialRampToValueAtTime(0.001, inicio + dur)
-      const filtro = ctx.createBiquadFilter()
-      filtro.type = 'lowpass'
-      filtro.frequency.setValueAtTime(300, inicio)
-      filtro.frequency.linearRampToValueAtTime(1200, inicio + 0.15)
-      filtro.frequency.linearRampToValueAtTime(800, inicio + dur)
-      osc.connect(filtro)
-      filtro.connect(gain)
+      osc.type = 'triangle'
+      osc.frequency.value = freq
+      gain.gain.setValueAtTime(0.15, ctx.currentTime + i * 0.08)
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.08 + 0.5)
+      osc.connect(gain)
       gain.connect(ctx.destination)
-      osc.start(inicio)
-      osc.stop(inicio + dur)
-
-      // 1er armónico (triangle) — más suave, da cuerpo vocal
-      const arm1 = ctx.createOscillator()
-      const g1 = ctx.createGain()
-      arm1.type = 'triangle'
-      arm1.frequency.setValueAtTime(360, inicio)
-      arm1.frequency.exponentialRampToValueAtTime(1040, inicio + 0.12)
-      arm1.frequency.linearRampToValueAtTime(960, inicio + 0.35)
-      arm1.frequency.linearRampToValueAtTime(840, inicio + dur)
-      g1.gain.setValueAtTime(0, inicio)
-      g1.gain.linearRampToValueAtTime(vol * 0.06, inicio + 0.1)
-      g1.gain.exponentialRampToValueAtTime(0.001, inicio + dur * 0.9)
-      arm1.connect(g1)
-      g1.connect(ctx.destination)
-      arm1.start(inicio)
-      arm1.stop(inicio + dur)
-
-      // 2do armónico (sine) — brillo
-      const arm2 = ctx.createOscillator()
-      const g2 = ctx.createGain()
-      arm2.type = 'sine'
-      arm2.frequency.setValueAtTime(540, inicio)
-      arm2.frequency.exponentialRampToValueAtTime(1560, inicio + 0.12)
-      arm2.frequency.linearRampToValueAtTime(1440, inicio + 0.35)
-      arm2.frequency.linearRampToValueAtTime(1260, inicio + dur)
-      g2.gain.setValueAtTime(0, inicio)
-      g2.gain.linearRampToValueAtTime(vol * 0.03, inicio + 0.12)
-      g2.gain.exponentialRampToValueAtTime(0.001, inicio + dur * 0.8)
-      arm2.connect(g2)
-      g2.connect(ctx.destination)
-      arm2.start(inicio)
-      arm2.stop(inicio + dur)
-
-      // Vibrato suave al final
-      const lfo = ctx.createOscillator()
-      const lfoGain = ctx.createGain()
-      lfo.type = 'sine'
-      lfo.frequency.value = 5
-      lfoGain.gain.setValueAtTime(0, inicio)
-      lfoGain.gain.linearRampToValueAtTime(15, inicio + 0.3)
-      lfoGain.gain.linearRampToValueAtTime(20, inicio + 0.5)
-      lfoGain.gain.linearRampToValueAtTime(5, inicio + dur)
-      lfo.connect(lfoGain)
-      lfoGain.connect(osc.frequency)
-      lfoGain.connect(arm1.frequency)
-      lfoGain.connect(arm2.frequency)
-      lfo.start(inicio)
-      lfo.stop(inicio + dur)
-    }
-
-    // Dos gritos de alegría, ligeramente desplazados
-    wuuu(t0, 1)
-    wuuu(t0 + 0.35, 0.7)
-
-    // Tap suave de fondo (como palmada lejana)
+      osc.start(ctx.currentTime + i * 0.08)
+      osc.stop(ctx.currentTime + i * 0.08 + 0.5)
+    })
     const ruido = ctx.createBufferSource()
-    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.08, ctx.sampleRate)
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.25, ctx.sampleRate)
     const data = buf.getChannelData(0)
-    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.01))
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.04))
     ruido.buffer = buf
     const gRuido = ctx.createGain()
-    const filtroRuido = ctx.createBiquadFilter()
-    filtroRuido.type = 'bandpass'
-    filtroRuido.frequency.value = 2000
-    filtroRuido.Q.value = 0.5
-    gRuido.gain.setValueAtTime(0.04, t0)
-    gRuido.gain.exponentialRampToValueAtTime(0.001, t0 + 0.08)
-    ruido.connect(filtroRuido)
-    filtroRuido.connect(gRuido)
+    gRuido.gain.setValueAtTime(0.12, ctx.currentTime)
+    gRuido.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25)
+    ruido.connect(gRuido)
     gRuido.connect(ctx.destination)
-    ruido.start(t0)
+    ruido.start(ctx.currentTime)
+    const o2 = ctx.createOscillator()
+    const g2 = ctx.createGain()
+    o2.type = 'sine'
+    o2.frequency.value = 1567.98
+    g2.gain.setValueAtTime(0.08, ctx.currentTime + 0.5)
+    g2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8)
+    o2.connect(g2)
+    g2.connect(ctx.destination)
+    o2.start(ctx.currentTime + 0.5)
+    o2.stop(ctx.currentTime + 0.8)
   } catch {}
 }
 

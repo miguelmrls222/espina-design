@@ -71,6 +71,7 @@ function renderProductos() {
   grid.innerHTML = productos.map((p, i) => {
     const img = p.fotos?.[0] ? p.fotos[0] : ''
     const agotado = p.stock === 'agotado'
+    const stockBajo = !agotado && typeof p.stock === 'number' && p.stock <= 3
 
     return `
       <div class="group flex flex-col ${agotado ? 'opacity-50' : ''}">
@@ -80,10 +81,15 @@ function renderProductos() {
             <span class="text-white text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 px-4 py-2">Ver más</span>
           </div>
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
+          ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 font-heading">Solo quedan ' + p.stock + '</span>' : ''}
         </div>
         <div class="flex flex-col flex-1">
           <h3 class="font-heading text-sm tracking-widest uppercase mb-1 cursor-pointer open-detail" data-index="${i}">${p.nombre}</h3>
-          <p class="font-body text-sm text-gray-500 mb-3">$${p.precio.toLocaleString('es-MX')} MXN</p>
+          <p class="font-body text-sm text-gray-500 mb-2">$${p.precio.toLocaleString('es-MX')} MXN</p>
+          ${p.colores?.length ? `
+          <div class="flex gap-1.5 mb-3">
+            ${p.colores.map(c => `<span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color:${colorMap[c] || '#ccc'}" title="${c}"></span>`).join('')}
+          </div>` : ''}
           ${!agotado ? `<button class="add-to-cart font-heading text-xs tracking-widest uppercase border border-black px-6 py-2 hover:bg-black hover:text-white transition-colors duration-300 mt-auto self-start"
             data-nombre="${p.nombre}"
             data-precio="${p.precio}"
@@ -114,6 +120,7 @@ function renderDestacados() {
     const prodIndex = productos.indexOf(p)
     const img = p.fotos?.[0] ? p.fotos[0] : ''
     const agotado = p.stock === 'agotado'
+    const stockBajo = !agotado && typeof p.stock === 'number' && p.stock <= 3
     return `
       <div class="flex-shrink-0 w-[220px] sm:w-[260px] group flex flex-col ${agotado ? 'opacity-50' : ''}">
         <div class="aspect-[4/5] bg-[#F5F5F5] mb-4 overflow-hidden relative cursor-pointer open-detail" data-index="${prodIndex}">
@@ -122,10 +129,15 @@ function renderDestacados() {
             <span class="text-white text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 px-4 py-2">Ver más</span>
           </div>
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
+          ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 font-heading">Solo quedan ' + p.stock + '</span>' : ''}
         </div>
         <div class="flex flex-col flex-1">
           <h3 class="font-heading text-sm tracking-widest uppercase mb-1 truncate cursor-pointer open-detail" data-index="${prodIndex}">${p.nombre}</h3>
-          <p class="font-body text-sm text-gray-500 mb-3">$${p.precio.toLocaleString('es-MX')} MXN</p>
+          <p class="font-body text-sm text-gray-500 mb-2">$${p.precio.toLocaleString('es-MX')} MXN</p>
+          ${p.colores?.length ? `
+          <div class="flex gap-1.5 mb-3">
+            ${p.colores.map(c => `<span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color:${colorMap[c] || '#ccc'}" title="${c}"></span>`).join('')}
+          </div>` : ''}
           ${!agotado ? `<button class="add-to-cart font-heading text-xs tracking-widest uppercase border border-black px-5 py-2 hover:bg-black hover:text-white transition-colors duration-300 mt-auto"
             data-nombre="${p.nombre}"
             data-precio="${p.precio}"
@@ -174,6 +186,13 @@ function renderTestimonios() {
 }
 
 // ─── Carrito ───
+
+const colorMap = {
+  'verde': '#4a7c59',
+  'gris': '#8c8c8c',
+  'vino': '#722f37',
+  'cafe oscuro': '#4a3728',
+}
 
 let cart = JSON.parse(localStorage.getItem('espina-cart') || '[]')
 
@@ -316,20 +335,37 @@ const productModalMeta = document.getElementById('product-modal-meta')
 const productModalAdd = document.getElementById('product-modal-add')
 let colorSeleccionado = ''
 
+let fotoActual = 0
+
 function openDetail(producto) {
-  const img = producto.fotos?.[0] ? producto.fotos[0] : ''
+  const fotos = producto.fotos?.filter(Boolean) || []
+  const img = fotos[0] || ''
   const agotado = producto.stock === 'agotado'
 
-  const colorMap = {
-    'verde': '#4a7c59',
-    'gris': '#8c8c8c',
-    'vino': '#722f37',
-    'cafe oscuro': '#4a3728',
+  fotoActual = 0
+
+  function renderFoto(index) {
+    const f = fotos[index]
+    if (f) {
+      productModalImage.innerHTML = `<img src="${f}" alt="${producto.nombre}" class="w-full h-full object-cover transition-opacity duration-300" />`
+    } else {
+      productModalImage.innerHTML = '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>'
+    }
+
+    const thumbsEl = document.getElementById('product-modal-thumbs')
+    if (fotos.length > 1) {
+      thumbsEl.innerHTML = fotos.map((f, fi) => `
+        <button class="thumb-btn flex-shrink-0 w-14 h-14 rounded border-2 overflow-hidden transition-all duration-200 ${fi === index ? 'border-black' : 'border-gray-200 hover:border-gray-400'}" data-foto-index="${fi}">
+          <img src="${f}" alt="" class="w-full h-full object-cover" />
+        </button>
+      `).join('')
+      thumbsEl.style.display = 'flex'
+    } else {
+      thumbsEl.style.display = 'none'
+    }
   }
 
-  productModalImage.innerHTML = img
-    ? `<img src="${img}" alt="${producto.nombre}" class="w-full h-full object-cover" />`
-    : '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>'
+  renderFoto(0)
 
   productModalName.textContent = producto.nombre
   productModalPrice.textContent = `$${producto.precio.toLocaleString('es-MX')} MXN`
@@ -403,6 +439,20 @@ document.addEventListener('click', e => {
     const idx = parseInt(detailTrigger.dataset.index)
     const producto = productos[idx]
     if (producto) openDetail(producto)
+  }
+
+  const thumbBtn = e.target.closest('.thumb-btn')
+  if (thumbBtn) {
+    const fi = parseInt(thumbBtn.dataset.fotoIndex)
+    const thumbs = document.querySelectorAll('.thumb-btn')
+    thumbs.forEach((t, i) => {
+      t.classList.toggle('border-black', i === fi)
+      t.classList.toggle('border-gray-200', i !== fi)
+      t.classList.toggle('hover:border-gray-400', i !== fi)
+    })
+    const fotosEl = document.getElementById('product-modal-image')
+    const img = thumbBtn.querySelector('img')?.src
+    if (img) fotosEl.innerHTML = `<img src="${img}" alt="" class="w-full h-full object-cover transition-opacity duration-300" />`
   }
 
   const colorBtn = e.target.closest('.color-btn')

@@ -116,18 +116,14 @@
 
           <!-- PRODUCTOS -->
           <div class="w-full max-w-6xl mt-20 pt-12 border-t border-gray-200">
-            <div class="flex items-center justify-between mb-10">
+            <div class="flex items-center justify-between mb-8">
               <h2 class="font-heading text-sm tracking-[0.2em] uppercase">Productos más vendidos</h2>
-              <div class="flex gap-2">
-                <button id="destacados-prev" class="w-10 h-10 border border-black flex items-center justify-center hover:bg-black hover:text-white transition-colors duration-300" aria-label="Anterior">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
-                </button>
-                <button id="destacados-next" class="w-10 h-10 border border-black flex items-center justify-center hover:bg-black hover:text-white transition-colors duration-300" aria-label="Siguiente">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-                </button>
-              </div>
+              <span class="font-body text-[10px] text-gray-400 tracking-wider uppercase">Desliza →</span>
             </div>
-            <div id="destacados-scroll" class="flex gap-6 overflow-x-auto pb-4 scroll-smooth" style="-webkit-overflow-scrolling:touch; scrollbar-width:none; -ms-overflow-style:none">
+            <div class="relative">
+              <div id="destacados-scroll" class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x snap-mandatory" style="-webkit-overflow-scrolling:touch; scrollbar-width:none; -ms-overflow-style:none">
+              </div>
+              <div class="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-white to-transparent"></div>
             </div>
           </div>
         </section>

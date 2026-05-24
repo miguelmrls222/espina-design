@@ -122,7 +122,7 @@ function renderDestacados() {
     const agotado = p.stock === 'agotado'
     const stockBajo = !agotado && typeof p.stock === 'number' && p.stock <= 3
     return `
-      <div class="flex-shrink-0 w-[220px] sm:w-[260px] group flex flex-col ${agotado ? 'opacity-50' : ''}">
+      <div class="flex-shrink-0 w-[220px] sm:w-[260px] group flex flex-col snap-start ${agotado ? 'opacity-50' : ''}">
         <div class="aspect-[4/5] bg-[#F5F5F5] mb-4 overflow-hidden relative cursor-pointer open-detail" data-index="${prodIndex}">
           ${img ? `<img src="${img}" alt="${p.nombre}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />` : '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>'}
           <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
@@ -150,13 +150,6 @@ function renderDestacados() {
       </div>
     `
   }).join('')
-
-  document.getElementById('destacados-prev').addEventListener('click', () => {
-    container.scrollBy({ left: -280, behavior: 'smooth' })
-  })
-  document.getElementById('destacados-next').addEventListener('click', () => {
-    container.scrollBy({ left: 280, behavior: 'smooth' })
-  })
 }
 
 // ─── Testimonios ───

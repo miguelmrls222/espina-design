@@ -84,7 +84,7 @@ function renderProductos() {
           ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 font-heading">Solo quedan ' + p.stock + '</span>' : ''}
         </div>
         <div class="flex flex-col flex-1">
-          <h3 class="font-heading text-sm tracking-widest uppercase mb-1 cursor-pointer open-detail" data-index="${i}">${p.nombre}</h3>
+          <h3 class="font-heading text-sm tracking-widest uppercase mb-1 cursor-pointer open-detail min-h-[2.5rem] sm:min-h-0 leading-tight" data-index="${i}">${p.nombre}</h3>
           <p class="font-body text-sm text-gray-500 mb-2">$${p.precio.toLocaleString('es-MX')} MXN</p>
           ${p.colores?.length ? `
           <div class="flex gap-1.5 mb-3">
@@ -132,7 +132,7 @@ function renderDestacados() {
           ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 font-heading">Solo quedan ' + p.stock + '</span>' : ''}
         </div>
         <div class="flex flex-col flex-1">
-          <h3 class="font-heading text-sm tracking-widest uppercase mb-1 truncate cursor-pointer open-detail" data-index="${prodIndex}">${p.nombre}</h3>
+          <h3 class="font-heading text-sm tracking-widest uppercase mb-1 cursor-pointer open-detail leading-tight" data-index="${prodIndex}">${p.nombre}</h3>
           <p class="font-body text-sm text-gray-500 mb-2">$${p.precio.toLocaleString('es-MX')} MXN</p>
           ${p.colores?.length ? `
           <div class="flex gap-1.5 mb-3">

@@ -701,11 +701,10 @@ async function iniciarCheckout() {
       body: JSON.stringify({
         email,
         items: cart.map(i => ({
-          nombre: i.color ? `${i.nombre} (${i.color})` : i.nombre,
+          nombre: i.nombre,
           precio: promo ? Math.round(i.precio * 0.8) : i.precio,
-          descripcion: i.descripcion,
-          imagen: i.imagen?.startsWith('http') ? i.imagen : `https://espinadesign.com${i.imagen || ''}`,
           cantidad: i.cantidad,
+          color: i.color || '',
         })),
       }),
     })

@@ -36,7 +36,8 @@ export async function onRequest(context) {
       params.set('customer_email', email)
       params.set('metadata[email]', email)
     }
-    params.set('metadata[items]', items.map(i => `${i.nombre}×${i.cantidad}`).join(', '))
+    const cartSummary = items.map(i => ({ n: i.nombre, p: i.precio, c: i.cantidad, col: i.color || '' }))
+    params.set('metadata[cart]', JSON.stringify(cartSummary))
 
     items.forEach((item, i) => {
       const prefix = `line_items[${i}]`

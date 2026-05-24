@@ -1,0 +1,10 @@
+name = "espina-design-abandoned"
+main = "abandoned-cart-worker.js"
+compatibility_date = "2026-05-24"
+
+[triggers]
+crons = ["*/60 * * * *"]
+
+[[kv_namespaces]]
+binding = "ABANDONED_CARTS"
+id = "REEMPLAZA_CON_TU_KV_ID"

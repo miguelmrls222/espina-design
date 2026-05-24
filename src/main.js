@@ -205,9 +205,7 @@ function saveCart() {
 }
 
 function isPromoActiva() {
-  const now = new Date()
-  const h = now.getHours()
-  return h >= 6 && h < 18
+  return true
 }
 
 function updateCartUI() {
@@ -550,8 +548,6 @@ navigate(window.location.pathname)
 
 // ─── Promo Timer ───
 
-let promoActivaAnterior = null
-
 function updatePromoTimer() {
   const bar = document.getElementById('promo-bar')
   const hoursEl = document.getElementById('promo-hours')
@@ -565,30 +561,18 @@ function updatePromoTimer() {
   const h = now.getHours()
   const m = now.getMinutes()
   const s = now.getSeconds()
-  const total = 12 * 3600
+  const remaining = (23 - h) * 3600 + (59 - m) * 60 + (60 - s)
 
-  if (isPromoActiva()) {
-    const elapsed = (h - 6) * 3600 + m * 60 + s
-    const remaining = total - elapsed
-    hoursEl.textContent = String(Math.floor(remaining / 3600)).padStart(2, '0')
-    minsEl.textContent = String(Math.floor((remaining % 3600) / 60)).padStart(2, '0')
-    secsEl.textContent = String(remaining % 60).padStart(2, '0')
-    text.textContent = '🔥 20% OFF'
-    if (subtext) subtext.textContent = 'SOLO POR HOY'
-    bar.classList.remove('hidden')
-  } else {
-    hoursEl.textContent = '00'
-    minsEl.textContent = '00'
-    secsEl.textContent = '00'
-    text.textContent = '🔥 20% OFF'
-    if (subtext) subtext.textContent = 'VUELVE MAÑANA 6:00 AM'
-    bar.classList.remove('hidden')
-  }
+  hoursEl.textContent = String(Math.floor(remaining / 3600)).padStart(2, '0')
+  minsEl.textContent = String(Math.floor((remaining % 3600) / 60)).padStart(2, '0')
+  secsEl.textContent = String(remaining % 60).padStart(2, '0')
+  text.textContent = '🔥 20% OFF'
+  if (subtext) subtext.textContent = 'SOLO POR HOY'
+  bar.classList.remove('hidden')
+}
 
-  const promoActual = isPromoActiva()
-  if (promoActual !== promoActivaAnterior) {
-    promoActivaAnterior = promoActual
-updateCartUI()
+updatePromoTimer()
+setInterval(updatePromoTimer, 1000)
 
 // ─── Scroll header ───
 
@@ -613,8 +597,3 @@ window.addEventListener('scroll', () => {
     ticking = true
   }
 })
-  }
-}
-
-updatePromoTimer()
-setInterval(updatePromoTimer, 1000)

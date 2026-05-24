@@ -7,6 +7,7 @@ const pages = {
   'faq': 'faq',
   'contacto': 'contacto',
   'gracias': 'gracias',
+  'recuperar': 'recuperar',
 }
 
 const menu = document.getElementById('menu-mobile')
@@ -28,6 +29,7 @@ function navigate(path) {
   }
   if (page === 'tienda') renderProductos()
   if (page === 'gracias') renderGracias()
+  if (page === 'recuperar') renderRecuperar()
 }
 
 function closeMenu() {
@@ -683,6 +685,32 @@ function renderGracias() {
   `).join('')
 }
 
+// ─── Recuperar carrito ───
+
+function renderRecuperar() {
+  const section = document.getElementById('page-recuperar')
+  if (!section) return
+  const params = new URLSearchParams(window.location.search)
+  const sessionId = params.get('session_id')
+  if (!sessionId) {
+    navigate('/tienda')
+    return
+  }
+  ;(async () => {
+    try {
+      const res = await fetch(`/api/recover-cart?session_id=${sessionId}&json=1`)
+      const data = await res.json()
+      if (data && Array.isArray(data) && data.length > 0) {
+        cart = data
+        saveCart()
+        updateCartUI()
+      }
+    } catch {}
+    window.history.replaceState({}, '', '/tienda')
+    navigate('/tienda')
+  })()
+}
+
 async function iniciarCheckout() {
   try {
     const email = cartEmail ? cartEmail.value.trim() : ''
@@ -744,23 +772,6 @@ if (params.get('exito') === '1') {
 
 if (params.get('cancelado') === '1') {
   window.history.replaceState({}, '', '/tienda')
-}
-
-// ─── Recuperar carrito ───
-const recuperarId = params.get('recuperar')
-if (recuperarId) {
-  (async () => {
-    try {
-      const res = await fetch(`/api/recover-cart?session_id=${recuperarId}&json=1`)
-      const data = await res.json()
-      if (data && Array.isArray(data) && data.length > 0) {
-        cart = data
-        saveCart()
-        updateCartUI()
-      }
-    } catch {}
-    window.history.replaceState({}, '', '/tienda')
-  })()
 }
 
 navigate(window.location.pathname)

@@ -2,13 +2,29 @@ export async function onRequest(context) {
   const { request, env } = context
   const url = new URL(request.url)
   const sessionId = url.searchParams.get('session_id')
+  const formatJson = url.searchParams.has('json')
 
   if (!sessionId) {
     return Response.redirect('https://espinadesign.com/tienda', 302)
   }
 
+  // Modo JSON: devuelve el carrito guardado en KV
+  if (formatJson) {
+    const saved = env.ABANDONED_CARTS
+      ? await env.ABANDONED_CARTS.get(`cart:${sessionId}`)
+      : null
+    if (saved) {
+      return new Response(saved, {
+        headers: { 'content-type': 'application/json' },
+      })
+    }
+    return new Response('null', {
+      headers: { 'content-type': 'application/json' },
+    })
+  }
+
   if (!env.STRIPE_SECRET_KEY) {
-    return new Response('Stripe no configurado', { status: 500 })
+    return Response.redirect('https://espinadesign.com/tienda', 302)
   }
 
   try {
@@ -28,39 +44,24 @@ export async function onRequest(context) {
     }
 
     const items = JSON.parse(cartRaw)
-    const cartJs = JSON.stringify(items.map(i => ({
+    const cartData = items.map(i => ({
       nombre: i.n,
       precio: i.p,
       cantidad: i.c || 1,
       imagen: '',
       descripcion: '',
       color: i.col || '',
-    })))
+    }))
 
-    const html = `<!doctype html>
-<html lang="es">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Recuperar carrito — Espina Design</title>
-<style>body{font-family:sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;background:#f5f5f5;text-align:center;padding:20px}.card{background:#fff;padding:40px;max-width:400px;width:100%}.card h1{font-size:18px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}.card p{font-size:14px;color:#666;margin-bottom:20px;line-height:1.5}.spinner{width:24px;height:24px;border:2px solid #ddd;border-top-color:#000;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}@keyframes spin{to{transform:rotate(360deg)}}</style>
-</head>
-<body>
-<div class="card">
-<h1>Recuperando tu carrito</h1>
-<p>Estamos preparando tus productos para ti…</p>
-<div class="spinner"></div>
-</div>
-<script>
-try {
-  localStorage.setItem('espina-cart', ${cartJs})
-  setTimeout(function(){ window.location.href = '/tienda' }, 800)
-} catch(e){ window.location.href = '/tienda' }
-<\/script>
-</body>
-</html>`
+    // Guardar en KV para que la app lo tome al cargar
+    if (env.ABANDONED_CARTS) {
+      await env.ABANDONED_CARTS.put(`cart:${sessionId}`, JSON.stringify(cartData), {
+        expirationTtl: 86400,
+      })
+    }
 
-    return new Response(html, {
-      headers: { 'content-type': 'text/html;charset=utf-8' },
-    })
+    // Redirigir a la tienda con el session_id para que main.js lo procese
+    return Response.redirect(`https://espinadesign.com/tienda?recuperar=${sessionId}`, 302)
   } catch {
     return Response.redirect('https://espinadesign.com/tienda', 302)
   }

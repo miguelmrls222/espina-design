@@ -746,6 +746,23 @@ if (params.get('cancelado') === '1') {
   window.history.replaceState({}, '', '/tienda')
 }
 
+// ─── Recuperar carrito ───
+const recuperarId = params.get('recuperar')
+if (recuperarId) {
+  (async () => {
+    try {
+      const res = await fetch(`/api/recover-cart?session_id=${recuperarId}&json=1`)
+      const data = await res.json()
+      if (data && Array.isArray(data) && data.length > 0) {
+        cart = data
+        saveCart()
+        updateCartUI()
+      }
+    } catch {}
+    window.history.replaceState({}, '', '/tienda')
+  })()
+}
+
 navigate(window.location.pathname)
 
 // ─── Promo Timer ───

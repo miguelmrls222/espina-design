@@ -281,7 +281,7 @@ function updateCartUI() {
       lanzarConfetti()
     }
     envioIcon.className = 'w-7 h-7 flex items-center justify-center rounded-full bg-green-500 border-2 border-green-500 flex-shrink-0 transition-all duration-500'
-    envioIcon.innerHTML = '<svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>'
+    envioIcon.innerHTML = '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>'
     envioTexto.textContent = '🎉 ¡Envío gratis!'
     envioTexto.className = 'font-heading text-xs tracking-widest uppercase text-green-600 mt-2'
   } else {

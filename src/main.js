@@ -39,18 +39,6 @@ function toggleMenu() {
   menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex'
 }
 
-document.addEventListener('click', e => {
-  const link = e.target.closest('[data-nav]')
-  if (link) {
-    e.preventDefault()
-    const href = link.getAttribute('href')
-    navigate(href)
-    window.history.pushState({}, '', href)
-  }
-  const btn = e.target.closest('#menu-btn')
-  if (btn) toggleMenu()
-})
-
 window.addEventListener('popstate', () => navigate(window.location.pathname))
 
 // ─── Productos ───
@@ -110,6 +98,7 @@ function renderDestacados() {
   const container = document.getElementById('destacados-scroll')
   if (!container || container.dataset.rendered) return
   container.dataset.rendered = '1'
+  if (container.children.length > 0) return
 
   const top = productos.slice(0, 4)
 
@@ -169,6 +158,7 @@ function renderTestimonios() {
   const track = document.getElementById('testimonios-track')
   if (!track || track.dataset.rendered) return
   track.dataset.rendered = '1'
+  if (track.children.length > 0) return
 
   const cards = testimonios.map(t => `
     <div class="flex-shrink-0 w-[280px] sm:w-[320px] bg-[#F5F5F5] p-6 flex flex-col justify-between">
@@ -176,7 +166,6 @@ function renderTestimonios() {
       <p class="font-heading text-xs tracking-widest uppercase text-gray-500">${t.autor}</p>
     </div>
   `).join('')
-
   track.innerHTML = cards + cards
 }
 
@@ -228,13 +217,23 @@ function updateCartUI() {
   cartCount.textContent = count
   cartCount.classList.toggle('hidden', count === 0)
 
+  const envioSection = document.getElementById('envio-section')
+  const giftSection = document.getElementById('gift-section')
+  const timelineSection = document.getElementById('timeline-section')
+
   if (cart.length === 0) {
     cartItems.innerHTML = '<p class="text-sm text-gray-500 text-center py-10">Tu carrito está vacío</p>'
     cartFooter.classList.add('hidden')
+    envioSection?.classList.add('hidden')
+    giftSection?.classList.add('hidden')
+    timelineSection?.classList.add('hidden')
     return
   }
 
   cartFooter.classList.remove('hidden')
+  envioSection?.classList.remove('hidden')
+  giftSection?.classList.remove('hidden')
+  timelineSection?.classList.remove('hidden')
   cartItems.innerHTML = cart.map((item, i) => `
     <div class="flex gap-4 pb-4 border-b border-gray-100">
       ${item.imagen ? `<img src="${item.imagen}" alt="${item.nombre}" class="w-20 h-20 object-cover bg-[#F5F5F5]" />` : ''}
@@ -567,8 +566,19 @@ function closeDetail() {
 }
 
 document.addEventListener('click', e => {
+  const link = e.target.closest('[data-nav]')
+  if (link) {
+    e.preventDefault()
+    const href = link.getAttribute('href')
+    navigate(href)
+    window.history.pushState({}, '', href)
+    return
+  }
+  if (e.target.closest('#menu-btn')) { toggleMenu(); return }
+
   if (e.target.closest('#cart-btn')) {
     openCart()
+    return
   }
 
   if (e.target.closest('#cart-close') || e.target.closest('#cart-overlay')) {
@@ -746,20 +756,45 @@ if (params.get('cancelado') === '1') {
   window.history.replaceState({}, '', '/tienda')
 }
 
-// ─── Recuperar carrito desde URL ───
+// ─── Navegar primero, luego recuperar carrito ───
+navigate(window.location.pathname)
+
+function getCookie(name) {
+  const match = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')
+  return match ? decodeURIComponent(match[2]) : null
+}
+
+let recoveryRedirect = false
+const cookieData = getCookie('espina_recovery')
+if (cookieData) {
+  try {
+    const d = JSON.parse(cookieData)
+    if (Array.isArray(d) && d.length > 0) { cart = d; saveCart() }
+  } catch {}
+  document.cookie = 'espina_recovery=; path=/; max-age=0; SameSite=Lax'
+  window.history.replaceState({}, '', '/tienda')
+  recoveryRedirect = true
+}
+
 const carritoEncoded = params.get('carrito')
 if (carritoEncoded) {
   try {
     const data = JSON.parse(decodeURIComponent(carritoEncoded))
-    if (data && Array.isArray(data) && data.length > 0) {
-      cart = data
-      saveCart()
-    }
+    if (data && Array.isArray(data) && data.length > 0) { cart = data; saveCart() }
   } catch {}
   window.history.replaceState({}, '', '/tienda')
+  recoveryRedirect = true
 }
 
-navigate(window.location.pathname)
+if (recoveryRedirect) navigate(window.location.pathname)
+
+// Safety fallback: si destacados/testimonios no se renderizaron, reintentar
+setTimeout(() => {
+  const d = document.getElementById('destacados-scroll')
+  if (d && !d.children.length) { delete d.dataset.rendered; renderDestacados() }
+  const t = document.getElementById('testimonios-track')
+  if (t && !t.children.length) { delete t.dataset.rendered; renderTestimonios() }
+}, 150)
 
 // ─── Promo Timer ───
 

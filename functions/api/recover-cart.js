@@ -10,74 +10,60 @@ export async function onRequest(context) {
 
   if (formatJson) {
     if (!env.STRIPE_SECRET_KEY) {
-      return new Response('null', {
-        headers: { 'content-type': 'application/json' },
-      })
+      return new Response('null', { headers: { 'content-type': 'application/json' } })
     }
     try {
       const stripeRes = await fetch(`https://api.stripe.com/v1/checkout/sessions/${sessionId}`, {
         headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` },
       })
-      if (!stripeRes.ok) {
-        return new Response('null', {
-          headers: { 'content-type': 'application/json' },
-        })
-      }
+      if (!stripeRes.ok) return new Response('null', { headers: { 'content-type': 'application/json' } })
       const session = await stripeRes.json()
       const cartRaw = session.metadata?.cart
-      if (!cartRaw) {
-        return new Response('null', {
-          headers: { 'content-type': 'application/json' },
-        })
-      }
+      if (!cartRaw) return new Response('null', { headers: { 'content-type': 'application/json' } })
       const items = JSON.parse(cartRaw)
       const cartData = items.map(i => ({
-        nombre: i.n,
-        precio: i.p,
-        cantidad: i.c || 1,
-        imagen: '',
-        descripcion: '',
-        color: i.col || '',
+        nombre: i.n, precio: i.p, cantidad: i.c || 1,
+        imagen: '', descripcion: '', color: i.col || '',
       }))
-      return new Response(JSON.stringify(cartData), {
-        headers: { 'content-type': 'application/json' },
-      })
+      return new Response(JSON.stringify(cartData), { headers: { 'content-type': 'application/json' } })
     } catch {
-      return new Response('null', {
-        headers: { 'content-type': 'application/json' },
-      })
+      return new Response('null', { headers: { 'content-type': 'application/json' } })
     }
   }
 
-  // Obtener el carrito de Stripe y redirigir con el carrito codificado en la URL
   try {
     const stripeRes = await fetch(`https://api.stripe.com/v1/checkout/sessions/${sessionId}`, {
       headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` },
     })
-
-    if (!stripeRes.ok) {
-      return Response.redirect('https://espinadesign.com/tienda', 302)
-    }
+    if (!stripeRes.ok) return Response.redirect('https://espinadesign.com/tienda', 302)
 
     const session = await stripeRes.json()
     const cartRaw = session.metadata?.cart
-
-    if (!cartRaw) {
-      return Response.redirect('https://espinadesign.com/tienda', 302)
-    }
+    if (!cartRaw) return Response.redirect('https://espinadesign.com/tienda', 302)
 
     const items = JSON.parse(cartRaw)
     const cartData = items.map(i => ({
-      nombre: i.n,
-      precio: i.p,
-      cantidad: i.c || 1,
-      imagen: '',
-      descripcion: '',
-      color: i.col || '',
+      nombre: i.n, precio: i.p, cantidad: i.c || 1,
+      imagen: '', descripcion: '', color: i.col || '',
     }))
 
-    const encoded = encodeURIComponent(JSON.stringify(cartData))
-    return Response.redirect(`https://espinadesign.com/tienda?carrito=${encoded}`, 302)
+    const cartJson = JSON.stringify(cartData)
+    const encoded = encodeURIComponent(cartJson)
+
+    // Usar meta refresh + cookie como fallback
+    const html = `<!doctype html>
+<html><head><meta charset="UTF-8">
+<meta http-equiv="refresh" content="0;url=/tienda?carrito=${encoded}">
+<title>Redirigiendo…</title></head><body></body></html>`
+
+    return new Response(html, {
+      status: 200,
+      headers: {
+        'content-type': 'text/html;charset=utf-8',
+        'cache-control': 'no-store, no-cache, must-revalidate',
+        'set-cookie': `espina_recovery=${encoded}; path=/; max-age=300; SameSite=Lax`,
+      },
+    })
   } catch {
     return Response.redirect('https://espinadesign.com/tienda', 302)
   }

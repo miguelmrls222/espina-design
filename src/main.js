@@ -322,28 +322,80 @@ function lanzarConfetti() {
 }
 
 let audioCtx = null
+let audioSessionReady = false
 
-function initAudio() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-  }
-  if (audioCtx.state === 'suspended') audioCtx.resume()
+function ensureAudioSession() {
+  if (audioSessionReady) return
+  audioSessionReady = true
+  try {
+    const el = document.createElement('audio')
+    el.setAttribute('playsinline', '')
+    const rate = 8000, freq = 220, dur = 0.1, vol = 0.01
+    const samples = Math.floor(rate * dur)
+    const buf = new ArrayBuffer(44 + samples)
+    const view = new DataView(buf)
+    const write = (off, str) => { for (let i = 0; i < str.length; i++) view.setUint8(off + i, str.charCodeAt(i)) }
+    write(0, 'RIFF')
+    view.setUint32(4, 36 + samples, true)
+    write(8, 'WAVE')
+    write(12, 'fmt ')
+    view.setUint32(16, 16, true)
+    view.setUint16(20, 1, true)
+    view.setUint16(22, 1, true)
+    view.setUint32(24, rate, true)
+    view.setUint32(28, rate, true)
+    view.setUint16(32, 1, true)
+    view.setUint16(34, 8, true)
+    write(36, 'data')
+    view.setUint32(40, samples, true)
+    for (let i = 0; i < samples; i++) {
+      const val = Math.sin(2 * Math.PI * freq * i / rate) * vol
+      view.setUint8(44 + i, Math.round((val + 1) * 127.5))
+    }
+    const blob = new Blob([buf], { type: 'audio/wav' })
+    el.src = URL.createObjectURL(blob)
+    el.play().then(() => {
+      setTimeout(() => URL.revokeObjectURL(el.src), 2000)
+    }).catch(() => {})
+  } catch {}
 }
 
-document.addEventListener('pointerdown', initAudio, { once: true })
+function initAudio() {
+  ensureAudioSession()
+  const Ctor = window.AudioContext || window.webkitAudioContext
+  if (!Ctor) return null
+  if (audioCtx && audioCtx.state !== 'closed') {
+    if (audioCtx.state === 'suspended') audioCtx.resume()
+    return audioCtx
+  }
+  audioCtx = new Ctor()
+  audioCtx.resume()
+  try {
+    const o = audioCtx.createOscillator()
+    const g = audioCtx.createGain()
+    o.type = 'sine'
+    o.frequency.value = 440
+    g.gain.setValueAtTime(0.001, audioCtx.currentTime)
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.05)
+    o.connect(g)
+    g.connect(audioCtx.destination)
+    o.start()
+    o.stop(audioCtx.currentTime + 0.05)
+  } catch {}
+  return audioCtx
+}
 
 function sonidoConfetti() {
   try {
-    initAudio()
-    if (!audioCtx) return
-    const ctx = audioCtx
+    const ctx = initAudio()
+    if (!ctx || ctx.state !== 'running') return
     const notas = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5, 1318.5]
     notas.forEach((freq, i) => {
       const osc = ctx.createOscillator()
       const gain = ctx.createGain()
       osc.type = 'triangle'
       osc.frequency.value = freq
-      gain.gain.setValueAtTime(0.12, ctx.currentTime + i * 0.08)
+      gain.gain.setValueAtTime(0.15, ctx.currentTime + i * 0.08)
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.08 + 0.5)
       osc.connect(gain)
       gain.connect(ctx.destination)
@@ -356,7 +408,7 @@ function sonidoConfetti() {
     for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.04))
     ruido.buffer = buf
     const gRuido = ctx.createGain()
-    gRuido.gain.setValueAtTime(0.1, ctx.currentTime)
+    gRuido.gain.setValueAtTime(0.12, ctx.currentTime)
     gRuido.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25)
     ruido.connect(gRuido)
     gRuido.connect(ctx.destination)
@@ -365,7 +417,7 @@ function sonidoConfetti() {
     const g2 = ctx.createGain()
     o2.type = 'sine'
     o2.frequency.value = 1567.98
-    g2.gain.setValueAtTime(0.06, ctx.currentTime + 0.5)
+    g2.gain.setValueAtTime(0.08, ctx.currentTime + 0.5)
     g2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8)
     o2.connect(g2)
     g2.connect(ctx.destination)
@@ -389,6 +441,8 @@ function closeCart() {
 }
 
 function addToCart(nombre, precio, imagen, descripcion, color) {
+  ensureAudioSession()
+  initAudio()
   color = color || ''
   const exist = cart.find(i => i.nombre === nombre && i.color === color)
   if (exist) {

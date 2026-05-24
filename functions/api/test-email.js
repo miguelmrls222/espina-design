@@ -15,8 +15,8 @@ export async function onRequest(context) {
       'api-key': brevoKey,
     },
     body: JSON.stringify({
-      sender: { name: 'Espina Design', email: 'mikemorales222@hotmail.com' },
-      to: [{ email: 'mikemorales222@hotmail.com' }],
+      sender: { name: 'Espina Design', email: 'miguelmrls222@gmail.com' },
+      to: [{ email: 'miguelmrls222@gmail.com' }],
       subject: '✅ Sistema de carritos abandonados activo',
       htmlContent: `
 <!doctype html>

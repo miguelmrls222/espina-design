@@ -84,7 +84,7 @@ async function enviarEmailRecuperacion(session, brevoKey) {
         'api-key': brevoKey,
       },
       body: JSON.stringify({
-        sender: { name: 'Espina Design', email: 'mikemorales222@hotmail.com' },
+        sender: { name: 'Espina Design', email: 'miguelmrls222@gmail.com' },
         to: [{ email }],
         subject: '¿Olvidaste algo? — Tu carrito te espera 🛒',
         htmlContent: `

@@ -6,6 +6,7 @@ const pages = {
   'nosotros': 'nosotros',
   'faq': 'faq',
   'contacto': 'contacto',
+  'gracias': 'gracias',
 }
 
 const menu = document.getElementById('menu-mobile')
@@ -26,6 +27,7 @@ function navigate(path) {
     renderTestimonios()
   }
   if (page === 'tienda') renderProductos()
+  if (page === 'gracias') renderGracias()
 }
 
 function closeMenu() {
@@ -497,6 +499,34 @@ document.addEventListener('click', e => {
   }
 })
 
+// ─── Página Gracias ───
+
+function renderGracias() {
+  const raw = sessionStorage.getItem('ultimo_pedido')
+  const container = document.getElementById('gracias-items')
+  const ref = document.getElementById('order-ref')
+  if (!container) return
+  if (!raw) {
+    container.innerHTML = ''
+    if (ref) ref.textContent = ''
+    return
+  }
+  const pedido = JSON.parse(raw)
+  if (ref) ref.textContent = `Pedido: ${pedido.session_id || '—'}  •  ${pedido.fecha || ''}`
+  container.innerHTML = pedido.items.map(i => `
+    <div class="flex items-center gap-4 text-sm">
+      <div class="w-14 h-14 bg-[#F5F5F5] flex-shrink-0 flex items-center justify-center overflow-hidden">
+        ${i.imagen ? `<img src="${i.imagen}" alt="${i.nombre}" class="w-full h-full object-cover" />` : `<span class="font-heading text-[10px] tracking-widest uppercase text-gray-400">ED</span>`}
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="font-heading text-xs tracking-widest uppercase truncate">${i.nombre}</p>
+        <p class="font-body text-xs text-gray-500">${i.color || ''} × ${i.cantidad}</p>
+      </div>
+      <p class="font-heading text-xs tracking-widest">$${(i.precio * i.cantidad).toLocaleString('es-MX')}</p>
+    </div>
+  `).join('')
+}
+
 async function iniciarCheckout() {
   try {
     const promo = isPromoActiva()
@@ -532,15 +562,20 @@ updateCartUI()
 // ─── Éxito / Cancelado ───
 
 const params = new URLSearchParams(window.location.search)
+const sesionId = params.get('session_id')
+
 if (params.get('exito') === '1') {
+  sessionStorage.setItem('ultimo_pedido', JSON.stringify({
+    items: [...cart],
+    session_id: sesionId,
+    fecha: new Date().toLocaleDateString('es-MX'),
+  }))
   cart = []
   saveCart()
-  alert('¡Gracias por tu compra! Recibirás un correo con los detalles de tu pedido.')
-  window.history.replaceState({}, '', '/')
+  window.history.replaceState({}, '', '/gracias')
 }
 
 if (params.get('cancelado') === '1') {
-  alert('El pago fue cancelado. Puedes intentar de nuevo cuando quieras.')
   window.history.replaceState({}, '', '/tienda')
 }
 

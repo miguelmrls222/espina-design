@@ -321,9 +321,22 @@ function lanzarConfetti() {
   }
 }
 
+let audioCtx = null
+
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume()
+}
+
+document.addEventListener('pointerdown', initAudio, { once: true })
+
 function sonidoConfetti() {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)()
+    initAudio()
+    if (!audioCtx) return
+    const ctx = audioCtx
     const notas = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5, 1318.5]
     notas.forEach((freq, i) => {
       const osc = ctx.createOscillator()

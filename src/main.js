@@ -295,6 +295,7 @@ function updateCartUI() {
 }
 
 function lanzarConfetti() {
+  sonidoConfetti()
   const colores = ['#D4A574', '#22c55e', '#3b82f6', '#eab308', '#ec4899', '#a855f7', '#f97316']
   const contenedor = document.getElementById('cart-panel')
   if (!contenedor) return
@@ -318,6 +319,36 @@ function lanzarConfetti() {
     document.body.appendChild(pieza)
     pieza.addEventListener('animationend', () => pieza.remove())
   }
+}
+
+function sonidoConfetti() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)()
+    const notas = [523.25, 659.25, 783.99, 1046.5]
+    notas.forEach((freq, i) => {
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.type = 'sine'
+      osc.frequency.value = freq
+      gain.gain.setValueAtTime(0.08, ctx.currentTime + i * 0.06)
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.06 + 0.4)
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.start(ctx.currentTime + i * 0.06)
+      osc.stop(ctx.currentTime + i * 0.06 + 0.4)
+    })
+    const ruido = ctx.createBufferSource()
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.15, ctx.sampleRate)
+    const data = buf.getChannelData(0)
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.03))
+    ruido.buffer = buf
+    const gRuido = ctx.createGain()
+    gRuido.gain.setValueAtTime(0.06, ctx.currentTime)
+    gRuido.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15)
+    ruido.connect(gRuido)
+    gRuido.connect(ctx.destination)
+    ruido.start(ctx.currentTime)
+  } catch {}
 }
 
 function openCart() {

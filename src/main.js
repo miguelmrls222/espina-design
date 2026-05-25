@@ -242,6 +242,13 @@ function renderTestimonios() {
     </div>
   `).join('')
   track.innerHTML = cards + cards
+
+  track.addEventListener('touchstart', () => {
+    track.style.animationPlayState = 'paused'
+  }, { passive: true })
+  track.addEventListener('touchend', () => {
+    track.style.animationPlayState = 'running'
+  }, { passive: true })
 }
 
 // ─── Carrito ───

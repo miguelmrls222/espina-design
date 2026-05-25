@@ -72,8 +72,10 @@
   animation: scroll-left 40s linear infinite;
 }
 
-#testimonios-track:hover {
-  animation-play-state: paused;
+@media (hover: hover) {
+  #testimonios-track:hover {
+    animation-play-state: paused;
+  }
 }
 
 #site-header.scrolled {

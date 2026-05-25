@@ -16,14 +16,37 @@ const menu = document.getElementById('menu-mobile')
 
 // ─── Routing ───
 
+const pageMeta = {
+  inicio: { title: 'Espina Design — Cuero Hecho a Mano en México', desc: 'Artículos cotidianos de cuero con estilo minimalista. Hecho a mano en Hermosillo, Sonora, México.' },
+  tienda: { title: 'Tienda — Espina Design', desc: 'Billeteras, tarjeteros y accesorios de cuero hechos a mano en México. Envíos a todo el país.' },
+  nosotros: { title: 'Nosotros — Espina Design', desc: 'Conoce la historia de Espina Design. Cuero hecho a mano en Hermosillo, Sonora desde 2016.' },
+  faq: { title: 'Preguntas Frecuentes — Espina Design', desc: 'Resuelve tus dudas sobre envíos, pagos, cuidados del cuero y más.' },
+  envios: { title: 'Envíos — Espina Design', desc: 'Información sobre envíos a toda la República Mexicana, costos y tiempos de entrega.' },
+  devoluciones: { title: 'Devoluciones — Espina Design', desc: 'Política de devoluciones y cambios. Plazo de 7 días para productos en condición original.' },
+  garantia: { title: 'Garantía — Espina Design', desc: 'Garantía de 30 días contra defectos de fabricación en todos nuestros productos de cuero.' },
+  contacto: { title: 'Contacto — Espina Design', desc: 'Contáctanos por WhatsApp, correo o Instagram. Estamos en Hermosillo, Sonora, México.' },
+  gracias: { title: '¡Gracias por tu compra! — Espina Design', desc: 'Tu pedido ha sido confirmado. Recibirás un correo con los detalles y el número de seguimiento.' },
+}
+
 function navigate(path) {
   const page = pages[path.replace(/^\//, '')] || 'inicio'
   document.querySelectorAll('.page-section').forEach(s => s.classList.add('hidden'))
   const section = document.getElementById(`page-${page}`)
   if (section) section.classList.remove('hidden')
-  document.title = page === 'inicio'
-    ? 'Espina Design — Cuero Hecho a Mano'
-    : `Espina Design — ${page.charAt(0).toUpperCase() + page.slice(1)}`
+  const meta = pageMeta[page] || pageMeta.inicio
+  document.title = meta.title
+  const descEl = document.getElementById('meta-desc')
+  if (descEl) descEl.content = meta.desc
+  document.querySelectorAll('#menu-mobile nav [data-nav]').forEach(a => {
+    const href = a.getAttribute('href')
+    const isActive = href === path
+    a.style.opacity = isActive ? '1' : '0.45'
+    if (isActive) {
+      a.innerHTML = a.textContent.trim() + ' <span class="inline-block w-1.5 h-1.5 rounded-full bg-black align-middle ml-1"></span>'
+    } else {
+      a.innerHTML = a.textContent.trim()
+    }
+  })
   closeMenu()
   if (page === 'inicio') {
     renderDestacados()
@@ -83,10 +106,15 @@ function renderProductos() {
           </div>
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
           ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 font-heading">Solo quedan ' + p.stock + '</span>' : ''}
+          <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm flex items-center gap-1">
+            <svg class="w-3 h-3 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+            <span class="font-heading text-[9px] tracking-wide text-green-800 font-semibold">Garantía de 1 año</span>
+          </div>
         </div>
         <div class="flex flex-col flex-1">
           <h3 class="font-heading text-sm tracking-widest uppercase mb-1 cursor-pointer open-detail min-h-[2.5rem] sm:min-h-0 leading-tight" data-index="${i}">${p.nombre}</h3>
           <p class="font-body text-sm text-gray-500 mb-2">$${p.precio.toLocaleString('es-MX')} MXN</p>
+          ${renderEstrellas(promedioResenas(p))}
           ${p.colores?.length ? `
           <div class="flex gap-1.5 mb-3">
             ${p.colores.map(c => `<span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color:${colorMap[c] || '#ccc'}" title="${c}"></span>`).join('')}
@@ -132,10 +160,15 @@ function renderDestacados() {
           </div>
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
           ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 font-heading">Solo quedan ' + p.stock + '</span>' : ''}
+          <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm flex items-center gap-1">
+            <svg class="w-3 h-3 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+            <span class="font-heading text-[9px] tracking-wide text-green-800 font-semibold">Garantía de 1 año</span>
+          </div>
         </div>
         <div class="flex flex-col flex-1">
           <h3 class="font-heading text-sm tracking-widest uppercase mb-1 cursor-pointer open-detail leading-tight" data-index="${prodIndex}">${p.nombre}</h3>
           <p class="font-body text-sm text-gray-500 mb-2">$${p.precio.toLocaleString('es-MX')} MXN</p>
+          ${renderEstrellas(promedioResenas(p))}
           ${p.colores?.length ? `
           <div class="flex gap-1.5 mb-3">
             ${p.colores.map(c => `<span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color:${colorMap[c] || '#ccc'}" title="${c}"></span>`).join('')}
@@ -152,6 +185,25 @@ function renderDestacados() {
       </div>
     `
   }).join('')
+}
+
+function renderEstrellas(puntuacion) {
+  if (!puntuacion) return ''
+  const full = Math.round(puntuacion)
+  return `
+    <div class="flex items-center gap-0.5 mb-2">
+      ${Array.from({ length: 5 }, (_, i) =>
+        i < full
+          ? '<svg class="w-3 h-3 text-amber-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'
+          : '<svg class="w-3 h-3 text-gray-200" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'
+      ).join('')}
+    </div>`
+}
+
+function promedioResenas(p) {
+  if (!p.resenas || p.resenas.length === 0) return null
+  const avg = p.resenas.reduce((s, r) => s + r.puntuacion, 0) / p.resenas.length
+  return Math.round(avg)
 }
 
 // ─── Testimonios ───
@@ -242,7 +294,11 @@ function updateCartUI() {
   const timelineSection = document.getElementById('timeline-section')
 
   if (cart.length === 0) {
-    cartItems.innerHTML = '<p class="text-sm text-gray-500 text-center py-10">Tu carrito está vacío</p>'
+    cartItems.innerHTML = `
+      <p class="text-sm text-gray-500 text-center pt-10 pb-6">Tu carrito está vacío</p>
+      <div class="text-center">
+        <a href="/tienda" data-nav class="inline-block font-heading text-xs tracking-widest uppercase border-2 border-black px-8 py-3 hover:bg-black hover:text-white transition-colors duration-300">Ver productos</a>
+      </div>`
     cartFooter.classList.add('hidden')
     envioSection?.classList.add('hidden')
     giftSection?.classList.add('hidden')
@@ -254,12 +310,16 @@ function updateCartUI() {
   envioSection?.classList.remove('hidden')
   giftSection?.classList.remove('hidden')
   timelineSection?.classList.remove('hidden')
-  cartItems.innerHTML = cart.map((item, i) => `
+  cartItems.innerHTML = cart.map((item, i) => {
+    const itemStock = item.stock
+    const itemStockBajo = typeof itemStock === 'number' && itemStock <= 3
+    return `
     <div class="flex gap-4 pb-4 border-b border-gray-100">
       ${item.imagen ? `<img src="${item.imagen}" alt="${item.nombre}" class="w-20 h-20 object-cover bg-[#F5F5F5]" />` : ''}
       <div class="flex-1 min-w-0">
         <h4 class="font-heading text-xs tracking-widest uppercase truncate">${item.nombre}</h4>
         ${item.color ? `<p class="font-body text-xs text-gray-400 mt-0.5">Color: ${item.color}</p>` : ''}
+        ${itemStockBajo ? `<p class="font-heading text-[10px] tracking-wider uppercase text-[#DC2626] mt-0.5">🔥 Solo quedan ${itemStock}</p>` : ''}
         <p class="text-sm text-gray-500 mt-1">$${(item.precio * item.cantidad).toLocaleString('es-MX')} MXN</p>
         <div class="flex items-center gap-3 mt-2">
           <button class="qty-minus text-xs border border-gray-300 w-6 h-6 rounded" data-index="${i}">−</button>
@@ -269,7 +329,7 @@ function updateCartUI() {
         </div>
       </div>
     </div>
-  `).join('')
+  `}).join('')
 
   const subtotal = cart.reduce((s, i) => s + i.precio * i.cantidad, 0)
   const promo = isPromoActiva()
@@ -287,6 +347,10 @@ function updateCartUI() {
     <div class="flex justify-between mb-1 text-sm text-[#DC2626]">
       <span class="font-heading tracking-wider uppercase">🔥 20% OFF</span>
       <span class="font-body">−$${descuento.toLocaleString('es-MX')} MXN</span>
+    </div>
+    <div class="flex justify-between mb-2 text-[10px] text-[#DC2626]/80">
+      <span class="font-heading tracking-wider uppercase">⏱ Vence en</span>
+      <span class="font-body font-mono" id="cart-countdown">--:--:--</span>
     </div>`
   }
 
@@ -480,11 +544,13 @@ function addToCart(nombre, precio, imagen, descripcion, color) {
   ensureAudioSession()
   initAudio()
   color = color || ''
+  const prod = productos.find(p => p.nombre === nombre)
+  const stock = prod ? prod.stock : 'disponible'
   const exist = cart.find(i => i.nombre === nombre && i.color === color)
   if (exist) {
     exist.cantidad++
   } else {
-    cart.push({ nombre, precio, imagen, descripcion, color, cantidad: 1 })
+    cart.push({ nombre, precio, imagen, descripcion, color, cantidad: 1, stock })
   }
   saveCart()
   openCart()
@@ -634,6 +700,8 @@ function openDetail(producto) {
 function closeDetail() {
   productModal.style.display = 'none'
   document.body.style.overflow = ''
+  const zoomOverlay = document.getElementById('image-zoom-overlay')
+  if (zoomOverlay) zoomOverlay.style.display = 'none'
   const form = document.getElementById('product-modal-review-form')
   if (form) {
     form.classList.add('hidden')
@@ -673,6 +741,26 @@ document.addEventListener('click', e => {
 
   if (e.target.closest('#product-modal-close') || e.target.closest('#product-modal-overlay')) {
     closeDetail()
+  }
+
+  const modalImage = e.target.closest('#product-modal-image')
+  if (modalImage) {
+    const img = modalImage.querySelector('img')
+    if (img && img.src) {
+      document.getElementById('image-zoom-img').src = img.src
+      document.getElementById('image-zoom-overlay').style.display = 'flex'
+      document.body.style.overflow = 'hidden'
+    }
+  }
+
+  const zoomOverlay = e.target.closest('#image-zoom-overlay')
+  if (zoomOverlay && e.target === zoomOverlay) {
+    document.getElementById('image-zoom-overlay').style.display = 'none'
+    document.body.style.overflow = ''
+  }
+  if (e.target.closest('#image-zoom-close')) {
+    document.getElementById('image-zoom-overlay').style.display = 'none'
+    document.body.style.overflow = ''
   }
 
   const detailTrigger = e.target.closest('.open-detail')
@@ -975,6 +1063,46 @@ setTimeout(() => {
   if (t && !t.children.length) { delete t.dataset.rendered; renderTestimonios() }
 }, 150)
 
+// ─── Newsletter ───
+
+document.getElementById('newsletter-form')?.addEventListener('submit', async e => {
+  e.preventDefault()
+  const input = document.getElementById('newsletter-email')
+  const feedback = document.getElementById('newsletter-feedback')
+  const email = input?.value.trim()
+  if (!email || !/\S+@\S+\.\S+/.test(email)) {
+    feedback.textContent = 'Ingresa un correo válido.'
+    feedback.className = 'font-body text-xs mt-3 text-red-500'
+    feedback.classList.remove('hidden')
+    return
+  }
+  const btn = e.target.querySelector('button[type="submit"]')
+  btn.disabled = true
+  btn.textContent = 'Enviando…'
+  try {
+    const res = await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+    const data = await res.json()
+    if (data.ok) {
+      feedback.textContent = '¡Gracias! Ahora recibirás nuestras novedades.'
+      feedback.className = 'font-body text-xs mt-3 text-green-600'
+      feedback.classList.remove('hidden')
+      input.value = ''
+    } else {
+      throw new Error(data.error || 'Error al suscribir')
+    }
+  } catch (err) {
+    feedback.textContent = 'Error al suscribir. ¿Ya estás registrado?'
+    feedback.className = 'font-body text-xs mt-3 text-red-500'
+    feedback.classList.remove('hidden')
+  }
+  btn.disabled = false
+  btn.textContent = 'Suscribirme'
+})
+
 // ─── Promo Timer ───
 
 function updatePromoTimer() {
@@ -995,6 +1123,10 @@ function updatePromoTimer() {
   hoursEl.textContent = String(Math.floor(remaining / 3600)).padStart(2, '0')
   minsEl.textContent = String(Math.floor((remaining % 3600) / 60)).padStart(2, '0')
   secsEl.textContent = String(remaining % 60).padStart(2, '0')
+  const cartCountdown = document.getElementById('cart-countdown')
+  if (cartCountdown) {
+    cartCountdown.textContent = `${String(Math.floor(remaining / 3600)).padStart(2, '0')}:${String(Math.floor((remaining % 3600) / 60)).padStart(2, '0')}:${String(remaining % 60).padStart(2, '0')}`
+  }
   text.textContent = '🔥 20% OFF'
   if (subtext) subtext.textContent = 'SOLO POR HOY'
   bar.classList.remove('hidden')

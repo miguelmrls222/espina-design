@@ -70,6 +70,10 @@
   height: 1.75rem;
 }
 
+#product-modal-image:hover #product-modal-zoom-hint {
+  opacity: 1;
+}
+
 @media (min-width: 768px) {
   #header-inner.scrolled {
     height: 60px;

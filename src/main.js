@@ -112,7 +112,7 @@ function renderProductos() {
           </div>
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
           ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 font-heading">Solo quedan ' + p.stock + '</span>' : ''}
-          ${p.precio >= 999 ? '<span class="absolute top-2 right-2 bg-black/80 text-white text-[9px] tracking-wider uppercase px-2 py-1 font-heading rounded">Envío gratis</span>' : ''}
+          ${p.precio >= 1250 ? '<span class="absolute top-2 right-2 bg-black/80 text-white text-[9px] tracking-wider uppercase px-2 py-1 font-heading rounded">Envío gratis</span>' : ''}
           <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm flex items-center gap-1">
             <svg class="w-3 h-3 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
             <span class="font-heading text-[9px] tracking-wide text-green-800 font-semibold">Garantía de 1 año</span>
@@ -158,7 +158,7 @@ function renderDestacados() {
     const agotado = p.stock === 'agotado'
     const stockBajo = !agotado && typeof p.stock === 'number' && p.stock <= 3
     return `
-      <div class="flex-shrink-0 w-[220px] sm:w-[260px] group flex flex-col snap-start ${agotado ? 'opacity-50' : ''}">
+          <div class="flex-shrink-0 w-[220px] sm:w-[260px] group flex flex-col snap-start ${agotado ? 'opacity-50' : ''}">
         <div class="aspect-[4/5] bg-[#F5F5F5] mb-4 overflow-hidden relative cursor-pointer open-detail" data-index="${prodIndex}">
           ${img ? `<img src="${img}" alt="${p.nombre}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />` : '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>'}
           <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
@@ -166,7 +166,7 @@ function renderDestacados() {
           </div>
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
           ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 font-heading">Solo quedan ' + p.stock + '</span>' : ''}
-          ${p.precio >= 999 ? '<span class="absolute top-2 right-2 bg-black/80 text-white text-[9px] tracking-wider uppercase px-2 py-1 font-heading rounded">Envío gratis</span>' : ''}
+          ${p.precio >= 1250 ? '<span class="absolute top-2 right-2 bg-black/80 text-white text-[9px] tracking-wider uppercase px-2 py-1 font-heading rounded">Envío gratis</span>' : ''}
           <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm flex items-center gap-1">
             <svg class="w-3 h-3 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
             <span class="font-heading text-[9px] tracking-wide text-green-800 font-semibold">Garantía de 1 año</span>
@@ -372,7 +372,7 @@ function updateCartUI() {
   cartFooter.querySelector('.cart-totals').innerHTML = html
 
   // ─── Envío gratis ───
-  const envioMeta = 999
+  const envioMeta = 1250
   const envioProgreso = Math.min(subtotal / envioMeta, 1)
   const envioBar = document.getElementById('envio-progress')
   const envioIcon = document.getElementById('envio-icon')

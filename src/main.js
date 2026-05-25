@@ -40,7 +40,7 @@ function navigate(path) {
   document.querySelectorAll('#menu-mobile nav [data-nav]').forEach(a => {
     const href = a.getAttribute('href')
     const isActive = href === path
-    a.style.opacity = isActive ? '1' : '0.45'
+    a.style.opacity = '1'
     if (isActive) {
       a.innerHTML = a.textContent.trim() + ' <span class="inline-block w-1.5 h-1.5 rounded-full bg-black align-middle ml-1"></span>'
     } else {

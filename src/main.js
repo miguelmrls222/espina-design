@@ -242,6 +242,17 @@ function renderTestimonios() {
     </div>
   `).join('')
   track.innerHTML = cards + cards
+
+  let paused = false
+  track.addEventListener('touchstart', () => { paused = true }, { passive: true })
+  track.addEventListener('touchend', () => { paused = false }, { passive: true })
+  track.addEventListener('touchcancel', () => { paused = false }, { passive: true })
+
+  setInterval(() => {
+    if (paused) return
+    track.scrollLeft += 0.5
+    if (track.scrollLeft >= track.scrollWidth / 2) track.scrollLeft = 0
+  }, 16)
 }
 
 // ─── Carrito ───

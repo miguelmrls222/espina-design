@@ -30,9 +30,9 @@
   }
 }
 
-@keyframes scroll-left {
+@keyframes marquee-text {
   0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  100% { transform: translateX(-33.333%); }
 }
 
 .animate-marquee {
@@ -40,7 +40,7 @@
 }
 
 #testimonios-track {
-  animation: scroll-left 40s linear infinite;
+  overflow-x: hidden;
 }
 
 #site-header.scrolled {

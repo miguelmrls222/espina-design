@@ -78,6 +78,11 @@
   50% { opacity: 0.8; }
 }
 
+@keyframes confetti-fall {
+  0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(80px) rotate(360deg); }
+}
+
 .animate-skeleton {
   animation: skeleton-pulse 1.4s ease-in-out infinite;
 }

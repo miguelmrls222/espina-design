@@ -48,8 +48,12 @@
   animation: scroll-left 40s linear infinite;
 }
 
+#header-logo {
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.2)) brightness(1.04);
+}
+
 #site-header.scrolled {
-  box-shadow: 0 1px 6px rgba(0,0,0,.3);
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
 }
 
 #header-inner.scrolled {

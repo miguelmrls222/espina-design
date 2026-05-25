@@ -144,7 +144,6 @@ function renderDestacados() {
   const container = document.getElementById('destacados-scroll')
   if (!container || container.dataset.rendered) return
   container.dataset.rendered = '1'
-  if (container.children.length > 0) return
 
   const top = productos.slice(0, 4)
 

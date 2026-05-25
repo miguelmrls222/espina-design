@@ -151,7 +151,7 @@
               <div id="destacados-scroll" class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x snap-mandatory" style="-webkit-overflow-scrolling:touch; scrollbar-width:none; -ms-overflow-style:none">
                 <div class="flex-shrink-0 w-[220px] sm:w-[260px] group flex flex-col snap-start">
                   <div class="aspect-[4/5] bg-[#F5F5F5] mb-4 overflow-hidden relative cursor-pointer open-detail" data-index="0">
-                    <img src="/images/products/billetera-sahuaro.jpg" alt="Billetera Sahuaro" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src="/images/products/billetera-sahuaro.jpg" alt="Billetera Sahuaro" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
                       <span class="text-white text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 px-4 py-2">Ver más</span>
                     </div>
@@ -174,7 +174,7 @@
                 </div>
                 <div class="flex-shrink-0 w-[220px] sm:w-[260px] group flex flex-col snap-start">
                   <div class="aspect-[4/5] bg-[#F5F5F5] mb-4 overflow-hidden relative cursor-pointer open-detail" data-index="1">
-                    <img src="/images/products/img_7196-2.jpg" alt="Tarjetero Agave" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src="/images/products/img_7196-2.jpg" alt="Tarjetero Agave" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
                       <span class="text-white text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 px-4 py-2">Ver más</span>
                     </div>
@@ -197,7 +197,7 @@
                 </div>
                 <div class="flex-shrink-0 w-[220px] sm:w-[260px] group flex flex-col snap-start">
                   <div class="aspect-[4/5] bg-[#F5F5F5] mb-4 overflow-hidden relative cursor-pointer open-detail" data-index="2">
-                    <img src="/images/products/img_5063.jpg" alt="Tarjetero Cactus" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src="/images/products/img_5063.jpg" alt="Tarjetero Cactus" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
                       <span class="text-white text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 px-4 py-2">Ver más</span>
                     </div>
@@ -220,7 +220,7 @@
                 </div>
                 <div class="flex-shrink-0 w-[220px] sm:w-[260px] group flex flex-col snap-start">
                   <div class="aspect-[4/5] bg-[#F5F5F5] mb-4 overflow-hidden relative cursor-pointer open-detail" data-index="3">
-                    <img src="/images/products/tarjetero-cardon.jpg" alt="Tarjetero Cardón" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src="/images/products/tarjetero-cardon.jpg" alt="Tarjetero Cardón" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
                       <span class="text-white text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 px-4 py-2">Ver más</span>
                     </div>
@@ -397,30 +397,60 @@
         <section id="page-faq" class="page-section min-h-screen px-6 pt-[136px] hidden">
           <div class="max-w-3xl mx-auto">
             <h1 class="font-heading text-3xl sm:text-4xl md:text-5xl tracking-wider uppercase mb-16 text-center">Preguntas Frecuentes</h1>
-            <div class="space-y-8">
-              <div>
-                <h3 class="font-heading text-sm tracking-widest uppercase mb-2">¿Hacen envíos a todo México?</h3>
-                <p class="font-body text-sm leading-relaxed text-gray-600">Sí, realizamos envíos a toda la República Mexicana. El costo de envío se calcula al momento del pago y el paquete se envía con rastreo.</p>
+            <div class="space-y-3" id="faq-container">
+              <div class="faq-item border border-gray-200 rounded">
+                <button class="faq-question w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-gray-50 transition-colors" aria-expanded="false">
+                  <h3 class="font-heading text-sm tracking-widest uppercase">¿Hacen envíos a todo México?</h3>
+                  <svg class="faq-icon w-4 h-4 text-gray-400 flex-shrink-0 ml-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                  <p class="font-body text-sm leading-relaxed text-gray-600 px-5 pb-4">Sí, realizamos envíos a toda la República Mexicana. El costo de envío se calcula al momento del pago y el paquete se envía con rastreo.</p>
+                </div>
               </div>
-              <div>
-                <h3 class="font-heading text-sm tracking-widest uppercase mb-2">¿Cuánto tarda la fabricación?</h3>
-                <p class="font-body text-sm leading-relaxed text-gray-600">Cada pieza se elabora a mano, por lo que el tiempo de fabricación puede variar entre 3 a 10 días hábiles, dependiendo del producto y la demanda.</p>
+              <div class="faq-item border border-gray-200 rounded">
+                <button class="faq-question w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-gray-50 transition-colors" aria-expanded="false">
+                  <h3 class="font-heading text-sm tracking-widest uppercase">¿Cuánto tarda la fabricación?</h3>
+                  <svg class="faq-icon w-4 h-4 text-gray-400 flex-shrink-0 ml-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                  <p class="font-body text-sm leading-relaxed text-gray-600 px-5 pb-4">Cada pieza se elabora a mano, por lo que el tiempo de fabricación puede variar entre 3 a 10 días hábiles, dependiendo del producto y la demanda.</p>
+                </div>
               </div>
-              <div>
-                <h3 class="font-heading text-sm tracking-widest uppercase mb-2">¿Cómo cuido mi producto de cuero?</h3>
-                <p class="font-body text-sm leading-relaxed text-gray-600">Recomendamos limpiar con un paño seco o ligeramente húmedo, evitar la exposición prolongada al sol y aplicar acondicionador de cuero cada 3 a 6 meses para mantenerlo hidratado.</p>
+              <div class="faq-item border border-gray-200 rounded">
+                <button class="faq-question w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-gray-50 transition-colors" aria-expanded="false">
+                  <h3 class="font-heading text-sm tracking-widest uppercase">¿Cómo cuido mi producto de cuero?</h3>
+                  <svg class="faq-icon w-4 h-4 text-gray-400 flex-shrink-0 ml-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                  <p class="font-body text-sm leading-relaxed text-gray-600 px-5 pb-4">Recomendamos limpiar con un paño seco o ligeramente húmedo, evitar la exposición prolongada al sol y aplicar acondicionador de cuero cada 3 a 6 meses para mantenerlo hidratado.</p>
+                </div>
               </div>
-              <div>
-                <h3 class="font-heading text-sm tracking-widest uppercase mb-2">¿Qué métodos de pago aceptan?</h3>
-                <p class="font-body text-sm leading-relaxed text-gray-600">Aceptamos tarjetas de crédito, débito y pagos vía transferencia a través de Stripe, nuestra plataforma de pagos segura.</p>
+              <div class="faq-item border border-gray-200 rounded">
+                <button class="faq-question w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-gray-50 transition-colors" aria-expanded="false">
+                  <h3 class="font-heading text-sm tracking-widest uppercase">¿Qué métodos de pago aceptan?</h3>
+                  <svg class="faq-icon w-4 h-4 text-gray-400 flex-shrink-0 ml-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                  <p class="font-body text-sm leading-relaxed text-gray-600 px-5 pb-4">Aceptamos tarjetas de crédito, débito y pagos vía transferencia a través de Stripe, nuestra plataforma de pagos segura.</p>
+                </div>
               </div>
-              <div>
-                <h3 class="font-heading text-sm tracking-widest uppercase mb-2">¿Puedo devolver o cambiar un producto?</h3>
-                <p class="font-body text-sm leading-relaxed text-gray-600">Sí, aceptamos cambios y devoluciones dentro de los primeros 7 días posteriores a la entrega, siempre que el producto esté en su condición original. Escríbenos para gestionarlo.</p>
+              <div class="faq-item border border-gray-200 rounded">
+                <button class="faq-question w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-gray-50 transition-colors" aria-expanded="false">
+                  <h3 class="font-heading text-sm tracking-widest uppercase">¿Puedo devolver o cambiar un producto?</h3>
+                  <svg class="faq-icon w-4 h-4 text-gray-400 flex-shrink-0 ml-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                  <p class="font-body text-sm leading-relaxed text-gray-600 px-5 pb-4">Sí, aceptamos cambios y devoluciones dentro de los primeros 7 días posteriores a la entrega, siempre que el producto esté en su condición original. Escríbenos para gestionarlo.</p>
+                </div>
               </div>
-              <div>
-                <h3 class="font-heading text-sm tracking-widest uppercase mb-2">¿Hacen pedidos personalizados?</h3>
-                <p class="font-body text-sm leading-relaxed text-gray-600">Sí, trabajamos pedidos personalizados. Contáctanos por WhatsApp o Instagram para platicar tu idea y te daremos un presupuesto sin compromiso.</p>
+              <div class="faq-item border border-gray-200 rounded">
+                <button class="faq-question w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-gray-50 transition-colors" aria-expanded="false">
+                  <h3 class="font-heading text-sm tracking-widest uppercase">¿Hacen pedidos personalizados?</h3>
+                  <svg class="faq-icon w-4 h-4 text-gray-400 flex-shrink-0 ml-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                  <p class="font-body text-sm leading-relaxed text-gray-600 px-5 pb-4">Sí, trabajamos pedidos personalizados. Contáctanos por WhatsApp o Instagram para platicar tu idea y te daremos un presupuesto sin compromiso.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -887,6 +917,27 @@
           </svg>
         </button>
         <img id="image-zoom-img" src="" alt="" class="max-w-full max-h-full object-contain" />
+      </div>
+
+      <!-- SKELETON LOADING -->
+      <div id="page-skeleton" class="fixed inset-0 z-[55] bg-white hidden" style="padding-top: 136px;">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="h-10 w-64 bg-gray-100 rounded mx-auto mb-16 animate-skeleton"></div>
+          <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            <div><div class="aspect-[4/5] bg-gray-100 rounded mb-4 animate-skeleton"></div><div class="h-4 w-3/4 bg-gray-100 rounded mb-2 animate-skeleton"></div><div class="h-3 w-1/3 bg-gray-100 rounded animate-skeleton"></div></div>
+            <div><div class="aspect-[4/5] bg-gray-100 rounded mb-4 animate-skeleton"></div><div class="h-4 w-3/4 bg-gray-100 rounded mb-2 animate-skeleton"></div><div class="h-3 w-1/3 bg-gray-100 rounded animate-skeleton"></div></div>
+            <div><div class="aspect-[4/5] bg-gray-100 rounded mb-4 animate-skeleton"></div><div class="h-4 w-3/4 bg-gray-100 rounded mb-2 animate-skeleton"></div><div class="h-3 w-1/3 bg-gray-100 rounded animate-skeleton"></div></div>
+            <div><div class="aspect-[4/5] bg-gray-100 rounded mb-4 animate-skeleton"></div><div class="h-4 w-3/4 bg-gray-100 rounded mb-2 animate-skeleton"></div><div class="h-3 w-1/3 bg-gray-100 rounded animate-skeleton"></div></div>
+            <div><div class="aspect-[4/5] bg-gray-100 rounded mb-4 animate-skeleton"></div><div class="h-4 w-3/4 bg-gray-100 rounded mb-2 animate-skeleton"></div><div class="h-3 w-1/3 bg-gray-100 rounded animate-skeleton"></div></div>
+            <div><div class="aspect-[4/5] bg-gray-100 rounded mb-4 animate-skeleton"></div><div class="h-4 w-3/4 bg-gray-100 rounded mb-2 animate-skeleton"></div><div class="h-3 w-1/3 bg-gray-100 rounded animate-skeleton"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOAST -->
+      <div id="toast" class="fixed top-24 left-1/2 -translate-x-1/2 z-[95] bg-black text-white px-6 py-3 rounded shadow-lg flex items-center gap-3 transition-all duration-400 opacity-0 translate-y-4 pointer-events-none" style="transition-property: opacity, transform; transition-duration: 0.4s;">
+        <svg class="w-5 h-5 text-green-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span id="toast-text" class="font-heading text-xs tracking-widest uppercase">Agregado al carrito</span>
       </div>
 
       <!-- WHATSAPP FLOTANTE -->

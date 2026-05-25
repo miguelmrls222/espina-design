@@ -29,6 +29,9 @@ const pageMeta = {
 }
 
 function navigate(path) {
+  const skeleton = document.getElementById('page-skeleton')
+  skeleton?.classList.remove('hidden')
+
   const page = pages[path.replace(/^\//, '')] || 'inicio'
   document.querySelectorAll('.page-section').forEach(s => s.classList.add('hidden'))
   const section = document.getElementById(`page-${page}`)
@@ -55,6 +58,8 @@ function navigate(path) {
   }
   if (page === 'tienda') renderProductos()
   if (page === 'gracias') renderGracias()
+
+  setTimeout(() => skeleton?.classList.add('hidden'), 300)
 }
 
 function closeMenu() {
@@ -101,12 +106,13 @@ function renderProductos() {
     return `
       <div class="group flex flex-col ${agotado ? 'opacity-50' : ''}">
         <div class="aspect-[4/5] bg-[#F5F5F5] mb-4 overflow-hidden relative cursor-pointer open-detail" data-index="${i}">
-          ${img ? `<img src="${img}" alt="${p.nombre}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />` : ''}
+          ${img ? `<img src="${img}" alt="${p.nombre}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />` : ''}
           <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
             <span class="text-white text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 px-4 py-2">Ver más</span>
           </div>
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
           ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 font-heading">Solo quedan ' + p.stock + '</span>' : ''}
+          ${p.precio >= 999 ? '<span class="absolute top-2 right-2 bg-black/80 text-white text-[9px] tracking-wider uppercase px-2 py-1 font-heading rounded">Envío gratis</span>' : ''}
           <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm flex items-center gap-1">
             <svg class="w-3 h-3 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
             <span class="font-heading text-[9px] tracking-wide text-green-800 font-semibold">Garantía de 1 año</span>
@@ -115,7 +121,7 @@ function renderProductos() {
         <div class="flex flex-col flex-1">
           <h3 class="font-heading text-sm tracking-widest uppercase mb-1 cursor-pointer open-detail min-h-[2.5rem] sm:min-h-0 leading-tight" data-index="${i}">${p.nombre}</h3>
           <p class="font-body text-sm text-gray-500 mb-2">$${p.precio.toLocaleString('es-MX')} MXN</p>
-          ${renderEstrellas(promedioResenas(p))}
+          ${renderEstrellas(p)}
           ${p.colores?.length ? `
           <div class="flex gap-1.5 mb-3">
             ${p.colores.map(c => `<span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color:${colorMap[c] || '#ccc'}" title="${c}"></span>`).join('')}
@@ -161,6 +167,7 @@ function renderDestacados() {
           </div>
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
           ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 font-heading">Solo quedan ' + p.stock + '</span>' : ''}
+          ${p.precio >= 999 ? '<span class="absolute top-2 right-2 bg-black/80 text-white text-[9px] tracking-wider uppercase px-2 py-1 font-heading rounded">Envío gratis</span>' : ''}
           <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm flex items-center gap-1">
             <svg class="w-3 h-3 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
             <span class="font-heading text-[9px] tracking-wide text-green-800 font-semibold">Garantía de 1 año</span>
@@ -169,7 +176,7 @@ function renderDestacados() {
         <div class="flex flex-col flex-1">
           <h3 class="font-heading text-sm tracking-widest uppercase mb-1 cursor-pointer open-detail leading-tight" data-index="${prodIndex}">${p.nombre}</h3>
           <p class="font-body text-sm text-gray-500 mb-2">$${p.precio.toLocaleString('es-MX')} MXN</p>
-          ${renderEstrellas(promedioResenas(p))}
+          ${renderEstrellas(p)}
           ${p.colores?.length ? `
           <div class="flex gap-1.5 mb-3">
             ${p.colores.map(c => `<span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color:${colorMap[c] || '#ccc'}" title="${c}"></span>`).join('')}
@@ -188,9 +195,10 @@ function renderDestacados() {
   }).join('')
 }
 
-function renderEstrellas(puntuacion) {
-  if (!puntuacion) return ''
-  const full = Math.round(puntuacion)
+function renderEstrellas(p) {
+  if (!p.resenas || p.resenas.length === 0) return ''
+  const avg = p.resenas.reduce((s, r) => s + r.puntuacion, 0) / p.resenas.length
+  const full = Math.round(avg)
   return `
     <div class="flex items-center gap-0.5 mb-2">
       ${Array.from({ length: 5 }, (_, i) =>
@@ -198,13 +206,8 @@ function renderEstrellas(puntuacion) {
           ? '<svg class="w-3 h-3 text-amber-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'
           : '<svg class="w-3 h-3 text-gray-200" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'
       ).join('')}
+      <span class="font-body text-[10px] text-gray-400 ml-0.5">${avg.toFixed(1)} (${p.resenas.length})</span>
     </div>`
-}
-
-function promedioResenas(p) {
-  if (!p.resenas || p.resenas.length === 0) return null
-  const avg = p.resenas.reduce((s, r) => s + r.puntuacion, 0) / p.resenas.length
-  return Math.round(avg)
 }
 
 // ─── Testimonios ───
@@ -316,7 +319,7 @@ function updateCartUI() {
     const itemStockBajo = typeof itemStock === 'number' && itemStock <= 3
     return `
     <div class="flex gap-4 pb-4 border-b border-gray-100">
-      ${item.imagen ? `<img src="${item.imagen}" alt="${item.nombre}" class="w-20 h-20 object-cover bg-[#F5F5F5]" />` : ''}
+      ${item.imagen ? `<img src="${item.imagen}" alt="${item.nombre}" loading="lazy" class="w-20 h-20 object-cover bg-[#F5F5F5]" />` : ''}
       <div class="flex-1 min-w-0">
         <h4 class="font-heading text-xs tracking-widest uppercase truncate">${item.nombre}</h4>
         ${item.color ? `<p class="font-body text-xs text-gray-400 mt-0.5">Color: ${item.color}</p>` : ''}
@@ -541,6 +544,22 @@ function gtagEvent(...args) {
   if (typeof gtag === 'function') gtag(...args)
 }
 
+function mostrarToast(texto) {
+  const toast = document.getElementById('toast')
+  const toastText = document.getElementById('toast-text')
+  if (!toast) return
+  toastText.textContent = texto
+  toast.style.opacity = '1'
+  toast.style.transform = 'translateY(0)'
+  toast.classList.remove('pointer-events-none')
+  clearTimeout(toast._timer)
+  toast._timer = setTimeout(() => {
+    toast.style.opacity = '0'
+    toast.style.transform = 'translateY(12px)'
+    toast.classList.add('pointer-events-none')
+  }, 2500)
+}
+
 function addToCart(nombre, precio, imagen, descripcion, color) {
   ensureAudioSession()
   initAudio()
@@ -555,6 +574,7 @@ function addToCart(nombre, precio, imagen, descripcion, color) {
   }
   saveCart()
   openCart()
+  mostrarToast('✓ Agregado al carrito')
   gtagEvent('event', 'add_to_cart', {
     currency: 'MXN',
     value: precio,
@@ -587,7 +607,7 @@ function openDetail(producto) {
   function renderFoto(index) {
     const f = fotos[index]
     if (f) {
-      productModalImage.innerHTML = `<img src="${f}" alt="${producto.nombre}" class="w-full h-full object-cover transition-opacity duration-300" />`
+      productModalImage.innerHTML = `<img src="${f}" alt="${producto.nombre}" loading="lazy" class="w-full h-full object-cover transition-opacity duration-300" />`
     } else {
       productModalImage.innerHTML = '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>'
     }
@@ -596,7 +616,7 @@ function openDetail(producto) {
     if (fotos.length > 1) {
       thumbsEl.innerHTML = fotos.map((f, fi) => `
         <button class="thumb-btn flex-shrink-0 w-14 h-14 rounded border-2 overflow-hidden transition-all duration-200 ${fi === index ? 'border-black' : 'border-gray-200 hover:border-gray-400'}" data-foto-index="${fi}">
-          <img src="${f}" alt="" class="w-full h-full object-cover" />
+          <img src="${f}" alt="" loading="lazy" class="w-full h-full object-cover" />
         </button>
       `).join('')
       thumbsEl.style.display = 'flex'
@@ -636,6 +656,7 @@ function openDetail(producto) {
 
   let metaHTML = ''
   if (producto.materiales) metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Materiales:</span> ${producto.materiales}</p>`
+  if (producto.dimensiones) metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Medidas:</span> ${producto.dimensiones}</p>`
   if (producto.tiempo_fabricacion) metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Fabricación:</span> ${producto.tiempo_fabricacion}</p>`
   if (producto.stock) {
     const estados = { disponible: 'Disponible', agotado: 'Agotado', 'bajo-pedido': 'Bajo pedido' }
@@ -943,7 +964,7 @@ function renderGracias() {
   container.innerHTML = pedido.items.map(i => `
     <div class="flex items-center gap-4 text-sm">
       <div class="w-14 h-14 bg-[#F5F5F5] flex-shrink-0 flex items-center justify-center overflow-hidden">
-        ${i.imagen ? `<img src="${i.imagen}" alt="${i.nombre}" class="w-full h-full object-cover" />` : `<span class="font-heading text-[10px] tracking-widest uppercase text-gray-400">ED</span>`}
+        ${i.imagen ? `<img src="${i.imagen}" alt="${i.nombre}" loading="lazy" class="w-full h-full object-cover" />` : `<span class="font-heading text-[10px] tracking-widest uppercase text-gray-400">ED</span>`}
       </div>
       <div class="flex-1 min-w-0">
         <p class="font-heading text-xs tracking-widest uppercase truncate">${i.nombre}</p>
@@ -1139,6 +1160,57 @@ function updatePromoTimer() {
 
 updatePromoTimer()
 setInterval(updatePromoTimer, 1000)
+
+// ─── FAQ Accordion ───
+
+document.addEventListener('click', e => {
+  const question = e.target.closest('.faq-question')
+  if (!question) return
+  const item = question.closest('.faq-item')
+  const answer = item.querySelector('.faq-answer')
+  const icon = question.querySelector('.faq-icon')
+  const isOpen = question.getAttribute('aria-expanded') === 'true'
+
+  document.querySelectorAll('.faq-item').forEach(other => {
+    const otherQuestion = other.querySelector('.faq-question')
+    const otherAnswer = other.querySelector('.faq-answer')
+    const otherIcon = other.querySelector('.faq-icon')
+    if (other !== item) {
+      otherQuestion.setAttribute('aria-expanded', 'false')
+      otherAnswer.style.maxHeight = '0'
+      otherIcon.style.transform = 'rotate(0deg)'
+    }
+  })
+
+  if (isOpen) {
+    question.setAttribute('aria-expanded', 'false')
+    answer.style.maxHeight = '0'
+    icon.style.transform = 'rotate(0deg)'
+  } else {
+    question.setAttribute('aria-expanded', 'true')
+    answer.style.maxHeight = answer.scrollHeight + 'px'
+    icon.style.transform = 'rotate(180deg)'
+  }
+})
+
+// ─── Swipe to close cart ───
+
+let touchStartX = 0
+let touchStartY = 0
+const cartPanelEl = document.getElementById('cart-panel')
+
+cartPanelEl?.addEventListener('touchstart', e => {
+  touchStartX = e.changedTouches[0].screenX
+  touchStartY = e.changedTouches[0].screenY
+}, { passive: true })
+
+cartPanelEl?.addEventListener('touchmove', e => {
+  const dx = e.changedTouches[0].screenX - touchStartX
+  const dy = e.changedTouches[0].screenY - touchStartY
+  if (Math.abs(dx) > Math.abs(dy) && dx > 50) {
+    closeCart()
+  }
+}, { passive: true })
 
 // ─── Scroll header ───
 

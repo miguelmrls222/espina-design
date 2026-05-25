@@ -1249,17 +1249,14 @@ function updatePromoTimer() {
   const minutes = Math.floor((remaining % 3600) / 60)
   const secs = remaining % 60
 
-  if (days > 0) {
-    hoursEl.textContent = String(days * 24 + hours).padStart(2, '0')
-  } else {
-    hoursEl.textContent = String(hours).padStart(2, '0')
-  }
+  const totalHours = days > 0 ? days * 24 + hours : hours
+  hoursEl.textContent = String(totalHours).padStart(2, '0')
   minsEl.textContent = String(minutes).padStart(2, '0')
   secsEl.textContent = String(secs).padStart(2, '0')
 
   const cartCountdown = document.getElementById('cart-countdown')
   if (cartCountdown) {
-    cartCountdown.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+    cartCountdown.textContent = `${String(totalHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
   }
 
   text.textContent = '🔥 20% OFF'

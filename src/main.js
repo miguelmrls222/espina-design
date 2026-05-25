@@ -48,6 +48,7 @@ function navigate(path) {
     }
   })
   closeMenu()
+  closeCart()
   if (page === 'inicio') {
     renderDestacados()
     renderTestimonios()

@@ -61,11 +61,11 @@
 
 @keyframes marquee-text {
   0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  100% { transform: translateX(-33.333%); }
 }
 
 .animate-marquee {
-  animation: marquee-text 30s linear infinite;
+  animation: marquee-text 24s linear infinite;
 }
 
 #testimonios-track {

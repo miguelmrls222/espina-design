@@ -92,6 +92,15 @@
   opacity: 1;
 }
 
+@keyframes promo-text-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-promo-text {
+  animation: promo-text-pulse 1.2s ease-in-out infinite;
+}
+
 @keyframes skeleton-pulse {
   0%, 100% { opacity: 0.4; }
   50% { opacity: 0.8; }

@@ -242,18 +242,7 @@ function renderTestimonios() {
     </div>
   `).join('')
   track.innerHTML = cards + cards
-
-  const el = track.parentElement
-  let paused = false
-  el.addEventListener('touchstart', () => { paused = true }, { passive: true })
-  el.addEventListener('touchend', () => { paused = false }, { passive: true })
-  el.addEventListener('touchcancel', () => { paused = false }, { passive: true })
-
-  setInterval(() => {
-    if (paused) return
-    el.scrollLeft += 0.5
-    if (el.scrollLeft >= el.scrollWidth / 2) el.scrollLeft = 0
-  }, 16)
+  void track.offsetHeight
 }
 
 // ─── Carrito ───

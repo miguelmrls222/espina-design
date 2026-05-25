@@ -243,15 +243,16 @@ function renderTestimonios() {
   `).join('')
   track.innerHTML = cards + cards
 
+  const el = track.parentElement
   let paused = false
-  track.addEventListener('touchstart', () => { paused = true }, { passive: true })
-  track.addEventListener('touchend', () => { paused = false }, { passive: true })
-  track.addEventListener('touchcancel', () => { paused = false }, { passive: true })
+  el.addEventListener('touchstart', () => { paused = true }, { passive: true })
+  el.addEventListener('touchend', () => { paused = false }, { passive: true })
+  el.addEventListener('touchcancel', () => { paused = false }, { passive: true })
 
   setInterval(() => {
     if (paused) return
-    track.scrollLeft += 0.5
-    if (track.scrollLeft >= track.scrollWidth / 2) track.scrollLeft = 0
+    el.scrollLeft += 0.5
+    if (el.scrollLeft >= el.scrollWidth / 2) el.scrollLeft = 0
   }, 16)
 }
 

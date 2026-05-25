@@ -34,12 +34,20 @@ function navigate(path) {
 }
 
 function closeMenu() {
-  if (menu) menu.style.display = 'none'
+  if (!menu) return
+  menu.classList.remove('opacity-100', 'pointer-events-auto')
+  menu.classList.add('opacity-0', 'pointer-events-none')
 }
 
 function toggleMenu() {
   if (!menu) return
-  menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex'
+  const isOpen = menu.classList.contains('opacity-100')
+  if (isOpen) {
+    closeMenu()
+  } else {
+    menu.classList.remove('opacity-0', 'pointer-events-none')
+    menu.classList.add('opacity-100', 'pointer-events-auto')
+  }
 }
 
 window.addEventListener('popstate', () => navigate(window.location.pathname))
@@ -628,6 +636,7 @@ document.addEventListener('click', e => {
     return
   }
   if (e.target.closest('#menu-btn')) { toggleMenu(); return }
+  if (e.target.closest('#menu-close')) { closeMenu(); return }
 
   if (e.target.closest('#cart-btn')) {
     openCart()

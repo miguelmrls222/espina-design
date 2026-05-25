@@ -39,6 +39,11 @@
   }
 }
 
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
 @keyframes confetti-fall {
   0% {
     opacity: 1;
@@ -48,6 +53,10 @@
     opacity: 0;
     transform: translateY(300px) rotate(720deg) scale(0.3);
   }
+}
+
+.animate-shimmer {
+  animation: shimmer 3.5s ease-in-out infinite;
 }
 
 #testimonios-track {

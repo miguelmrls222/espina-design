@@ -283,8 +283,11 @@ function saveCart() {
   updateCartUI()
 }
 
+// Cambia esta fecha para renovar la promo (formato: Año, Mes-1, Día, Hora, Minuto, Segundo)
+const PROMO_EXPIRES = new Date(2026, 4, 31, 23, 59, 59) // 31 de mayo 2026 23:59:59
+
 function isPromoActiva() {
-  return true
+  return Date.now() < PROMO_EXPIRES.getTime()
 }
 
 function updateCartUI() {
@@ -1210,6 +1213,8 @@ document.getElementById('newsletter-form')?.addEventListener('submit', async e =
 
 // ─── Promo Timer ───
 
+let _promoState = null
+
 function updatePromoTimer() {
   const bar = document.getElementById('promo-bar')
   const hoursEl = document.getElementById('promo-hours')
@@ -1219,21 +1224,45 @@ function updatePromoTimer() {
   const subtext = document.getElementById('promo-subtext')
   if (!bar) return
 
-  const now = new Date()
-  const h = now.getHours()
-  const m = now.getMinutes()
-  const s = now.getSeconds()
-  const remaining = (23 - h) * 3600 + (59 - m) * 60 + (60 - s)
+  const prev = _promoState
+  _promoState = isPromoActiva()
 
-  hoursEl.textContent = String(Math.floor(remaining / 3600)).padStart(2, '0')
-  minsEl.textContent = String(Math.floor((remaining % 3600) / 60)).padStart(2, '0')
-  secsEl.textContent = String(remaining % 60).padStart(2, '0')
+  if (prev !== null && prev !== _promoState) {
+    updateCartUI()
+  }
+
+  if (!_promoState) {
+    bar.classList.add('hidden')
+    return
+  }
+
+  const remaining = Math.max(0, Math.floor((PROMO_EXPIRES.getTime() - Date.now()) / 1000))
+
+  if (remaining <= 0) {
+    bar.classList.add('hidden')
+    return
+  }
+
+  const days = Math.floor(remaining / 86400)
+  const hours = Math.floor((remaining % 86400) / 3600)
+  const minutes = Math.floor((remaining % 3600) / 60)
+  const secs = remaining % 60
+
+  if (days > 0) {
+    hoursEl.textContent = String(days * 24 + hours).padStart(2, '0')
+  } else {
+    hoursEl.textContent = String(hours).padStart(2, '0')
+  }
+  minsEl.textContent = String(minutes).padStart(2, '0')
+  secsEl.textContent = String(secs).padStart(2, '0')
+
   const cartCountdown = document.getElementById('cart-countdown')
   if (cartCountdown) {
-    cartCountdown.textContent = `${String(Math.floor(remaining / 3600)).padStart(2, '0')}:${String(Math.floor((remaining % 3600) / 60)).padStart(2, '0')}:${String(remaining % 60).padStart(2, '0')}`
+    cartCountdown.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
   }
+
   text.textContent = '🔥 20% OFF'
-  if (subtext) subtext.textContent = 'SOLO POR HOY'
+  if (subtext) subtext.textContent = 'POR TIEMPO LIMITADO'
   bar.classList.remove('hidden')
 }
 

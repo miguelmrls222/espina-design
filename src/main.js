@@ -242,31 +242,6 @@ function renderTestimonios() {
     </div>
   `).join('')
   track.innerHTML = cards + cards
-
-  let pos = 0
-  let raf = null
-  let running = true
-
-  function step() {
-    if (!running) return
-    pos -= 0.5
-    const w = track.scrollWidth / 2
-    if (Math.abs(pos) >= w) pos += w
-    track.style.transform = `translateX(${pos}px)`
-    raf = requestAnimationFrame(step)
-  }
-
-  track.addEventListener('touchstart', () => { running = false; raf && cancelAnimationFrame(raf) }, { passive: true })
-  track.addEventListener('touchend', () => { running = true; raf = requestAnimationFrame(step) }, { passive: true })
-  track.addEventListener('touchcancel', () => { running = true; raf = requestAnimationFrame(step) }, { passive: true })
-
-  setTimeout(() => {
-    if (!window.matchMedia('(hover: hover)').matches) return
-    track.addEventListener('mouseenter', () => { running = false; raf && cancelAnimationFrame(raf) })
-    track.addEventListener('mouseleave', () => { running = true; raf = requestAnimationFrame(step) })
-  }, 100)
-
-  raf = requestAnimationFrame(step)
 }
 
 // ─── Carrito ───

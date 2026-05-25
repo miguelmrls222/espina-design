@@ -30,12 +30,17 @@
   }
 }
 
+@keyframes scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 .animate-marquee {
   animation: marquee-text 24s linear infinite;
 }
 
 #testimonios-track {
-  will-change: transform;
+  animation: scroll-left 40s linear infinite;
 }
 
 #site-header.scrolled {

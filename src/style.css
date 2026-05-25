@@ -49,7 +49,7 @@
 }
 
 #header-logo {
-  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.2)) brightness(1.04);
+  filter: drop-shadow(0 4px 14px rgba(156,98,38,0.3)) brightness(1.12) contrast(1.05);
 }
 
 #site-header.scrolled {

@@ -1258,20 +1258,23 @@ function updatePromoTimer() {
   const minutes = Math.floor((remaining % 3600) / 60)
   const secs = remaining % 60
 
-  const totalHours = days > 0 ? days * 24 + hours : hours
-  hoursEl.textContent = String(totalHours).padStart(2, '0')
+  const daysEl = document.getElementById('promo-days')
+  if (daysEl) daysEl.textContent = String(days).padStart(2, '0')
+  hoursEl.textContent = String(hours).padStart(2, '0')
   minsEl.textContent = String(minutes).padStart(2, '0')
   secsEl.textContent = String(secs).padStart(2, '0')
 
   if (text) {
-    text.textContent = days > 0
-      ? `🔥 20% OFF — ${days} día${days !== 1 ? 's' : ''}`
-      : '🔥 20% OFF'
+    text.textContent = '🔥 20% OFF'
   }
 
   const cartCountdown = document.getElementById('cart-countdown')
   if (cartCountdown) {
-    cartCountdown.textContent = `${String(totalHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+    if (days > 0) {
+      cartCountdown.textContent = `${String(days).padStart(2, '0')}d ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+    } else {
+      cartCountdown.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+    }
   }
 
   if (subtext) subtext.textContent = 'POR TIEMPO LIMITADO'

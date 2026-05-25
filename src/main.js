@@ -463,6 +463,10 @@ function closeCart() {
   setTimeout(() => { cartPanel.style.display = 'none' }, 300)
 }
 
+function gtagEvent(...args) {
+  if (typeof gtag === 'function') gtag(...args)
+}
+
 function addToCart(nombre, precio, imagen, descripcion, color) {
   ensureAudioSession()
   initAudio()
@@ -475,6 +479,11 @@ function addToCart(nombre, precio, imagen, descripcion, color) {
   }
   saveCart()
   openCart()
+  gtagEvent('event', 'add_to_cart', {
+    currency: 'MXN',
+    value: precio,
+    items: [{ item_name: nombre, price: precio, quantity: 1 }]
+  })
 }
 
 // ─── Detalle de producto ───
@@ -555,6 +564,12 @@ function openDetail(producto) {
     metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Stock:</span> ${estados[producto.stock] || producto.stock}</p>`
   }
   productModalMeta.innerHTML = metaHTML
+
+  gtagEvent('event', 'view_item', {
+    currency: 'MXN',
+    value: producto.precio,
+    items: [{ item_name: producto.nombre, price: producto.precio, item_category: producto.categoria }]
+  })
 
   const reviewsEl = document.getElementById('product-modal-reviews')
   const resenas = producto.resenas
@@ -718,6 +733,14 @@ document.addEventListener('click', e => {
   const remove = e.target.closest('.remove-item')
   if (remove) {
     const i = parseInt(remove.dataset.index)
+    const item = cart[i]
+    if (item) {
+      gtagEvent('event', 'remove_from_cart', {
+        currency: 'MXN',
+        value: item.precio * item.cantidad,
+        items: [{ item_name: item.nombre, price: item.precio, quantity: item.cantidad }]
+      })
+    }
     cart.splice(i, 1)
     saveCart()
   }
@@ -827,6 +850,12 @@ function renderGracias() {
       <p class="font-heading text-xs tracking-widest">$${(i.precio * i.cantidad).toLocaleString('es-MX')}</p>
     </div>
   `).join('')
+  gtagEvent('event', 'purchase', {
+    transaction_id: pedido.session_id || '',
+    value: pedido.items.reduce((t, i) => t + (i.precio || 0) * (i.cantidad || 0), 0),
+    currency: 'MXN',
+    items: pedido.items.map(i => ({ item_name: i.nombre, price: i.precio, quantity: i.cantidad }))
+  })
 }
 
 async function iniciarCheckout() {
@@ -841,6 +870,11 @@ async function iniciarCheckout() {
       return
     }
     saveEmail()
+    gtagEvent('event', 'begin_checkout', {
+      currency: 'MXN',
+      value: cart.reduce((t, i) => t + i.precio * i.cantidad, 0),
+      items: cart.map(i => ({ item_name: i.nombre, price: i.precio, quantity: i.cantidad }))
+    })
     const promo = isPromoActiva()
     const res = await fetch('/api/create-checkout', {
       method: 'POST',

@@ -12,5 +12,19 @@
   "categoria": "billeteras",
   "materiales": "Cuero",
   "stock": "disponible",
-  "tiempo_fabricacion": "3-10 dias hábiles"
+  "tiempo_fabricacion": "3-10 dias hábiles",
+  "resenas": [
+    {
+      "nombre": "Sofía H.",
+      "puntuacion": 5,
+      "texto": "Perfecto para el día a día, super ligero y cabe en cualquier bolsillo.",
+      "fecha": "Abr 2026"
+    },
+    {
+      "nombre": "Diego V.",
+      "puntuacion": 5,
+      "texto": "Segunda vez que compro, la calidad es consistente. Muy recomendado.",
+      "fecha": "Ene 2026"
+    }
+  ]
 }

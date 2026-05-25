@@ -12,5 +12,19 @@
   "categoria": "billeteras",
   "materiales": "Cuero vegetal 100%",
   "stock": "disponible",
-  "tiempo_fabricacion": "3-5 días"
+  "tiempo_fabricacion": "3-5 días",
+  "resenas": [
+    {
+      "nombre": "Carlos M.",
+      "puntuacion": 5,
+      "texto": "Excelente calidad, el cuero se siente premium. Ya pedí otra para regalar.",
+      "fecha": "Mar 2026"
+    },
+    {
+      "nombre": "Ana R.",
+      "puntuacion": 5,
+      "texto": "Me encantó, muy funcional y elegante. El envío fue rápido.",
+      "fecha": "Feb 2026"
+    }
+  ]
 }

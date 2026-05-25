@@ -560,6 +560,44 @@
               <div id="color-swatches" class="flex gap-3 flex-wrap"></div>
             </div>
             <div id="product-modal-meta" class="border-t border-gray-100 pt-4 space-y-2 text-sm text-gray-500 font-body mb-6"></div>
+            <div id="product-modal-reviews" class="border-t border-gray-100 pt-4 mb-6"></div>
+            <div id="product-modal-review-form" class="border-t border-gray-100 pt-4 mb-6 hidden">
+              <p class="font-heading text-xs tracking-widest uppercase text-black mb-3">Dejar reseña</p>
+              <div class="mb-3">
+                <div class="flex items-center gap-1" id="review-stars">
+                  <button class="review-star w-7 h-7 flex items-center justify-center text-gray-300 hover:text-black transition-colors" data-val="1">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  </button>
+                  <button class="review-star w-7 h-7 flex items-center justify-center text-gray-300 hover:text-black transition-colors" data-val="2">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  </button>
+                  <button class="review-star w-7 h-7 flex items-center justify-center text-gray-300 hover:text-black transition-colors" data-val="3">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  </button>
+                  <button class="review-star w-7 h-7 flex items-center justify-center text-gray-300 hover:text-black transition-colors" data-val="4">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  </button>
+                  <button class="review-star w-7 h-7 flex items-center justify-center text-gray-300 hover:text-black transition-colors" data-val="5">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="mb-3">
+                <input type="text" id="review-name" placeholder="Tu nombre" class="w-full border border-gray-200 px-3 py-2 text-sm font-body outline-none focus:border-black transition-colors" />
+              </div>
+              <div class="mb-3">
+                <textarea id="review-text" rows="3" placeholder="Escribe tu comentario..." class="w-full border border-gray-200 px-3 py-2 text-sm font-body outline-none focus:border-black transition-colors resize-none"></textarea>
+              </div>
+              <div class="flex gap-2">
+                <button id="review-submit" class="flex-1 font-heading text-xs tracking-widest uppercase border-2 border-black px-4 py-2 hover:bg-black hover:text-white transition-colors duration-300">
+                  Enviar reseña
+                </button>
+                <button id="review-cancel" class="font-heading text-xs tracking-widest uppercase border-2 border-gray-300 px-4 py-2 text-gray-500 hover:border-gray-500 transition-colors duration-300">
+                  Cancelar
+                </button>
+              </div>
+              <p id="review-feedback" class="font-body text-xs mt-2 hidden"></p>
+            </div>
             <button id="product-modal-add" class="w-full font-heading text-sm tracking-widest uppercase border-2 border-black px-10 py-3 hover:bg-black hover:text-white transition-colors duration-300">
               Agregar al carrito
             </button>

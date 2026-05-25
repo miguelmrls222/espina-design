@@ -545,6 +545,42 @@ function openDetail(producto) {
   }
   productModalMeta.innerHTML = metaHTML
 
+  const reviewsEl = document.getElementById('product-modal-reviews')
+  const resenas = producto.resenas
+  if (resenas && resenas.length > 0) {
+    reviewsEl.innerHTML = `
+      <p class="font-heading text-xs tracking-widest uppercase text-black mb-3">Reseñas</p>
+      <div class="space-y-3">
+        ${resenas.map(r => {
+          const estrellas = Array.from({ length: 5 }, (_, i) =>
+            i < r.puntuacion
+              ? `<svg class="w-3.5 h-3.5 text-black flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`
+              : `<svg class="w-3.5 h-3.5 text-gray-300 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`
+          ).join('')
+          return `
+            <div class="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+              <div class="flex items-center gap-2 mb-1">
+                <div class="flex items-center gap-0.5">${estrellas}</div>
+                <span class="font-heading text-[11px] tracking-wider uppercase text-black">${r.nombre}</span>
+                ${r.fecha ? `<span class="font-body text-[10px] text-gray-400">${r.fecha}</span>` : ''}
+              </div>
+              <p class="font-body text-xs text-gray-600 leading-relaxed">${r.texto}</p>
+            </div>
+          `
+        }).join('')}
+      </div>
+      <button id="toggle-review-btn" class="mt-3 font-heading text-[10px] tracking-widest uppercase border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors duration-300">
+        Dejar reseña
+      </button>
+    `
+    reviewsEl.classList.remove('hidden')
+  } else {
+    reviewsEl.innerHTML = `<button id="toggle-review-btn" class="font-heading text-[10px] tracking-widest uppercase border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors duration-300">
+      Dejar reseña
+    </button>`
+    reviewsEl.classList.remove('hidden')
+  }
+
   productModalAdd.disabled = agotado
   productModalAdd.textContent = agotado ? 'Agotado' : 'Agregar al carrito'
   productModalAdd.className = `w-full font-heading text-sm tracking-widest uppercase border-2 px-10 py-3 transition-colors duration-300 ${agotado ? 'border-gray-300 text-gray-300 cursor-not-allowed' : 'border-black hover:bg-black hover:text-white cursor-pointer'}`
@@ -563,6 +599,20 @@ function openDetail(producto) {
 function closeDetail() {
   productModal.style.display = 'none'
   document.body.style.overflow = ''
+  const form = document.getElementById('product-modal-review-form')
+  if (form) {
+    form.classList.add('hidden')
+    document.getElementById('review-name').value = ''
+    document.getElementById('review-text').value = ''
+    document.querySelectorAll('.review-star').forEach(b => {
+      b.classList.add('text-gray-300')
+      b.classList.remove('text-black')
+    })
+    const starsEl = document.getElementById('review-stars')
+    delete starsEl.dataset.selected
+    const feedback = document.getElementById('review-feedback')
+    feedback.classList.add('hidden')
+  }
 }
 
 document.addEventListener('click', e => {
@@ -658,6 +708,80 @@ document.addEventListener('click', e => {
     const i = parseInt(remove.dataset.index)
     cart.splice(i, 1)
     saveCart()
+  }
+
+  if (e.target.closest('#toggle-review-btn')) {
+    const form = document.getElementById('product-modal-review-form')
+    form.classList.toggle('hidden')
+  }
+
+  if (e.target.closest('#review-cancel')) {
+    document.getElementById('product-modal-review-form').classList.add('hidden')
+  }
+
+  const starBtn = e.target.closest('.review-star')
+  if (starBtn) {
+    const val = parseInt(starBtn.dataset.val)
+    document.querySelectorAll('.review-star').forEach(b => {
+      const bv = parseInt(b.dataset.val)
+      b.classList.toggle('text-black', bv <= val)
+      b.classList.toggle('text-gray-300', bv > val)
+    })
+    document.getElementById('review-stars').dataset.selected = val
+  }
+
+  if (e.target.closest('#review-submit')) {
+    const form = document.getElementById('product-modal-review-form')
+    const producto = document.getElementById('product-modal-name')?.textContent || ''
+    const nombre = document.getElementById('review-name')?.value.trim()
+    const texto = document.getElementById('review-text')?.value.trim()
+    const starsEl = document.getElementById('review-stars')
+    const puntuacion = parseInt(starsEl?.dataset?.selected || '0')
+    const feedback = document.getElementById('review-feedback')
+
+    if (!nombre || !texto || puntuacion === 0) {
+      feedback.textContent = 'Completa todos los campos y selecciona una puntuación.'
+      feedback.className = 'font-body text-xs mt-2 text-red-500'
+      feedback.classList.remove('hidden')
+      return
+    }
+
+    const btn = document.getElementById('review-submit')
+    btn.disabled = true
+    btn.textContent = 'Enviando…'
+
+    fetch('/api/submit-review', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ producto, nombre, puntuacion, texto }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.ok) {
+          feedback.textContent = '¡Gracias! Tu reseña será revisada y publicada pronto.'
+          feedback.className = 'font-body text-xs mt-2 text-green-600'
+          feedback.classList.remove('hidden')
+          document.getElementById('review-name').value = ''
+          document.getElementById('review-text').value = ''
+          document.querySelectorAll('.review-star').forEach(b => {
+            b.classList.add('text-gray-300')
+            b.classList.remove('text-black')
+          })
+          delete starsEl.dataset.selected
+          setTimeout(() => form.classList.add('hidden'), 2500)
+        } else {
+          throw new Error(data.error || 'Error al enviar')
+        }
+      })
+      .catch(() => {
+        feedback.textContent = 'Error al enviar. Intenta de nuevo o escríbenos por WhatsApp.'
+        feedback.className = 'font-body text-xs mt-2 text-red-500'
+        feedback.classList.remove('hidden')
+      })
+      .finally(() => {
+        btn.disabled = false
+        btn.textContent = 'Enviar reseña'
+      })
   }
 })
 

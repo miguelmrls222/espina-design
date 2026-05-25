@@ -8,12 +8,6 @@
     "/images/products/tarjetero-cardon.jpg"
   ],
   "colores": ["verde", "gris", "vino", "cafe oscuro"],
-  "fotosPorColor": {
-    "verde": "/images/products/tarjetero-cardon-verde.jpg",
-    "gris": "/images/products/tarjetero-cardon-gris.jpg",
-    "vino": "/images/products/tarjetero-cardon-vino.jpg",
-    "cafe oscuro": "/images/products/tarjetero-cardon-cafe.jpg"
-  },
   "activo": true,
   "categoria": "billeteras",
   "materiales": "Cuero vegetal 100%",

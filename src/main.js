@@ -5,6 +5,9 @@ const pages = {
   'tienda': 'tienda',
   'nosotros': 'nosotros',
   'faq': 'faq',
+  'envios': 'envios',
+  'devoluciones': 'devoluciones',
+  'garantia': 'garantia',
   'contacto': 'contacto',
   'gracias': 'gracias',
 }

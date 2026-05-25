@@ -244,8 +244,8 @@ function renderTestimonios() {
   track.innerHTML = cards + cards
 
   let pos = 0
-  let running = true
   let raf = null
+  let running = true
 
   function step() {
     if (!running) return
@@ -256,11 +256,15 @@ function renderTestimonios() {
     raf = requestAnimationFrame(step)
   }
 
-  track.addEventListener('touchstart', () => { running = false; if (raf) cancelAnimationFrame(raf) }, { passive: true })
+  track.addEventListener('touchstart', () => { running = false; raf && cancelAnimationFrame(raf) }, { passive: true })
   track.addEventListener('touchend', () => { running = true; raf = requestAnimationFrame(step) }, { passive: true })
   track.addEventListener('touchcancel', () => { running = true; raf = requestAnimationFrame(step) }, { passive: true })
-  track.addEventListener('mouseenter', () => { running = false; if (raf) cancelAnimationFrame(raf) })
-  track.addEventListener('mouseleave', () => { running = true; raf = requestAnimationFrame(step) })
+
+  setTimeout(() => {
+    if (!window.matchMedia('(hover: hover)').matches) return
+    track.addEventListener('mouseenter', () => { running = false; raf && cancelAnimationFrame(raf) })
+    track.addEventListener('mouseleave', () => { running = true; raf = requestAnimationFrame(step) })
+  }, 100)
 
   raf = requestAnimationFrame(step)
 }

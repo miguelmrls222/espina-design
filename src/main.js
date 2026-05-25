@@ -295,6 +295,7 @@ function updateCartUI() {
   const envioSection = document.getElementById('envio-section')
   const giftSection = document.getElementById('gift-section')
   const timelineSection = document.getElementById('timeline-section')
+  const crossellSection = document.getElementById('cart-crossell')
 
   if (cart.length === 0) {
     cartItems.innerHTML = `
@@ -306,6 +307,7 @@ function updateCartUI() {
     envioSection?.classList.add('hidden')
     giftSection?.classList.add('hidden')
     timelineSection?.classList.add('hidden')
+    crossellSection?.classList.add('hidden')
     return
   }
 
@@ -390,6 +392,36 @@ function updateCartUI() {
     envioIcon.innerHTML = `<svg class="w-3.5 h-3.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`
     envioTexto.textContent = `Falta $${falta.toLocaleString('es-MX')} MXN para envío gratis`
     envioTexto.className = 'font-body text-xs text-gray-500 mt-2'
+  }
+
+  // ─── Cross-sell ───
+  const cartNames = cart.map(i => i.nombre)
+  const sugeridos = productos.filter(p => !cartNames.includes(p.nombre) && p.stock !== 'agotado').slice(0, 2)
+  if (sugeridos.length > 0) {
+    crossellSection?.classList.remove('hidden')
+    document.getElementById('crossell-items').innerHTML = sugeridos.map(p => {
+      const img = p.fotos?.[0] || ''
+      return `
+      <div class="flex items-center gap-3">
+        <div class="w-14 h-14 bg-[#F5F5F5] flex-shrink-0 overflow-hidden rounded">
+          ${img ? `<img src="${img}" alt="${p.nombre}" loading="lazy" class="w-full h-full object-cover" />` : '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg></div>'}
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-heading text-[11px] tracking-widest uppercase truncate">${p.nombre}</p>
+          <p class="font-body text-xs text-gray-500">$${p.precio.toLocaleString('es-MX')} MXN</p>
+        </div>
+        <button class="crossell-add font-heading text-[10px] tracking-widest uppercase border border-black px-3 py-1.5 hover:bg-black hover:text-white transition-colors duration-300 flex-shrink-0"
+          data-nombre="${p.nombre}"
+          data-precio="${p.precio}"
+          data-imagen="${img}"
+          data-descripcion="${p.descripcion || ''}"
+          data-color="${p.colores?.[0] || ''}">
+          + Agregar
+        </button>
+      </div>`
+    }).join('')
+  } else {
+    crossellSection?.classList.add('hidden')
   }
 }
 
@@ -834,6 +866,17 @@ document.addEventListener('click', e => {
       addBtn.dataset.imagen,
       addBtn.dataset.descripcion,
       addBtn.dataset.color || ''
+    )
+  }
+
+  const crossellBtn = e.target.closest('.crossell-add')
+  if (crossellBtn) {
+    addToCart(
+      crossellBtn.dataset.nombre,
+      parseFloat(crossellBtn.dataset.precio),
+      crossellBtn.dataset.imagen,
+      crossellBtn.dataset.descripcion,
+      crossellBtn.dataset.color || ''
     )
   }
 

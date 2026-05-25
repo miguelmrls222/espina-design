@@ -6,7 +6,6 @@ const PRECIOS = {
 }
 
 const PROMO_EXPIRES = new Date(Date.UTC(2026, 4, 31, 23, 59, 59))
-const ENVIO_GRATIS_THRESHOLD = 1250
 
 function isPromoActiva() {
   return Date.now() < PROMO_EXPIRES.getTime()
@@ -40,8 +39,7 @@ export async function onRequest(context) {
     }
 
     const promoActiva = isPromoActiva()
-    const subtotal = items.reduce((s, i) => s + i.precio * (i.cantidad || 1), 0)
-    const aplicarDesc = promoActiva && subtotal >= ENVIO_GRATIS_THRESHOLD
+    const aplicarDesc = promoActiva
 
     for (const item of items) {
       const key = item.nombre.toLowerCase().trim()

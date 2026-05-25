@@ -339,7 +339,7 @@ function updateCartUI() {
   `}).join('')
 
   const subtotal = cart.reduce((s, i) => s + i.precio * i.cantidad, 0)
-  const promo = isPromoActiva() && subtotal >= 1250
+  const promo = isPromoActiva()
   const descuento = promo ? Math.round(subtotal * 0.2) : 0
   const total = subtotal - descuento
 
@@ -1086,8 +1086,7 @@ async function iniciarCheckout() {
       items: cart.map(i => ({ item_name: i.nombre, price: i.precio, quantity: i.cantidad }))
     })
     const promo = isPromoActiva()
-    const cartTotal = cart.reduce((t, i) => t + i.precio * i.cantidad, 0)
-    const aplicarDesc = promo && cartTotal >= 1250
+    const aplicarDesc = promo
     const res = await fetch('/api/create-checkout', {
       method: 'POST',
       body: JSON.stringify({

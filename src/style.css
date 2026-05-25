@@ -97,10 +97,10 @@
 
 @media (min-width: 768px) {
   #header-inner.scrolled {
-    height: 60px;
+    height: 64px;
   }
   #header-logo.scrolled {
-    height: 2.25rem;
+    height: 2.5rem;
   }
 }
 

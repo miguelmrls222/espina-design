@@ -748,6 +748,43 @@ function openDetail(producto) {
     }
   }
 
+  // ─── Schema.org Product (para crawlers client-side) ───
+  const existingScript = document.getElementById('ld-product')
+  if (existingScript) existingScript.remove()
+  const ldScript = document.createElement('script')
+  ldScript.id = 'ld-product'
+  ldScript.type = 'application/ld+json'
+  const totalResenas = producto.resenas?.length || 0
+  const avgResena = totalResenas > 0
+    ? (producto.resenas.reduce((s, r) => s + r.puntuacion, 0) / totalResenas).toFixed(1)
+    : null
+  const ld = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: producto.nombre,
+    image: fotos.map(f => `https://espinadesign.com${f}`),
+    description: producto.descripcion || '',
+    sku: producto.slug || producto.nombre,
+    brand: { '@type': 'Brand', name: 'Espina Design' },
+    offers: {
+      '@type': 'Offer',
+      price: producto.precio,
+      priceCurrency: 'MXN',
+      availability: producto.stock === 'agotado' ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
+      url: `https://espinadesign.com/tienda`,
+    },
+  }
+  if (avgResena && totalResenas > 0) {
+    ld.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: avgResena,
+      reviewCount: totalResenas,
+      bestRating: '5',
+    }
+  }
+  ldScript.textContent = JSON.stringify(ld)
+  document.head.appendChild(ldScript)
+
   productModal.style.display = 'flex'
   document.body.style.overflow = 'hidden'
 }

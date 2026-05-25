@@ -617,6 +617,8 @@ function openDetail(producto) {
   if (producto.colores && producto.colores.length > 0) {
     coloresEl.classList.remove('hidden')
     colorSeleccionado = producto.colores[0]
+    const nameEl = document.getElementById('color-selected-name')
+    if (nameEl) nameEl.textContent = colorSeleccionado
     swatchesEl.innerHTML = producto.colores.map(c => {
       const hex = colorMap[c] || '#ccc'
       return `
@@ -794,6 +796,8 @@ document.addEventListener('click', e => {
     colorBtn.classList.remove('border-gray-200', 'hover:border-gray-400')
     colorBtn.classList.add('border-black', 'scale-110')
     colorSeleccionado = colorBtn.dataset.color
+    const nameEl = document.getElementById('color-selected-name')
+    if (nameEl) nameEl.textContent = colorSeleccionado
   }
 
   if (e.target.closest('#checkout-btn')) {

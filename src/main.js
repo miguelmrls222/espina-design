@@ -629,6 +629,14 @@ const productModalDesc = document.getElementById('product-modal-desc')
 const productModalMeta = document.getElementById('product-modal-meta')
 const productModalAdd = document.getElementById('product-modal-add')
 let colorSeleccionado = ''
+let currentProducto = null
+
+function getImgPorColor(producto, color) {
+  if (producto?.fotosPorColor && color && producto.fotosPorColor[color]) {
+    return producto.fotosPorColor[color]
+  }
+  return producto?.fotos?.filter(Boolean)?.[0] || ''
+}
 
 let fotoActual = 0
 
@@ -637,6 +645,7 @@ function openDetail(producto) {
   const img = fotos[0] || ''
   const agotado = producto.stock === 'agotado'
 
+  currentProducto = producto
   fotoActual = 0
 
   function renderFoto(index) {
@@ -687,6 +696,12 @@ function openDetail(producto) {
     }).join('')
   } else {
     coloresEl.classList.add('hidden')
+  }
+
+  // Mostrar imagen del primer color si existe fotosPorColor
+  const imgInicial = getImgPorColor(producto, colorSeleccionado)
+  if (imgInicial && imgInicial !== fotos[0]) {
+    productModalImage.innerHTML = `<img src="${imgInicial}" alt="${producto.nombre} - ${colorSeleccionado}" loading="lazy" class="w-full h-full object-cover transition-opacity duration-300" />`
   }
 
   let metaHTML = ''
@@ -747,7 +762,7 @@ function openDetail(producto) {
 
   productModalAdd.onclick = () => {
     if (!agotado) {
-      addToCart(producto.nombre, producto.precio, img, producto.descripcion || '', colorSeleccionado)
+      addToCart(producto.nombre, producto.precio, getImgPorColor(producto, colorSeleccionado), producto.descripcion || '', colorSeleccionado)
       closeDetail()
     }
   }
@@ -891,6 +906,19 @@ document.addEventListener('click', e => {
     colorSeleccionado = colorBtn.dataset.color
     const nameEl = document.getElementById('color-selected-name')
     if (nameEl) nameEl.textContent = colorSeleccionado
+
+    // Cambiar imagen según color seleccionado
+    const nuevaImg = getImgPorColor(currentProducto, colorSeleccionado)
+    if (nuevaImg) {
+      const imgContainer = document.getElementById('product-modal-image')
+      const imgEl = imgContainer?.querySelector('img')
+      if (imgEl) {
+        imgEl.src = nuevaImg
+        imgEl.alt = `${currentProducto?.nombre || ''} - ${colorSeleccionado}`
+      } else {
+        imgContainer.innerHTML = `<img src="${nuevaImg}" alt="${currentProducto?.nombre || ''} - ${colorSeleccionado}" loading="lazy" class="w-full h-full object-cover transition-opacity duration-300" />`
+      }
+    }
   }
 
   if (e.target.closest('#checkout-btn')) {

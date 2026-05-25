@@ -8,6 +8,12 @@
     "/images/products/img_5063.jpg"
   ],
   "colores": ["verde", "gris", "vino", "cafe oscuro"],
+  "fotosPorColor": {
+    "verde": "/images/products/tarjetero-cactus-verde.jpg",
+    "gris": "/images/products/tarjetero-cactus-gris.jpg",
+    "vino": "/images/products/tarjetero-cactus-vino.jpg",
+    "cafe oscuro": "/images/products/tarjetero-cactus-cafe.jpg"
+  },
   "activo": true,
   "categoria": "billeteras",
   "materiales": "Cuero",

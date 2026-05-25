@@ -26,6 +26,10 @@ export async function onRequest(context) {
       })
     }
 
+    const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+    const productoEsc = esc(producto)
+    const nombreEsc = esc(nombre)
+    const textoEsc = esc(texto)
     const estrellas = '★'.repeat(puntuacion) + '☆'.repeat(5 - puntuacion)
 
     const res = await fetch('https://api.brevo.com/v3/smtp/email', {
@@ -38,7 +42,7 @@ export async function onRequest(context) {
         sender: { name: 'Espina Design', email: 'miguelmrls222@gmail.com' },
         to: [{ email: 'miguelmrls222@gmail.com' }],
         replyTo: { email: 'miguelmrls222@gmail.com' },
-        subject: `Nueva reseña — ${producto}`,
+        subject: `Nueva reseña — ${productoEsc}`,
         htmlContent: `
 <!doctype html>
 <html>
@@ -49,10 +53,10 @@ export async function onRequest(context) {
 </td></tr>
 <tr><td>
 <table style="width:100%;font-size:13px;color:#333;line-height:1.6">
-<tr><td style="padding:6px 0;font-weight:bold;color:#000;width:100px">Producto</td><td>${producto}</td></tr>
-<tr><td style="padding:6px 0;font-weight:bold;color:#000">Cliente</td><td>${nombre}</td></tr>
+<tr><td style="padding:6px 0;font-weight:bold;color:#000;width:100px">Producto</td><td>${productoEsc}</td></tr>
+<tr><td style="padding:6px 0;font-weight:bold;color:#000">Cliente</td><td>${nombreEsc}</td></tr>
 <tr><td style="padding:6px 0;font-weight:bold;color:#000">Puntuación</td><td>${estrellas} (${puntuacion}/5)</td></tr>
-<tr><td style="padding:6px 0;font-weight:bold;color:#000;vertical-align:top">Comentario</td><td>${texto}</td></tr>
+<tr><td style="padding:6px 0;font-weight:bold;color:#000;vertical-align:top">Comentario</td><td>${textoEsc}</td></tr>
 </table>
 </td></tr>
 <tr><td style="text-align:center;padding-top:24px;font-size:11px;color:#999">
@@ -66,7 +70,8 @@ export async function onRequest(context) {
 
     if (!res.ok) {
       const errBody = await res.text()
-      throw new Error(errBody)
+      console.error('Brevo error:', errBody)
+      throw new Error('Error al enviar reseña')
     }
 
     return new Response(JSON.stringify({ ok: true }), {

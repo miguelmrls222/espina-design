@@ -26,15 +26,18 @@ export async function onRequest(context) {
 
   const payload = JSON.stringify({ token });
 
+  const origin = url.origin;
+
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Authorizing...</title></head><body>
 <script>
   function receiveMessage(event) {
-    window.opener.postMessage('authorization:github:success:${payload}', '*');
+    if (event.origin !== '${origin}') return;
+    window.opener.postMessage('authorization:github:success:${payload}', '${origin}');
     window.removeEventListener('message', receiveMessage, false);
     window.close();
   }
   window.addEventListener('message', receiveMessage, false);
-  window.opener.postMessage('authorizing:github', '*');
+  window.opener.postMessage('authorizing:github', '${origin}');
 </script>
 <p>Authorizing Decap CMS...</p>
 </body></html>`;

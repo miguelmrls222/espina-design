@@ -1,3 +1,17 @@
+const PRECIOS = {
+  'tarjetero cardón': 589,
+  'tarjetero cactus': 489,
+  'tarjetero agave': 589,
+  'billetera sahuaro': 789,
+}
+
+const PROMO_EXPIRES = new Date(Date.UTC(2026, 4, 31, 23, 59, 59))
+const ENVIO_GRATIS_THRESHOLD = 1250
+
+function isPromoActiva() {
+  return Date.now() < PROMO_EXPIRES.getTime()
+}
+
 export async function onRequest(context) {
   const { request, env } = context
 
@@ -25,6 +39,28 @@ export async function onRequest(context) {
       })
     }
 
+    const promoActiva = isPromoActiva()
+    const subtotal = items.reduce((s, i) => s + i.precio * (i.cantidad || 1), 0)
+    const aplicarDesc = promoActiva && subtotal >= ENVIO_GRATIS_THRESHOLD
+
+    for (const item of items) {
+      const key = item.nombre.toLowerCase().trim()
+      const precioReal = PRECIOS[key]
+      if (precioReal === undefined) {
+        return new Response(JSON.stringify({ error: `Producto desconocido: ${item.nombre}` }), {
+          status: 400,
+          headers: { 'content-type': 'application/json' },
+        })
+      }
+      const precioEsperado = aplicarDesc ? Math.round(precioReal * 0.8) : precioReal
+      if (Math.round(item.precio) !== precioEsperado) {
+        return new Response(JSON.stringify({ error: `Precio inválido para: ${item.nombre}` }), {
+          status: 400,
+          headers: { 'content-type': 'application/json' },
+        })
+      }
+    }
+
     const origin = new URL(request.url).origin
     const params = new URLSearchParams()
     params.set('mode', 'payment')
@@ -36,16 +72,21 @@ export async function onRequest(context) {
       params.set('customer_email', email)
       params.set('metadata[email]', email)
     }
-    const cartSummary = items.map(i => ({ n: i.nombre, p: i.precio, c: i.cantidad, col: i.color || '' }))
+    const cartSummary = items.map(i => ({ n: i.nombre, p: i.precio, c: i.cantidad, col: i.color || '', img: i.imagen || '' }))
     params.set('metadata[cart]', JSON.stringify(cartSummary))
 
     items.forEach((item, i) => {
       const prefix = `line_items[${i}]`
       params.set(`${prefix}[price_data][currency]`, 'mxn')
       params.set(`${prefix}[price_data][product_data][name]`, item.nombre)
-      const descConPromo = item.descripcion ? `${item.descripcion}\n🔥 Incluye llavero GRATIS 🔥` : '🔥 Incluye un llavero totalmente GRATIS 🔥'
+      const descConPromo = item.descripcion
+        ? `${item.descripcion}\n🔥 Incluye llavero GRATIS 🔥`
+        : '🔥 Incluye un llavero totalmente GRATIS 🔥'
       params.set(`${prefix}[price_data][product_data][description]`, descConPromo)
-      if (item.imagen) params.set(`${prefix}[price_data][product_data][images][0]`, item.imagen)
+      if (item.imagen) {
+        const imgAbs = item.imagen.startsWith('http') ? item.imagen : `${origin}${item.imagen}`
+        params.set(`${prefix}[price_data][product_data][images][0]`, imgAbs)
+      }
       params.set(`${prefix}[price_data][unit_amount]`, String(Math.round(item.precio * 100)))
       params.set(`${prefix}[quantity]`, String(item.cantidad || 1))
     })

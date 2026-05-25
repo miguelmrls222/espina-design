@@ -41,7 +41,8 @@ export async function onRequest(context) {
 
     if (!res.ok && res.status !== 409) {
       const errBody = await res.text()
-      throw new Error(errBody)
+      console.error('Brevo error:', errBody)
+      throw new Error('Error al suscribir')
     }
 
     return new Response(JSON.stringify({ ok: true }), {

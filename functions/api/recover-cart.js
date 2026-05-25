@@ -23,7 +23,7 @@ export async function onRequest(context) {
       const items = JSON.parse(cartRaw)
       const cartData = items.map(i => ({
         nombre: i.n, precio: i.p, cantidad: i.c || 1,
-        imagen: '', descripcion: '', color: i.col || '',
+        imagen: i.img || '', descripcion: '', color: i.col || '',
       }))
       return new Response(JSON.stringify(cartData), { headers: { 'content-type': 'application/json' } })
     } catch {
@@ -44,7 +44,7 @@ export async function onRequest(context) {
     const items = JSON.parse(cartRaw)
     const cartData = items.map(i => ({
       nombre: i.n, precio: i.p, cantidad: i.c || 1,
-      imagen: '', descripcion: '', color: i.col || '',
+      imagen: i.img || '', descripcion: '', color: i.col || '',
     }))
 
     const cartJson = JSON.stringify(cartData)
@@ -61,7 +61,7 @@ export async function onRequest(context) {
       headers: {
         'content-type': 'text/html;charset=utf-8',
         'cache-control': 'no-store, no-cache, must-revalidate',
-        'set-cookie': `espina_recovery=${encoded}; path=/; max-age=300; SameSite=Lax`,
+        'set-cookie': `espina_recovery=${encoded}; path=/; max-age=300; SameSite=Lax; HttpOnly`,
       },
     })
   } catch {

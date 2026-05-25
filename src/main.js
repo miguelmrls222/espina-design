@@ -112,7 +112,6 @@ function renderProductos() {
           </div>
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
           ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 font-heading">Solo quedan ' + p.stock + '</span>' : ''}
-          ${p.precio >= 1250 ? '<span class="absolute top-2 right-2 bg-black/80 text-white text-[9px] tracking-wider uppercase px-2 py-1 font-heading rounded">Envío gratis</span>' : ''}
           <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm flex items-center gap-1">
             <svg class="w-3 h-3 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
             <span class="font-heading text-[9px] tracking-wide text-green-800 font-semibold">Garantía de 1 año</span>
@@ -166,7 +165,6 @@ function renderDestacados() {
           </div>
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
           ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 font-heading">Solo quedan ' + p.stock + '</span>' : ''}
-          ${p.precio >= 1250 ? '<span class="absolute top-2 right-2 bg-black/80 text-white text-[9px] tracking-wider uppercase px-2 py-1 font-heading rounded">Envío gratis</span>' : ''}
           <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm flex items-center gap-1">
             <svg class="w-3 h-3 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
             <span class="font-heading text-[9px] tracking-wide text-green-800 font-semibold">Garantía de 1 año</span>
@@ -430,6 +428,7 @@ function updateCartUI() {
 }
 
 function lanzarConfetti() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
   sonidoConfetti()
   const colores = ['#D4A574', '#22c55e', '#3b82f6', '#eab308', '#ec4899', '#a855f7', '#f97316']
   const contenedor = document.getElementById('cart-panel')
@@ -579,11 +578,13 @@ function gtagEvent(...args) {
   if (typeof gtag === 'function') gtag(...args)
 }
 
-function mostrarToast(texto) {
+function mostrarToast(texto, tipo) {
   const toast = document.getElementById('toast')
   const toastText = document.getElementById('toast-text')
   if (!toast) return
   toastText.textContent = texto
+  toast.className = toast.className.replace(/bg-(black|red-600)/g, '').trim()
+  toast.classList.add(tipo === 'error' ? 'bg-red-600' : 'bg-black')
   toast.style.opacity = '1'
   toast.style.transform = 'translateY(0)'
   toast.classList.remove('pointer-events-none')
@@ -600,9 +601,11 @@ function addToCart(nombre, precio, imagen, descripcion, color) {
   initAudio()
   color = color || ''
   const prod = productos.find(p => p.nombre === nombre)
+  if (prod && prod.stock === 'agotado') return
   const stock = prod ? prod.stock : 'disponible'
   const exist = cart.find(i => i.nombre === nombre && i.color === color)
   if (exist) {
+    if (exist.cantidad >= 10) return
     exist.cantidad++
   } else {
     cart.push({ nombre, precio, imagen, descripcion, color, cantidad: 1, stock })
@@ -932,6 +935,7 @@ document.addEventListener('click', e => {
   const plus = e.target.closest('.qty-plus')
   if (plus) {
     const i = parseInt(plus.dataset.index)
+    if (cart[i].cantidad >= 10) return
     cart[i].cantidad++
     saveCart()
   }
@@ -1092,6 +1096,8 @@ async function iniciarCheckout() {
           nombre: i.nombre,
           precio: aplicarDesc ? Math.round(i.precio * 0.8) : i.precio,
           cantidad: i.cantidad,
+          imagen: i.imagen || '',
+          descripcion: i.descripcion || '',
           color: i.color || '',
         })),
       }),
@@ -1105,7 +1111,7 @@ async function iniciarCheckout() {
       throw new Error(data.error || 'Error al crear el pago')
     }
   } catch (err) {
-    alert('Error al procesar el pago: ' + err.message)
+    mostrarToast(err.message, 'error')
     checkoutBtn.disabled = false
     checkoutBtn.textContent = 'Pagar ahora'
   }
@@ -1236,6 +1242,7 @@ function updatePromoTimer() {
 
   if (!_promoState) {
     bar.classList.add('hidden')
+    clearInterval(_promoInterval)
     return
   }
 
@@ -1243,6 +1250,7 @@ function updatePromoTimer() {
 
   if (remaining <= 0) {
     bar.classList.add('hidden')
+    clearInterval(_promoInterval)
     return
   }
 
@@ -1256,18 +1264,23 @@ function updatePromoTimer() {
   minsEl.textContent = String(minutes).padStart(2, '0')
   secsEl.textContent = String(secs).padStart(2, '0')
 
+  if (text) {
+    text.textContent = days > 0
+      ? `🔥 20% OFF — ${days} día${days !== 1 ? 's' : ''}`
+      : '🔥 20% OFF'
+  }
+
   const cartCountdown = document.getElementById('cart-countdown')
   if (cartCountdown) {
     cartCountdown.textContent = `${String(totalHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
   }
 
-  text.textContent = '🔥 20% OFF'
   if (subtext) subtext.textContent = 'POR TIEMPO LIMITADO'
   bar.classList.remove('hidden')
 }
 
 updatePromoTimer()
-setInterval(updatePromoTimer, 1000)
+const _promoInterval = setInterval(updatePromoTimer, 1000)
 
 // ─── FAQ Accordion ───
 

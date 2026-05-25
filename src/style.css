@@ -48,6 +48,10 @@
   animation: scroll-left 40s linear infinite;
 }
 
+#testimonios-track:hover {
+  animation-play-state: paused;
+}
+
 #header-logo {
   filter: drop-shadow(0 4px 14px rgba(156,98,38,0.3)) brightness(1.12) contrast(1.05);
 }
@@ -97,5 +101,15 @@
   }
   #header-logo.scrolled {
     height: 2.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #testimonios-track,
+  .animate-marquee,
+  .animate-promo-text,
+  .animate-skeleton,
+  .confetti-piece {
+    animation: none !important;
   }
 }

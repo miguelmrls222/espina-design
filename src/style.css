@@ -30,52 +30,12 @@
   }
 }
 
-@keyframes scroll-left {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(200%); }
-}
-
-@keyframes confetti-fall {
-  0% {
-    opacity: 1;
-    transform: translateY(0) rotate(0deg) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(300px) rotate(720deg) scale(0.3);
-  }
-}
-
-.animate-shimmer {
-  animation: shimmer 2.8s ease-in-out infinite;
-}
-
-@keyframes marquee-text {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-33.333%); }
-}
-
 .animate-marquee {
   animation: marquee-text 24s linear infinite;
 }
 
 #testimonios-track {
-  animation: scroll-left 40s linear infinite;
-}
-
-@media (hover: hover) {
-  #testimonios-track:hover {
-    animation-play-state: paused;
-  }
+  will-change: transform;
 }
 
 #site-header.scrolled {

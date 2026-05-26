@@ -231,6 +231,8 @@ function renderTestimonios() {
 
 // ─── Carrito ───
 
+let cart = JSON.parse(localStorage.getItem('espina-cart') || '[]')
+
 const cartPanel = document.getElementById('cart-panel')
 const cartOverlay = document.getElementById('cart-overlay')
 const cartCount = document.getElementById('cart-count')

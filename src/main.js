@@ -429,14 +429,14 @@ function updateCartUI() {
 
   // ─── Envío gratis ───
   const envioMeta = 1250
-  const envioProgreso = Math.min(subtotal / envioMeta, 1)
+  const envioProgreso = Math.min(total / envioMeta, 1)
   const envioBar = document.getElementById('envio-progress')
   const envioIcon = document.getElementById('envio-icon')
   const envioTexto = document.getElementById('envio-texto')
 
   envioBar.style.width = `${envioProgreso * 100}%`
 
-  if (subtotal >= envioMeta) {
+  if (total >= envioMeta) {
     if (!envioIcon.dataset.confetti) {
       envioIcon.dataset.confetti = '1'
       lanzarConfetti()
@@ -447,7 +447,7 @@ function updateCartUI() {
     envioTexto.className = 'font-heading text-xs tracking-widest uppercase text-green-600 mt-2'
   } else {
     delete envioIcon.dataset.confetti
-    const falta = envioMeta - subtotal
+    const falta = envioMeta - total
     envioIcon.className = 'w-7 h-7 flex items-center justify-center rounded-full border-2 border-gray-300 flex-shrink-0 transition-all duration-500'
     envioIcon.innerHTML = `<svg class="w-3.5 h-3.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`
     envioTexto.textContent = `Falta $${falta.toLocaleString('es-MX')} MXN para envío gratis`

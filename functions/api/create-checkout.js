@@ -119,6 +119,7 @@ async function calcularEnvio(token, zipTo) {
   const tarifa = tarifaMasBarata(completa)
   if (!tarifa) return null
   return {
+    rate_id: tarifa.id,
     monto: Math.round(parseFloat(tarifa.total)),
     proveedor: tarifa.provider_display_name || tarifa.provider_name,
     servicio: tarifa.provider_service_name || '',
@@ -201,6 +202,10 @@ export async function onRequest(context) {
     }
     const cartSummary = items.map(i => ({ n: i.nombre, p: i.precio, c: i.cantidad, col: i.color || '', img: i.imagen || '' }))
     params.set('metadata[cart]', JSON.stringify(cartSummary))
+    if (envio) {
+      params.set('metadata[rate_id]', envio.rate_id)
+      params.set('metadata[zip_to]', zip_to)
+    }
 
     let itemIndex = 0
     items.forEach((item) => {

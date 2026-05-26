@@ -1,5 +1,7 @@
 import './style.css'
 
+const BUILD = '20260526'
+
 const pages = {
   '': 'inicio',
   'tienda': 'tienda',
@@ -230,6 +232,13 @@ function renderTestimonios() {
 }
 
 // ─── Carrito ───
+
+const colorMap = {
+  'verde': '#4a7c59',
+  'gris': '#8c8c8c',
+  'vino': '#722f37',
+  'cafe oscuro': '#4a3728',
+}
 
 let cart = JSON.parse(localStorage.getItem('espina-cart') || '[]')
 

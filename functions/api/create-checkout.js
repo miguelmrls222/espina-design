@@ -77,9 +77,7 @@ export async function onRequest(context) {
       const prefix = `line_items[${i}]`
       params.set(`${prefix}[price_data][currency]`, 'mxn')
       params.set(`${prefix}[price_data][product_data][name]`, item.nombre)
-      const descConPromo = item.descripcion
-        ? `${item.descripcion}\n🔥 Incluye llavero GRATIS 🔥`
-        : '🔥 Incluye un llavero totalmente GRATIS 🔥'
+      const descConPromo = item.descripcion || ''
       params.set(`${prefix}[price_data][product_data][description]`, descConPromo)
       if (item.imagen) {
         const imgAbs = item.imagen.startsWith('http') ? item.imagen : `${origin}${item.imagen}`

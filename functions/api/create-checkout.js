@@ -65,7 +65,7 @@ export async function onRequest(context) {
     params.set('success_url', `${origin}/gracias?exito=1&session_id={CHECKOUT_SESSION_ID}`)
     params.set('cancel_url', `${origin}/tienda?cancelado=1`)
     params.set('shipping_address_collection[allowed_countries][0]', 'MX')
-    params.set('custom_text[submit][message]', '🔥 Incluye un llavero totalmente 𝐆𝐑𝐀𝐓𝐈𝐒 🔥')
+    params.set('custom_text[submit][message]', '🎁 Incluye un llavero totalmente 𝐆𝐑𝐀𝐓𝐈𝐒 🎁')
     if (email) {
       params.set('customer_email', email)
       params.set('metadata[email]', email)

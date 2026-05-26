@@ -652,6 +652,10 @@
             <label class="font-heading text-[10px] tracking-widest uppercase text-gray-500 block mb-1.5">Correo para confirmación</label>
             <input type="email" id="cart-email" placeholder="tu@correo.com" autocomplete="email" class="w-full border border-gray-200 px-3 py-2 text-sm font-body outline-none focus:border-black transition-colors" />
           </div>
+          <div class="mb-3">
+            <label class="font-heading text-[10px] tracking-widest uppercase text-gray-500 block mb-1.5">Código Postal de envío</label>
+            <input type="text" id="cart-zip" placeholder="ej. 83170" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="postal-code" class="w-full border border-gray-200 px-3 py-2 text-sm font-body outline-none focus:border-black transition-colors" />
+          </div>
           <div class="flex items-center justify-center gap-2 mb-3">
             <svg class="w-4 h-4 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
             <span class="font-body text-[11px] text-gray-500">Pago 100% seguro vía <span class="font-heading font-semibold text-[11px] tracking-wider uppercase">Stripe</span></span>

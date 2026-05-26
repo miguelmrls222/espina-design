@@ -249,6 +249,7 @@ const cartItems = document.getElementById('cart-items')
 const cartFooter = document.getElementById('cart-footer')
 const checkoutBtn = document.getElementById('checkout-btn')
 const cartEmail = document.getElementById('cart-email')
+const cartZip = document.getElementById('cart-zip')
 
 // ─── Focus management ───
 
@@ -305,8 +306,19 @@ function saveEmail() {
   if (cartEmail) localStorage.setItem('espina-email', cartEmail.value.trim())
 }
 
+function loadZip() {
+  const saved = localStorage.getItem('espina-zip')
+  if (saved && cartZip) cartZip.value = saved
+}
+
+function saveZip() {
+  if (cartZip) localStorage.setItem('espina-zip', cartZip.value.trim())
+}
+
 cartEmail?.addEventListener('input', saveEmail)
+cartZip?.addEventListener('input', saveZip)
 loadEmail()
+loadZip()
 
 function saveCart() {
   localStorage.setItem('espina-cart', JSON.stringify(cart))
@@ -1119,6 +1131,17 @@ async function iniciarCheckout() {
       return
     }
     saveEmail()
+    const zip = cartZip ? cartZip.value.trim() : ''
+    if (!zip || !/^\d{5}$/.test(zip)) {
+      cartZip?.focus()
+      cartZip?.classList.add('border-red-400')
+      setTimeout(() => cartZip?.classList.remove('border-red-400'), 2000)
+      checkoutBtn.disabled = false
+      checkoutBtn.textContent = 'Pagar ahora'
+      return
+    }
+    saveZip()
+    checkoutBtn.textContent = 'Calculando envío…'
     gtagEvent('event', 'begin_checkout', {
       currency: 'MXN',
       value: cart.reduce((t, i) => t + i.precio * i.cantidad, 0),
@@ -1130,6 +1153,7 @@ async function iniciarCheckout() {
       method: 'POST',
       body: JSON.stringify({
         email,
+        zip_to: zip,
         items: cart.map(i => ({
           nombre: i.nombre,
           precio: aplicarDesc ? Math.round(i.precio * 0.8) : i.precio,

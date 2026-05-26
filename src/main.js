@@ -87,6 +87,7 @@ window.addEventListener('popstate', () => navigate(window.location.pathname))
 
 // ─── Productos ───
 
+import crossSellSlugs from '/src/data/cross-sell.json'
 const productosModules = import.meta.glob('/src/data/productos/*.json', { eager: true })
 const productos = Object.values(productosModules)
   .map(m => m.default || m)
@@ -131,50 +132,64 @@ function renderProductCard(p, index, opts = {}) {
   const img = p.fotos?.[0] || ''
   const agotado = p.stock === 'agotado'
   const stockBajo = !agotado && typeof p.stock === 'number' && p.stock <= 3
-  const {
-    carousel = false,
-    btnClass = 'px-6 py-2',
-    titleClass = 'min-h-[2.5rem] sm:min-h-0',
-  } = opts
+  const { carousel = false } = opts
 
   const wrapperClass = carousel
-    ? 'flex-shrink-0 w-[220px] sm:w-[260px] group flex flex-col snap-start'
-    : 'group flex flex-col'
-
-  const imgPlaceholder = carousel
-    ? '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>'
+    ? 'flex-shrink-0 w-[220px] sm:w-[260px] snap-start'
     : ''
+
+  let avg = null, total = 0
+  if (p.resenas?.length) {
+    total = p.resenas.length
+    avg = (p.resenas.reduce((s, r) => s + r.puntuacion, 0) / total)
+  }
 
   return `
     <div class="${wrapperClass} ${agotado ? 'opacity-50' : ''}">
-      <div class="aspect-[4/5] bg-[#F5F5F5] mb-4 overflow-hidden relative cursor-pointer open-detail" data-index="${index}">
-        ${img ? `<img src="${img}" alt="${p.nombre}"${carousel ? '' : ' loading="lazy"'} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />` : imgPlaceholder}
-        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
-          <span class="text-white text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 px-4 py-2">Ver más</span>
+      <div class="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow hover:shadow-lg transition-shadow duration-300">
+        <div class="aspect-[4/5] bg-[#F5F5F5] relative cursor-pointer open-detail group rounded-t-2xl" data-index="${index}">
+          <div class="absolute inset-0 overflow-hidden rounded-t-2xl">
+            ${img ? `<img src="${img}" alt="${p.nombre}"${carousel ? '' : ' loading="lazy"'} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />` : '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg></div>'}
+          </div>
+          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
+            <span class="text-white text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 px-4 py-2">Ver más</span>
+          </div>
+          ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
+          ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 font-heading">Solo quedan ' + p.stock + '</span>' : ''}
+          <div class="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm flex items-center gap-1">
+            <svg class="w-3 h-3 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+            <span class="font-heading text-[9px] tracking-wide text-green-800 font-semibold">Garantía de 1 año</span>
+          </div>
+          ${!agotado ? `
+          <div class="absolute bottom-2 right-2 z-10">
+            <button class="add-to-cart w-9 h-9 sm:w-10 sm:h-10 bg-black text-white rounded-full flex items-center justify-center hover:bg-gray-800 transition-colors duration-200 shadow-md"
+              data-nombre="${p.nombre}"
+              data-precio="${p.precio}"
+              data-imagen="${img}"
+              data-descripcion="${p.descripcion || ''}"
+              data-color="${p.colores?.[0] || ''}">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/>
+                <path d="M8 6V5a4 4 0 1 1 8 0v1"/>
+              </svg>
+            </button>
+          </div>` : ''}
         </div>
-        ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
-        ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 font-heading">Solo quedan ' + p.stock + '</span>' : ''}
-        <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm flex items-center gap-1">
-          <svg class="w-3 h-3 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-          <span class="font-heading text-[9px] tracking-wide text-green-800 font-semibold">Garantía de 1 año</span>
+        <div class="p-3 sm:p-4">
+          <div class="flex items-center justify-between gap-2 mb-1">
+            <h3 class="font-heading text-xs sm:text-sm tracking-widest uppercase leading-none cursor-pointer open-detail flex-1 min-w-0" data-index="${index}">${p.nombre}</h3>
+            ${avg !== null ? `
+            <div class="flex items-center gap-0.5 flex-shrink-0">
+              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <span class="font-body text-[11px] sm:text-sm font-semibold sm:font-normal text-gray-400 leading-none">${avg.toFixed(1)} (${total})</span>
+            </div>` : ''}
+          </div>
+          <p class="font-body text-sm text-gray-500 mb-2">$${p.precio.toLocaleString('es-MX')} MXN</p>
+          ${p.colores?.length ? `
+          <div class="flex gap-1.5 mb-3">
+            ${p.colores.map(c => `<span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color:${colorMap[c] || '#ccc'}" title="${c}"></span>`).join('')}
+          </div>` : ''}
         </div>
-      </div>
-      <div class="flex flex-col flex-1">
-        <h3 class="font-heading text-sm tracking-widest uppercase mb-1 cursor-pointer open-detail ${titleClass} leading-tight" data-index="${index}">${p.nombre}</h3>
-        <p class="font-body text-sm text-gray-500 mb-2">$${p.precio.toLocaleString('es-MX')} MXN</p>
-        ${renderEstrellas(p)}
-        ${p.colores?.length ? `
-        <div class="flex gap-1.5 mb-3">
-          ${p.colores.map(c => `<span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color:${colorMap[c] || '#ccc'}" title="${c}"></span>`).join('')}
-        </div>` : ''}
-        ${!agotado ? `<button class="add-to-cart font-heading text-xs tracking-widest uppercase border border-black ${btnClass} hover:bg-black hover:text-white transition-colors duration-300 mt-auto${carousel ? '' : ' self-start'}"
-          data-nombre="${p.nombre}"
-          data-precio="${p.precio}"
-          data-imagen="${img}"
-          data-descripcion="${p.descripcion || ''}"
-          data-color="${p.colores?.[0] || ''}">
-          Agregar
-        </button>` : ''}
       </div>
     </div>
   `
@@ -441,7 +456,11 @@ function updateCartUI() {
 
   // ─── Cross-sell ───
   const cartNames = cart.map(i => i.nombre)
-  const sugeridos = productos.filter(p => !cartNames.includes(p.nombre) && p.stock !== 'agotado').slice(0, 2)
+  const sugeridos = crossSellSlugs
+    .map(slug => productos.find(p => p.slug === slug))
+    .filter(Boolean)
+    .filter(p => !cartNames.includes(p.nombre) && p.stock !== 'agotado')
+    .slice(0, 2)
   if (sugeridos.length > 0) {
     crossellSection?.classList.remove('hidden')
     document.getElementById('crossell-items').innerHTML = sugeridos.map(p => {
@@ -470,107 +489,11 @@ function updateCartUI() {
   }
 }
 
-let _lastConfetti = 0
-
-function lanzarConfetti() {
-  const now = Date.now()
-  if (now - _lastConfetti < 10000) return
-  _lastConfetti = now
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-  sonidoConfetti()
-  const colores = ['#D4A574', '#22c55e', '#3b82f6', '#eab308', '#ec4899', '#a855f7', '#f97316']
-  const contenedor = document.getElementById('cart-panel')
-  if (!contenedor) return
-  for (let i = 0; i < 80; i++) {
-    const pieza = document.createElement('div')
-    const color = colores[Math.floor(Math.random() * colores.length)]
-    const size = Math.random() * 8 + 4
-    const isCircle = Math.random() > 0.5
-    pieza.style.cssText = `
-      position: fixed; z-index: 9999; pointer-events: none;
-      width: ${size}px; height: ${isCircle ? size : size * 0.5}px;
-      background: ${color};
-      border-radius: ${isCircle ? '50%' : '2px'};
-      top: ${Math.random() * 40 + 15}%;
-      left: ${Math.random() * 90 + 5}%;
-      opacity: 1;
-      animation: confetti-fall ${Math.random() * 1.2 + 1.2}s ease-out forwards;
-      animation-delay: ${Math.random() * 0.6}s;
-      transform: rotate(${Math.random() * 360}deg);
-    `
-    document.body.appendChild(pieza)
-    pieza.addEventListener('animationend', () => pieza.remove())
-  }
-}
-
-let audioCtx = null
-let audioSessionReady = false
-
-function ensureAudioSession() {
-  if (audioSessionReady) return
-  audioSessionReady = true
-  try {
-    const el = document.createElement('audio')
-    el.setAttribute('playsinline', '')
-    const rate = 8000, freq = 220, dur = 0.1, vol = 0.01
-    const samples = Math.floor(rate * dur)
-    const buf = new ArrayBuffer(44 + samples)
-    const view = new DataView(buf)
-    const write = (off, str) => { for (let i = 0; i < str.length; i++) view.setUint8(off + i, str.charCodeAt(i)) }
-    write(0, 'RIFF')
-    view.setUint32(4, 36 + samples, true)
-    write(8, 'WAVE')
-    write(12, 'fmt ')
-    view.setUint32(16, 16, true)
-    view.setUint16(20, 1, true)
-    view.setUint16(22, 1, true)
-    view.setUint32(24, rate, true)
-    view.setUint32(28, rate, true)
-    view.setUint16(32, 1, true)
-    view.setUint16(34, 8, true)
-    write(36, 'data')
-    view.setUint32(40, samples, true)
-    for (let i = 0; i < samples; i++) {
-      const val = Math.sin(2 * Math.PI * freq * i / rate) * vol
-      view.setUint8(44 + i, Math.round((val + 1) * 127.5))
-    }
-    const blob = new Blob([buf], { type: 'audio/wav' })
-    el.src = URL.createObjectURL(blob)
-    el.play().then(() => {
-      setTimeout(() => URL.revokeObjectURL(el.src), 2000)
-    }).catch(() => {})
-  } catch {}
-}
-
-function initAudio() {
-  ensureAudioSession()
-  const Ctor = window.AudioContext || window.webkitAudioContext
-  if (!Ctor) return null
-  if (audioCtx && audioCtx.state !== 'closed') {
-    if (audioCtx.state === 'suspended') audioCtx.resume()
-    return audioCtx
-  }
-  audioCtx = new Ctor()
-  audioCtx.resume()
-  try {
-    const o = audioCtx.createOscillator()
-    const g = audioCtx.createGain()
-    o.type = 'sine'
-    o.frequency.value = 440
-    g.gain.setValueAtTime(0.001, audioCtx.currentTime)
-    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.05)
-    o.connect(g)
-    g.connect(audioCtx.destination)
-    o.start()
-    o.stop(audioCtx.currentTime + 0.05)
-  } catch {}
-  return audioCtx
-}
-
 function sonidoConfetti() {
   try {
-    const ctx = initAudio()
-    if (!ctx || ctx.state !== 'running') return
+    const Ctor = window.AudioContext || window.webkitAudioContext
+    if (!Ctor) return
+    const ctx = new Ctor()
     const notas = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5, 1318.5]
     notas.forEach((freq, i) => {
       const osc = ctx.createOscillator()
@@ -607,6 +530,40 @@ function sonidoConfetti() {
     o2.stop(ctx.currentTime + 0.8)
   } catch {}
 }
+
+let _lastConfetti = 0
+
+function lanzarConfetti() {
+  const now = Date.now()
+  if (now - _lastConfetti < 10000) return
+  _lastConfetti = now
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  sonidoConfetti()
+  const colores = ['#D4A574', '#22c55e', '#3b82f6', '#eab308', '#ec4899', '#a855f7', '#f97316']
+  const contenedor = document.getElementById('cart-panel')
+  if (!contenedor) return
+  for (let i = 0; i < 80; i++) {
+    const pieza = document.createElement('div')
+    const color = colores[Math.floor(Math.random() * colores.length)]
+    const size = Math.random() * 8 + 4
+    const isCircle = Math.random() > 0.5
+    pieza.style.cssText = `
+      position: fixed; z-index: 9999; pointer-events: none;
+      width: ${size}px; height: ${isCircle ? size : size * 0.5}px;
+      background: ${color};
+      border-radius: ${isCircle ? '50%' : '2px'};
+      top: ${Math.random() * 40 + 15}%;
+      left: ${Math.random() * 90 + 5}%;
+      opacity: 1;
+      animation: confetti-fall ${Math.random() * 1.2 + 1.2}s ease-out forwards;
+      animation-delay: ${Math.random() * 0.6}s;
+      transform: rotate(${Math.random() * 360}deg);
+    `
+    document.body.appendChild(pieza)
+    pieza.addEventListener('animationend', () => pieza.remove())
+  }
+}
+
 
 function openCart() {
   cartPanel.style.display = 'flex'
@@ -647,7 +604,6 @@ function mostrarToast(texto, tipo) {
 }
 
 function addToCart(nombre, precio, imagen, descripcion, color) {
-  initAudio()
   color = color || ''
   const prod = productos.find(p => p.nombre === nombre)
   if (prod && prod.stock === 'agotado') return
@@ -914,7 +870,7 @@ document.addEventListener('click', e => {
   }
 
   const detailTrigger = e.target.closest('.open-detail')
-  if (detailTrigger) {
+  if (detailTrigger && !e.target.closest('.add-to-cart')) {
     const idx = parseInt(detailTrigger.dataset.index)
     const producto = productos[idx]
     if (producto) openDetail(producto)
@@ -1234,13 +1190,19 @@ if (carritoEncoded) {
 
 if (recoveryRedirect) navigate(window.location.pathname)
 
-// Safety fallback: si destacados/testimonios no se renderizaron, reintentar
+// Safety fallback + mostrar app tras render completo
 setTimeout(() => {
   const d = document.getElementById('destacados-scroll')
   if (d && !d.children.length) { delete d.dataset.rendered; renderDestacados() }
   const t = document.getElementById('testimonios-track')
   if (t && !t.children.length) { delete t.dataset.rendered; renderTestimonios() }
-}, 150)
+  document.body.style.opacity = '0'
+  var guard = document.getElementById('fouc-guard')
+  if (guard) guard.remove()
+  void document.body.offsetHeight
+  document.body.style.transition = 'opacity 0.15s ease-in'
+  document.body.style.opacity = '1'
+}, 50)
 
 // ─── Newsletter ───
 

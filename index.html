@@ -68,13 +68,21 @@
       gtag('js', new Date());
       gtag('config', 'G-9BSPYSWER7');
     </script>
+    <style>
+      body { background-color: #f5f2ed; color: #000; margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; }
+      header { position: fixed; top: 48px; left: 0; right: 0; z-index: 50; background: rgba(255,255,255,0.95); border-bottom: 1px solid #e5e7eb; }
+      header > div { height: 64px; display: flex; align-items: center; justify-content: center; }
+      header img { height: 40px; width: auto; }
+      @media (min-width: 640px) { header { top: 56px; } }
+      @media (min-width: 768px) { header > div { height: 96px; } header img { height: 72px; } }
+    </style>
+    <script>!function(){var e=document.createElement('style');e.id='fouc-guard';e.textContent='body>*{display:none!important}';document.head.appendChild(e)}()</script>
   </head>
   <body class="bg-[#f5f2ed] text-black">
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-black focus:text-white focus:px-4 focus:py-2 focus:rounded focus:text-sm focus:font-heading focus:tracking-widest focus:uppercase">
-      Saltar al contenido
-    </a>
     <div id="app">
-
+      <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-black focus:text-white focus:px-4 focus:py-2 focus:rounded focus:text-sm focus:font-heading focus:tracking-widest focus:uppercase">
+        Saltar al contenido
+      </a>
       <div id="promo-bar" class="fixed top-0 left-0 w-full bg-[#DC2626] z-[60] hidden">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 h-12 sm:h-14 flex items-center justify-center gap-4 sm:gap-5">
           <div class="flex flex-col items-center text-center justify-center py-1 sm:py-1.5">
@@ -136,7 +144,7 @@
           <p class="font-heading text-3xl sm:text-4xl md:text-5xl tracking-[0.08em] text-black max-w-2xl mb-10 leading-snug text-center uppercase">
             ARTÍCULOS COTIDIANOS HECHOS A MANO.
           </p>
-          <a href="/tienda" data-nav class="font-heading text-sm tracking-widest uppercase border-2 border-black px-10 py-3 hover:bg-black hover:text-white transition-colors duration-300">
+          <a href="/tienda" data-nav class="font-heading text-sm tracking-widest uppercase border-2 border-black px-10 py-3 hover:bg-black hover:text-white active:bg-black active:text-white active:scale-95 transition-all duration-200">
             Ver Colección
           </a>
           <div class="w-[calc(100%+3rem)] -mx-6 mt-8 bg-black py-3.5 overflow-hidden relative">
@@ -185,7 +193,7 @@
             </div>
             <div class="relative">
               <div id="destacados-scroll" class="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x snap-mandatory" style="-webkit-overflow-scrolling:touch; scrollbar-width:none; -ms-overflow-style:none"></div>
-              <div class="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-white to-transparent"></div>
+              <div class="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#f5f2ed] to-transparent"></div>
             </div>
           </div>
 
@@ -749,15 +757,15 @@
 
       <!-- MENÚ -->
       <div id="menu-mobile" role="dialog" aria-modal="true" aria-label="Menú de navegación" class="fixed inset-0 bg-white/98 backdrop-blur-sm flex-col z-[70] opacity-0 pointer-events-none transition-all duration-500">
-        <div class="flex items-center justify-between px-6 h-16 border-b border-gray-100 flex-shrink-0">
+        <div class="flex items-center justify-center px-6 h-16 border-b border-gray-100 flex-shrink-0">
           <img src="/LOGO%20ED.png" alt="Espina Design" class="h-12 w-auto" />
-          <button id="menu-close" class="p-2 outline-none" aria-label="Cerrar menú">
+          <button id="menu-close" class="absolute right-6 p-2 outline-none" aria-label="Cerrar menú">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
               <path d="M18 6 6 18M6 6l12 12"/>
             </svg>
           </button>
         </div>
-        <div class="flex-1 flex flex-col items-center justify-center px-6">
+        <div class="flex-1 flex flex-col items-center justify-center pt-12 px-6">
           <nav class="flex flex-col items-center gap-12">
             <a href="/" data-nav class="font-heading text-3xl tracking-[0.15em] uppercase hover:text-gray-500 transition-colors">Inicio</a>
             <a href="/tienda" data-nav class="font-heading text-3xl tracking-[0.15em] uppercase hover:text-gray-500 transition-colors">Tienda</a>

@@ -208,7 +208,7 @@ export async function onRequest(context) {
       params.set(`${prefix}[price_data][currency]`, 'mxn')
       params.set(`${prefix}[price_data][product_data][name]`, item.nombre)
       const descConPromo = item.descripcion || ''
-      params.set(`${prefix}[price_data][product_data][description]`, descConPromo)
+      if (descConPromo) params.set(`${prefix}[price_data][product_data][description]`, descConPromo)
       if (item.imagen) {
         const imgAbs = item.imagen.startsWith('http') ? item.imagen : `${origin}${item.imagen}`
         params.set(`${prefix}[price_data][product_data][images][0]`, imgAbs)

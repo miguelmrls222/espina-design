@@ -66,6 +66,7 @@ function closeMenu() {
   if (!menu) return
   menu.classList.remove('opacity-100', 'pointer-events-auto')
   menu.classList.add('opacity-0', 'pointer-events-none')
+  modalClosed(menu)
 }
 
 function toggleMenu() {
@@ -76,6 +77,7 @@ function toggleMenu() {
   } else {
     menu.classList.remove('opacity-0', 'pointer-events-none')
     menu.classList.add('opacity-100', 'pointer-events-auto')
+    modalOpened(menu, document.getElementById('menu-btn'))
   }
 }
 
@@ -98,45 +100,7 @@ function renderProductos() {
     return
   }
 
-  grid.innerHTML = productos.map((p, i) => {
-    const img = p.fotos?.[0] ? p.fotos[0] : ''
-    const agotado = p.stock === 'agotado'
-    const stockBajo = !agotado && typeof p.stock === 'number' && p.stock <= 3
-
-    return `
-      <div class="group flex flex-col ${agotado ? 'opacity-50' : ''}">
-        <div class="aspect-[4/5] bg-[#F5F5F5] mb-4 overflow-hidden relative cursor-pointer open-detail" data-index="${i}">
-          ${img ? `<img src="${img}" alt="${p.nombre}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />` : ''}
-          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
-            <span class="text-white text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 px-4 py-2">Ver más</span>
-          </div>
-          ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
-          ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 font-heading">Solo quedan ' + p.stock + '</span>' : ''}
-          <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm flex items-center gap-1">
-            <svg class="w-3 h-3 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-            <span class="font-heading text-[9px] tracking-wide text-green-800 font-semibold">Garantía de 1 año</span>
-          </div>
-        </div>
-        <div class="flex flex-col flex-1">
-          <h3 class="font-heading text-sm tracking-widest uppercase mb-1 cursor-pointer open-detail min-h-[2.5rem] sm:min-h-0 leading-tight" data-index="${i}">${p.nombre}</h3>
-          <p class="font-body text-sm text-gray-500 mb-2">$${p.precio.toLocaleString('es-MX')} MXN</p>
-          ${renderEstrellas(p)}
-          ${p.colores?.length ? `
-          <div class="flex gap-1.5 mb-3">
-            ${p.colores.map(c => `<span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color:${colorMap[c] || '#ccc'}" title="${c}"></span>`).join('')}
-          </div>` : ''}
-          ${!agotado ? `<button class="add-to-cart font-heading text-xs tracking-widest uppercase border border-black px-6 py-2 hover:bg-black hover:text-white transition-colors duration-300 mt-auto self-start"
-            data-nombre="${p.nombre}"
-            data-precio="${p.precio}"
-            data-imagen="${img}"
-            data-descripcion="${p.descripcion || ''}"
-            data-color="${p.colores?.[0] || ''}">
-            Agregar
-          </button>` : ''}
-        </div>
-      </div>
-    `
-  }).join('')
+  grid.innerHTML = productos.map((p, i) => renderProductCard(p, i)).join('')
 }
 
 function renderDestacados() {
@@ -153,43 +117,65 @@ function renderDestacados() {
 
   container.innerHTML = top.map((p, i) => {
     const prodIndex = productos.indexOf(p)
-    const img = p.fotos?.[0] ? p.fotos[0] : ''
-    const agotado = p.stock === 'agotado'
-    const stockBajo = !agotado && typeof p.stock === 'number' && p.stock <= 3
-    return `
-          <div class="flex-shrink-0 w-[220px] sm:w-[260px] group flex flex-col snap-start ${agotado ? 'opacity-50' : ''}">
-        <div class="aspect-[4/5] bg-[#F5F5F5] mb-4 overflow-hidden relative cursor-pointer open-detail" data-index="${prodIndex}">
-          ${img ? `<img src="${img}" alt="${p.nombre}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />` : '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>'}
-          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
-            <span class="text-white text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 px-4 py-2">Ver más</span>
-          </div>
-          ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
-          ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 font-heading">Solo quedan ' + p.stock + '</span>' : ''}
-          <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm flex items-center gap-1">
-            <svg class="w-3 h-3 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-            <span class="font-heading text-[9px] tracking-wide text-green-800 font-semibold">Garantía de 1 año</span>
-          </div>
+    return renderProductCard(p, prodIndex, {
+      carousel: true,
+      btnClass: 'px-5 py-2',
+      titleClass: '',
+    })
+  }).join('')
+}
+
+function renderProductCard(p, index, opts = {}) {
+  const img = p.fotos?.[0] || ''
+  const agotado = p.stock === 'agotado'
+  const stockBajo = !agotado && typeof p.stock === 'number' && p.stock <= 3
+  const {
+    carousel = false,
+    btnClass = 'px-6 py-2',
+    titleClass = 'min-h-[2.5rem] sm:min-h-0',
+  } = opts
+
+  const wrapperClass = carousel
+    ? 'flex-shrink-0 w-[220px] sm:w-[260px] group flex flex-col snap-start'
+    : 'group flex flex-col'
+
+  const imgPlaceholder = carousel
+    ? '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>'
+    : ''
+
+  return `
+    <div class="${wrapperClass} ${agotado ? 'opacity-50' : ''}">
+      <div class="aspect-[4/5] bg-[#F5F5F5] mb-4 overflow-hidden relative cursor-pointer open-detail" data-index="${index}">
+        ${img ? `<img src="${img}" alt="${p.nombre}"${carousel ? '' : ' loading="lazy"'} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />` : imgPlaceholder}
+        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
+          <span class="text-white text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 px-4 py-2">Ver más</span>
         </div>
-        <div class="flex flex-col flex-1">
-          <h3 class="font-heading text-sm tracking-widest uppercase mb-1 cursor-pointer open-detail leading-tight" data-index="${prodIndex}">${p.nombre}</h3>
-          <p class="font-body text-sm text-gray-500 mb-2">$${p.precio.toLocaleString('es-MX')} MXN</p>
-          ${renderEstrellas(p)}
-          ${p.colores?.length ? `
-          <div class="flex gap-1.5 mb-3">
-            ${p.colores.map(c => `<span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color:${colorMap[c] || '#ccc'}" title="${c}"></span>`).join('')}
-          </div>` : ''}
-          ${!agotado ? `<button class="add-to-cart font-heading text-xs tracking-widest uppercase border border-black px-5 py-2 hover:bg-black hover:text-white transition-colors duration-300 mt-auto"
-            data-nombre="${p.nombre}"
-            data-precio="${p.precio}"
-            data-imagen="${img}"
-            data-descripcion="${p.descripcion || ''}"
-            data-color="${p.colores?.[0] || ''}">
+        ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
+        ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 font-heading">Solo quedan ' + p.stock + '</span>' : ''}
+        <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm flex items-center gap-1">
+          <svg class="w-3 h-3 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+          <span class="font-heading text-[9px] tracking-wide text-green-800 font-semibold">Garantía de 1 año</span>
+        </div>
+      </div>
+      <div class="flex flex-col flex-1">
+        <h3 class="font-heading text-sm tracking-widest uppercase mb-1 cursor-pointer open-detail ${titleClass} leading-tight" data-index="${index}">${p.nombre}</h3>
+        <p class="font-body text-sm text-gray-500 mb-2">$${p.precio.toLocaleString('es-MX')} MXN</p>
+        ${renderEstrellas(p)}
+        ${p.colores?.length ? `
+        <div class="flex gap-1.5 mb-3">
+          ${p.colores.map(c => `<span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color:${colorMap[c] || '#ccc'}" title="${c}"></span>`).join('')}
+        </div>` : ''}
+        ${!agotado ? `<button class="add-to-cart font-heading text-xs tracking-widest uppercase border border-black ${btnClass} hover:bg-black hover:text-white transition-colors duration-300 mt-auto${carousel ? '' : ' self-start'}"
+          data-nombre="${p.nombre}"
+          data-precio="${p.precio}"
+          data-imagen="${img}"
+          data-descripcion="${p.descripcion || ''}"
+          data-color="${p.colores?.[0] || ''}">
           Agregar
         </button>` : ''}
       </div>
-      </div>
-    `
-  }).join('')
+    </div>
+  `
 }
 
 function renderEstrellas(p) {
@@ -245,25 +231,59 @@ function renderTestimonios() {
 
 // ─── Carrito ───
 
-const colorMap = {
-  'verde': '#4a7c59',
-  'gris': '#8c8c8c',
-  'vino': '#722f37',
-  'cafe oscuro': '#4a3728',
-}
-
-let cart = JSON.parse(localStorage.getItem('espina-cart') || '[]')
-
 const cartPanel = document.getElementById('cart-panel')
 const cartOverlay = document.getElementById('cart-overlay')
+const cartCount = document.getElementById('cart-count')
 const cartItems = document.getElementById('cart-items')
 const cartFooter = document.getElementById('cart-footer')
-const cartTotal = document.getElementById('cart-total')
-const cartCount = document.getElementById('cart-count')
-const cartBtn = document.getElementById('cart-btn')
-const cartClose = document.getElementById('cart-close')
 const checkoutBtn = document.getElementById('checkout-btn')
 const cartEmail = document.getElementById('cart-email')
+
+// ─── Focus management ───
+
+let lastFocused = null
+const mainEl = document.getElementById('main-content')
+
+function getFocusable(el) {
+  if (!el) return []
+  return Array.from(el.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+}
+
+function focusTrap(e) {
+  const modal = e.currentTarget
+  const focusable = getFocusable(modal)
+  if (!focusable.length) return
+  const first = focusable[0]
+  const last = focusable[focusable.length - 1]
+  if (e.key === 'Tab') {
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault()
+      last.focus()
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault()
+      first.focus()
+    }
+  }
+}
+
+function modalOpened(modal, trigger) {
+  lastFocused = trigger || document.activeElement
+  requestAnimationFrame(() => {
+    const f = getFocusable(modal)
+    if (f.length) f[0].focus()
+  })
+  if (mainEl) mainEl.setAttribute('aria-hidden', 'true')
+  modal.addEventListener('keydown', focusTrap)
+}
+
+function modalClosed(modal) {
+  if (mainEl) mainEl.removeAttribute('aria-hidden')
+  if (lastFocused) {
+    lastFocused.focus()
+    lastFocused = null
+  }
+  modal.removeEventListener('keydown', focusTrap)
+}
 
 function loadEmail() {
   const saved = localStorage.getItem('espina-email')
@@ -329,9 +349,9 @@ function updateCartUI() {
         ${itemStockBajo ? `<p class="font-heading text-[10px] tracking-wider uppercase text-[#DC2626] mt-0.5">🔥 Solo quedan ${itemStock}</p>` : ''}
         <p class="text-sm text-gray-500 mt-1">$${(item.precio * item.cantidad).toLocaleString('es-MX')} MXN</p>
         <div class="flex items-center gap-3 mt-2">
-          <button class="qty-minus text-xs border border-gray-300 w-6 h-6 rounded" data-index="${i}">−</button>
+          <button class="qty-minus text-xs border border-gray-300 w-6 h-6 rounded" data-index="${i}" aria-label="Reducir cantidad">−</button>
           <span class="text-sm">${item.cantidad}</span>
-          <button class="qty-plus text-xs border border-gray-300 w-6 h-6 rounded" data-index="${i}">+</button>
+          <button class="qty-plus text-xs border border-gray-300 w-6 h-6 rounded" data-index="${i}" aria-label="Aumentar cantidad">+</button>
           <button class="ml-auto text-xs text-gray-400 hover:text-black transition-colors remove-item" data-index="${i}">Eliminar</button>
         </div>
       </div>
@@ -427,7 +447,12 @@ function updateCartUI() {
   }
 }
 
+let _lastConfetti = 0
+
 function lanzarConfetti() {
+  const now = Date.now()
+  if (now - _lastConfetti < 10000) return
+  _lastConfetti = now
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
   sonidoConfetti()
   const colores = ['#D4A574', '#22c55e', '#3b82f6', '#eab308', '#ec4899', '#a855f7', '#f97316']
@@ -566,12 +591,14 @@ function openCart() {
   requestAnimationFrame(() => {
     cartPanel.classList.remove('translate-x-full')
   })
+  modalOpened(cartPanel, document.getElementById('cart-btn'))
 }
 
 function closeCart() {
   cartPanel.classList.add('translate-x-full')
   cartOverlay.style.display = 'none'
   setTimeout(() => { cartPanel.style.display = 'none' }, 300)
+  modalClosed(cartPanel)
 }
 
 function gtagEvent(...args) {
@@ -597,7 +624,6 @@ function mostrarToast(texto, tipo) {
 }
 
 function addToCart(nombre, precio, imagen, descripcion, color) {
-  ensureAudioSession()
   initAudio()
   color = color || ''
   const prod = productos.find(p => p.nombre === nombre)
@@ -794,11 +820,13 @@ function openDetail(producto) {
 
   productModal.style.display = 'flex'
   document.body.style.overflow = 'hidden'
+  modalOpened(productModal, document.querySelector('.open-detail[data-index]'))
 }
 
 function closeDetail() {
   productModal.style.display = 'none'
   document.body.style.overflow = ''
+  modalClosed(productModal)
   const zoomOverlay = document.getElementById('image-zoom-overlay')
   if (zoomOverlay) zoomOverlay.style.display = 'none'
   const form = document.getElementById('product-modal-review-form')

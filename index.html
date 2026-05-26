@@ -70,6 +70,9 @@
     </script>
   </head>
   <body class="bg-white text-black">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-black focus:text-white focus:px-4 focus:py-2 focus:rounded focus:text-sm focus:font-heading focus:tracking-widest focus:uppercase">
+      Saltar al contenido
+    </a>
     <div id="app">
 
       <div id="promo-bar" class="fixed top-0 left-0 w-full bg-[#DC2626] z-[60] hidden">
@@ -127,7 +130,7 @@
         </div>
       </header>
 
-      <main>
+      <main id="main-content">
         <!-- INICIO -->
         <section id="page-inicio" class="page-section flex flex-col items-center px-6 pt-[168px] pb-16">
           <p class="font-heading text-3xl sm:text-4xl md:text-5xl tracking-[0.08em] text-black max-w-2xl mb-10 leading-snug text-center uppercase">
@@ -571,7 +574,7 @@
         </div>
       </footer>
       <!-- CARRITO -->
-      <div id="cart-panel" class="fixed top-0 right-0 w-full max-w-md h-dvh bg-white z-[70] shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col" style="display:none">
+      <div id="cart-panel" role="dialog" aria-modal="true" aria-label="Carrito de compras" class="fixed top-0 right-0 w-full max-w-md h-dvh bg-white z-[70] shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col" style="display:none">
         <div class="flex items-center justify-between px-6 h-16 border-b border-gray-100 flex-shrink-0">
           <h2 class="font-heading text-sm tracking-widest uppercase">Carrito</h2>
           <button id="cart-close" class="p-2" aria-label="Cerrar">
@@ -668,7 +671,7 @@
       <div id="cart-overlay" class="fixed inset-0 bg-black/20 z-[65]" style="display:none"></div>
 
       <!-- DETALLE DE PRODUCTO -->
-      <div id="product-modal" class="fixed inset-0 z-[75] flex items-center justify-center p-4" style="display:none">
+      <div id="product-modal" role="dialog" aria-modal="true" aria-label="Detalle de producto" class="fixed inset-0 z-[75] flex items-center justify-center p-4" style="display:none">
         <div id="product-modal-overlay" class="absolute inset-0 bg-black/20"></div>
         <div class="relative bg-white w-full max-w-lg max-h-[90vh] overflow-y-auto">
           <button id="product-modal-close" class="absolute top-4 right-4 z-10 p-2 hover:opacity-60 transition-opacity" aria-label="Cerrar">
@@ -741,7 +744,7 @@
       </div>
 
       <!-- MENÚ -->
-      <div id="menu-mobile" class="fixed inset-0 bg-white/98 backdrop-blur-sm flex-col z-[70] opacity-0 pointer-events-none transition-all duration-500">
+      <div id="menu-mobile" role="dialog" aria-modal="true" aria-label="Menú de navegación" class="fixed inset-0 bg-white/98 backdrop-blur-sm flex-col z-[70] opacity-0 pointer-events-none transition-all duration-500">
         <div class="flex items-center justify-between px-6 h-16 border-b border-gray-100 flex-shrink-0">
           <img src="/LOGO%20ED.png" alt="Espina Design" class="h-12 w-auto" />
           <button id="menu-close" class="p-2" aria-label="Cerrar menú">

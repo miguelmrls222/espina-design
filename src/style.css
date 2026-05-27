@@ -130,6 +130,34 @@
   animation: skeleton-pulse 1.4s ease-in-out infinite;
 }
 
+.warranty-badge {
+  position: relative;
+  overflow: hidden;
+}
+
+.warranty-badge::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.6) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: warranty-shine 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes warranty-shine {
+  0% { background-position: 200% 0; }
+  50% { background-position: -50% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .warranty-badge::after {
+    animation: none;
+    display: none;
+  }
+}
+
 @media (min-width: 768px) {
   #header-inner.scrolled {
     height: 68px;

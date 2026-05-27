@@ -60,10 +60,6 @@
   box-shadow: 0 1px 4px rgba(0,0,0,.06);
 }
 
-#promo-bar {
-  display: none !important;
-}
-
 #header-inner.scrolled {
   height: 56px;
 }

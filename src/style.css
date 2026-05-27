@@ -68,6 +68,23 @@
   height: 1.75rem;
 }
 
+@media (min-width: 768px) {
+  #header-inner.scrolled {
+    height: 68px;
+  }
+  #header-logo.scrolled {
+    height: 2.5rem;
+  }
+}
+
+#header-inner.scrolled {
+  height: 56px;
+}
+
+#header-logo.scrolled {
+  height: 1.75rem;
+}
+
 #product-modal-image:hover #product-modal-zoom-hint {
   opacity: 1;
 }

@@ -19,7 +19,7 @@ const menu = document.getElementById('menu-mobile')
 // ─── Routing ───
 
 const pageMeta = {
-  inicio: { title: 'Espina Design — Cuero Hecho a Mano en México', desc: 'Artículos cotidianos de cuero con estilo minimalista. Hecho a mano en Hermosillo, Sonora, México.' },
+  inicio: { title: 'Tienda en línea de Espina Design', desc: 'Artículos cotidianos de cuero con estilo minimalista. Hecho a mano en Hermosillo, Sonora, México.' },
   tienda: { title: 'Tienda — Espina Design', desc: 'Billeteras, tarjeteros y accesorios de cuero hechos a mano en México. Envíos a todo el país.' },
   nosotros: { title: 'Nosotros — Espina Design', desc: 'Conoce la historia de Espina Design. Cuero hecho a mano en Hermosillo, Sonora desde 2016.' },
   faq: { title: 'Preguntas Frecuentes — Espina Design', desc: 'Resuelve tus dudas sobre envíos, pagos, cuidados del cuero y más.' },

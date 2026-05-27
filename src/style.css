@@ -60,10 +60,6 @@
   box-shadow: 0 1px 4px rgba(0,0,0,.06);
 }
 
-#site-header.top-zero {
-  top: 0 !important;
-}
-
 #header-inner.scrolled {
   height: 56px;
 }

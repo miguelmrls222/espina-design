@@ -1253,7 +1253,6 @@ let _promoState = null
 
 function updatePromoTimer() {
   const bar = document.getElementById('promo-bar')
-  const header = document.getElementById('site-header')
   const hoursEl = document.getElementById('promo-hours')
   const minsEl = document.getElementById('promo-minutes')
   const secsEl = document.getElementById('promo-seconds')
@@ -1264,11 +1263,13 @@ function updatePromoTimer() {
   const prev = _promoState
   _promoState = isPromoActiva()
 
+  if (prev !== null && prev !== _promoState) {
+    updateCartUI()
+  }
+
   if (!_promoState) {
     bar.classList.add('hidden')
-    header?.classList.add('top-zero')
     clearInterval(_promoInterval)
-    if (prev !== null && prev !== _promoState) updateCartUI()
     return
   }
 
@@ -1276,18 +1277,9 @@ function updatePromoTimer() {
 
   if (remaining <= 0) {
     bar.classList.add('hidden')
-    header?.classList.add('top-zero')
     clearInterval(_promoInterval)
-    if (prev !== null && prev !== _promoState) updateCartUI()
     return
   }
-
-  if (prev !== null && prev !== _promoState) {
-    updateCartUI()
-  }
-
-  bar.classList.remove('hidden')
-  header?.classList.remove('top-zero')
 
   const days = Math.floor(remaining / 86400)
   const hours = Math.floor((remaining % 86400) / 3600)

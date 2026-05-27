@@ -54,13 +54,6 @@
 
 #header-logo {
   filter: drop-shadow(0 4px 14px rgba(156,98,38,0.3)) brightness(1.12) contrast(1.05);
-  transition: height 0.3s, filter 0.3s;
-  animation: logo-breathe 3s ease-in-out infinite;
-}
-
-@keyframes logo-breathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.04); }
 }
 
 #site-header.scrolled {
@@ -73,14 +66,6 @@
 
 #header-logo.scrolled {
   height: 1.75rem;
-  animation: none;
-}
-
-@media (min-width: 768px) {
-  #header-logo.scrolled {
-    height: 2.5rem;
-    animation: none;
-  }
 }
 
 #product-modal-image:hover #product-modal-zoom-hint {
@@ -176,10 +161,12 @@
   #header-inner.scrolled {
     height: 68px;
   }
+  #header-logo.scrolled {
+    height: 2.5rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #header-logo,
   #testimonios-track,
   .animate-marquee,
   .animate-promo-text,

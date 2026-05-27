@@ -54,6 +54,13 @@
 
 #header-logo {
   filter: drop-shadow(0 4px 14px rgba(156,98,38,0.3)) brightness(1.12) contrast(1.05);
+  animation: logo-glow 3s ease-in-out infinite;
+  will-change: filter;
+}
+
+@keyframes logo-glow {
+  0%, 100% { filter: drop-shadow(0 4px 14px rgba(156,98,38,0.3)) brightness(1.12) contrast(1.05); }
+  50% { filter: drop-shadow(0 4px 20px rgba(156,98,38,0.45)) brightness(1.15) contrast(1.08); }
 }
 
 #site-header.scrolled {
@@ -167,6 +174,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  #header-logo,
   #testimonios-track,
   .animate-marquee,
   .animate-promo-text,

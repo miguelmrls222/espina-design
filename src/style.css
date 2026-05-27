@@ -112,6 +112,20 @@
   }
 }
 
+#gift-section {
+  overflow: hidden;
+}
+
+#gift-section p {
+  font-size: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  #gift-section p {
+    font-size: 0.8125rem;
+  }
+}
+
 .animate-skeleton {
   animation: skeleton-pulse 1.4s ease-in-out infinite;
 }

@@ -54,6 +54,8 @@
 
 #header-logo {
   filter: drop-shadow(0 4px 14px rgba(156,98,38,0.3)) brightness(1.12) contrast(1.05);
+  will-change: filter;
+  transform: translateZ(0);
 }
 
 #site-header.scrolled {

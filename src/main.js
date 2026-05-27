@@ -1099,14 +1099,6 @@ async function iniciarCheckout() {
     }
     saveZip()
     const telefono = cartPhone ? cartPhone.value.trim() : ''
-    if (!telefono || !/^\d{10,13}$/.test(telefono)) {
-      cartPhone?.focus()
-      cartPhone?.classList.add('border-red-400')
-      setTimeout(() => cartPhone?.classList.remove('border-red-400'), 2000)
-      checkoutBtn.disabled = false
-      checkoutBtn.textContent = 'Pagar ahora'
-      return
-    }
     checkoutBtn.textContent = 'Calculando envío…'
     gtagEvent('event', 'begin_checkout', {
       currency: 'MXN',

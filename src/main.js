@@ -265,6 +265,7 @@ const cartFooter = document.getElementById('cart-footer')
 const checkoutBtn = document.getElementById('checkout-btn')
 const cartEmail = document.getElementById('cart-email')
 const cartZip = document.getElementById('cart-zip')
+const cartPhone = document.getElementById('cart-phone')
 
 // ─── Focus management ───
 
@@ -1097,6 +1098,15 @@ async function iniciarCheckout() {
       return
     }
     saveZip()
+    const telefono = cartPhone ? cartPhone.value.trim() : ''
+    if (!telefono || !/^\d{10,13}$/.test(telefono)) {
+      cartPhone?.focus()
+      cartPhone?.classList.add('border-red-400')
+      setTimeout(() => cartPhone?.classList.remove('border-red-400'), 2000)
+      checkoutBtn.disabled = false
+      checkoutBtn.textContent = 'Pagar ahora'
+      return
+    }
     checkoutBtn.textContent = 'Calculando envío…'
     gtagEvent('event', 'begin_checkout', {
       currency: 'MXN',
@@ -1109,6 +1119,7 @@ async function iniciarCheckout() {
       method: 'POST',
       body: JSON.stringify({
         email,
+        telefono,
         zip_to: zip,
         items: cart.map(i => ({
           nombre: i.nombre,

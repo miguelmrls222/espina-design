@@ -176,6 +176,8 @@ export async function onRequest(context) {
         })
       }
 
+      const telefono = meta.telefono || '5210000000000'
+
       const address = shipping.address || {}
       const zipDestino = zipTo || address.postal_code || ''
 
@@ -194,7 +196,7 @@ export async function onRequest(context) {
         address_type: 'to',
         name: shipping.name || 'Cliente',
         company: '',
-        phone: '5210000000000',
+        phone: telefono,
         email: email,
         street1: address.line1 || '',
         street_number: extraerNumero(address.line1 || ''),

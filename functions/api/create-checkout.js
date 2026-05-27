@@ -144,7 +144,7 @@ export async function onRequest(context) {
   }
 
   try {
-    const { email, items, zip_to } = await request.json()
+    const { email, telefono, items, zip_to } = await request.json()
 
     if (!items || items.length === 0) {
       return new Response(JSON.stringify({ error: 'Carrito vacío' }), {
@@ -202,6 +202,9 @@ export async function onRequest(context) {
     }
     const cartSummary = items.map(i => ({ n: i.nombre, p: i.precio, c: i.cantidad, col: i.color || '', img: i.imagen || '' }))
     params.set('metadata[cart]', JSON.stringify(cartSummary))
+    if (telefono) {
+      params.set('metadata[telefono]', telefono.replace(/\D/g, ''))
+    }
     if (envio) {
       params.set('metadata[rate_id]', envio.rate_id)
       params.set('metadata[zip_to]', zip_to)

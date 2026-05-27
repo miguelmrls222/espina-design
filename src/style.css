@@ -41,7 +41,7 @@
 }
 
 .animate-marquee {
-  animation: marquee-text 24s linear infinite;
+  animation: marquee-text 14s linear infinite;
 }
 
 #testimonios-track {

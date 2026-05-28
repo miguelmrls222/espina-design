@@ -181,7 +181,7 @@ function renderProductCard(p, index, opts = {}) {
             ${avg !== null ? `
             <div class="flex items-center gap-0.5 flex-shrink-0">
               <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <span class="font-body text-[11px] sm:text-sm font-semibold sm:font-normal text-gray-400 leading-none">${avg.toFixed(1)} (${total})</span>
+              <span class="font-body text-[11px] sm:text-sm font-semibold sm:font-normal text-gray-600 leading-none">${avg.toFixed(1)} (${total})</span>
             </div>` : ''}
           </div>
           <p class="font-body text-sm text-gray-500 mb-2">$${p.precio.toLocaleString('es-MX')} MXN</p>

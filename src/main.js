@@ -942,7 +942,7 @@ document.addEventListener('click', e => {
       crossellBtn.dataset.color || ''
     )
     crossellBtn.disabled = true
-    crossellBtn.textContent = '✓ Agregado'
+    crossellBtn.textContent = 'Agregado'
     setTimeout(() => {
       crossellBtn.disabled = false
       crossellBtn.textContent = '+ Agregar'

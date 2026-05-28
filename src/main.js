@@ -396,9 +396,9 @@ function updateCartUI() {
         ${itemStockBajo ? `<p class="font-heading text-[10px] tracking-wider uppercase text-[#DC2626] mt-0.5">🔥 Solo quedan ${itemStock}</p>` : ''}
         <p class="text-sm text-gray-500 mt-1">$${(item.precio * item.cantidad).toLocaleString('es-MX')} MXN</p>
         <div class="flex items-center gap-3 mt-2">
-          <button class="qty-minus text-xs border border-gray-300 w-6 h-6 rounded" data-index="${i}" aria-label="Reducir cantidad">−</button>
+          <button class="qty-minus text-xs border border-gray-300 w-6 h-6 rounded hover:bg-gray-100 active:scale-90 transition-all duration-200" data-index="${i}" aria-label="Reducir cantidad">−</button>
           <span class="text-sm">${item.cantidad}</span>
-          <button class="qty-plus text-xs border border-gray-300 w-6 h-6 rounded" data-index="${i}" aria-label="Aumentar cantidad">+</button>
+          <button class="qty-plus text-xs border border-gray-300 w-6 h-6 rounded hover:bg-gray-100 active:scale-90 transition-all duration-200" data-index="${i}" aria-label="Aumentar cantidad">+</button>
           <button class="ml-auto text-xs text-gray-400 hover:text-black transition-colors remove-item" data-index="${i}">Eliminar</button>
         </div>
       </div>

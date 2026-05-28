@@ -162,7 +162,7 @@ function renderProductCard(p, index, opts = {}) {
           </div>
           ${!agotado ? `
           <div class="absolute bottom-2 right-2 z-10">
-            <button class="add-to-cart w-9 h-9 sm:w-10 sm:h-10 bg-black text-white rounded-full flex items-center justify-center hover:bg-gray-800 transition-colors duration-200 shadow-md"
+            <button class="add-to-cart w-9 h-9 sm:w-10 sm:h-10 bg-black text-white rounded-xl flex items-center justify-center hover:bg-gray-800 hover:scale-105 active:scale-95 transition-all duration-300 shadow-md"
               data-nombre="${p.nombre}"
               data-precio="${p.precio}"
               data-imagen="${img}"

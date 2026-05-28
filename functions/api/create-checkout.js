@@ -182,9 +182,13 @@ export async function onRequest(context) {
     }
 
     let envio = null
+    const subtotal = items.reduce((sum, item) => sum + (Math.round(item.precio) * (item.cantidad || 1)), 0)
     try {
       const token = await getSkydropToken(env)
       envio = await calcularEnvio(token, zip_to)
+      if (subtotal >= 1250 && envio) {
+        envio.monto = 0
+      }
     } catch (e) {
       console.error('SkyDrop error:', e.message)
     }

@@ -444,15 +444,18 @@ function updateCartUI() {
     }
     envioIcon.className = 'w-7 h-7 flex items-center justify-center rounded-full bg-green-500 border-2 border-green-500 flex-shrink-0 transition-all duration-500'
     envioIcon.innerHTML = '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>'
-    envioTexto.textContent = '🎉 ¡Envío gratis!'
-    envioTexto.className = 'font-heading text-xs tracking-widest uppercase text-green-600 mt-2'
+    envioTexto.classList.add('hidden')
+    const envioSuccess = document.getElementById('envio-success')
+    envioSuccess.classList.remove('hidden')
+    envioSuccess.classList.add('fade-in')
   } else {
     delete envioIcon.dataset.confetti
     const falta = envioMeta - total
     envioIcon.className = 'w-7 h-7 flex items-center justify-center rounded-full border-2 border-gray-300 flex-shrink-0 transition-all duration-500'
     envioIcon.innerHTML = `<svg class="w-3.5 h-3.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`
     envioTexto.textContent = `Falta $${falta.toLocaleString('es-MX')} MXN para envío gratis`
-    envioTexto.className = 'font-body text-xs text-gray-500 mt-2'
+    document.getElementById('envio-success')?.classList.add('hidden')
+    envioTexto.classList.remove('hidden')
   }
 
   // ─── Cross-sell ───

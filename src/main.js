@@ -31,37 +31,45 @@ const pageMeta = {
 }
 
 function navigate(path) {
+  const main = document.getElementById('main-content')
   const skeleton = document.getElementById('page-skeleton')
-  skeleton?.classList.remove('hidden')
 
-  const page = pages[path.replace(/^\//, '')] || 'inicio'
-  document.querySelectorAll('.page-section').forEach(s => s.classList.add('hidden'))
-  const section = document.getElementById(`page-${page}`)
-  if (section) section.classList.remove('hidden')
-  const meta = pageMeta[page] || pageMeta.inicio
-  document.title = meta.title
-  const descEl = document.getElementById('meta-desc')
-  if (descEl) descEl.content = meta.desc
-  document.querySelectorAll('#menu-mobile nav [data-nav]').forEach(a => {
-    const href = a.getAttribute('href')
-    const isActive = href === path
-    a.style.opacity = '1'
-    if (isActive) {
-      a.innerHTML = a.textContent.trim() + ' <span class="inline-block w-1.5 h-1.5 rounded-full bg-black align-middle ml-1"></span>'
-    } else {
-      a.innerHTML = a.textContent.trim()
+  main?.classList.add('opacity-0')
+
+  setTimeout(() => {
+    skeleton?.classList.remove('hidden')
+
+    const page = pages[path.replace(/^\//, '')] || 'inicio'
+    document.querySelectorAll('.page-section').forEach(s => s.classList.add('hidden'))
+    const section = document.getElementById(`page-${page}`)
+    if (section) section.classList.remove('hidden')
+    const meta = pageMeta[page] || pageMeta.inicio
+    document.title = meta.title
+    const descEl = document.getElementById('meta-desc')
+    if (descEl) descEl.content = meta.desc
+    document.querySelectorAll('#menu-mobile nav [data-nav]').forEach(a => {
+      const href = a.getAttribute('href')
+      const isActive = href === path
+      a.style.opacity = '1'
+      if (isActive) {
+        a.innerHTML = a.textContent.trim() + ' <span class="inline-block w-1.5 h-1.5 rounded-full bg-black align-middle ml-1"></span>'
+      } else {
+        a.innerHTML = a.textContent.trim()
+      }
+    })
+    closeMenu()
+    closeCart()
+    if (page === 'inicio') {
+      renderDestacados()
+      renderTestimonios()
     }
-  })
-  closeMenu()
-  closeCart()
-  if (page === 'inicio') {
-    renderDestacados()
-    renderTestimonios()
-  }
-  if (page === 'tienda') renderProductos()
-  if (page === 'gracias') renderGracias()
+    if (page === 'tienda') renderProductos()
+    if (page === 'gracias') renderGracias()
 
-  setTimeout(() => skeleton?.classList.add('hidden'), 300)
+    main?.classList.remove('opacity-0')
+
+    setTimeout(() => skeleton?.classList.add('hidden'), 300)
+  }, 250)
 }
 
 function closeMenu() {

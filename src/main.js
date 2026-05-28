@@ -362,7 +362,7 @@ function updateCartUI() {
     cartItems.innerHTML = `
       <p class="text-sm text-gray-500 text-center pt-10 pb-6">Tu carrito está vacío</p>
       <div class="text-center">
-        <a href="/tienda" data-nav class="inline-block font-heading text-xs tracking-widest uppercase border-2 border-black px-8 py-3 hover:bg-black hover:text-white transition-colors duration-300">Ver productos</a>
+        <a href="/tienda" data-nav class="inline-block font-heading text-xs tracking-widest uppercase bg-black text-white rounded-xl px-8 py-3 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] transition-all duration-300">Ver productos</a>
       </div>`
     cartFooter.classList.add('hidden')
     envioSection?.classList.add('hidden')
@@ -478,7 +478,7 @@ function updateCartUI() {
           <p class="font-heading text-[11px] tracking-widest uppercase truncate">${p.nombre}</p>
           <p class="font-body text-xs text-gray-500">$${p.precio.toLocaleString('es-MX')} MXN</p>
         </div>
-        <button class="crossell-add font-heading text-[10px] tracking-widest uppercase border border-black px-3 py-1.5 hover:bg-black hover:text-white transition-colors duration-300 flex-shrink-0"
+        <button class="crossell-add font-heading text-[10px] tracking-widest uppercase border border-black px-3 py-1.5 rounded-xl hover:bg-black hover:text-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex-shrink-0"
           data-nombre="${p.nombre}"
           data-precio="${p.precio}"
           data-imagen="${img}"
@@ -741,13 +741,13 @@ function openDetail(producto) {
           `
         }).join('')}
       </div>
-      <button id="toggle-review-btn" class="mt-3 font-heading text-[10px] tracking-widest uppercase border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors duration-300">
+      <button id="toggle-review-btn" class="mt-3 font-heading text-[10px] tracking-widest uppercase border border-black px-4 py-2 rounded-xl hover:bg-black hover:text-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
         Dejar reseña
       </button>
     `
     reviewsEl.classList.remove('hidden')
   } else {
-    reviewsEl.innerHTML = `<button id="toggle-review-btn" class="font-heading text-[10px] tracking-widest uppercase border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors duration-300">
+    reviewsEl.innerHTML = `<button id="toggle-review-btn" class="font-heading text-[10px] tracking-widest uppercase border border-black px-4 py-2 rounded-xl hover:bg-black hover:text-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
       Dejar reseña
     </button>`
     reviewsEl.classList.remove('hidden')

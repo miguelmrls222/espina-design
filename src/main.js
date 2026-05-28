@@ -752,7 +752,7 @@ function openDetail(producto) {
 
   productModalAdd.disabled = agotado
   productModalAdd.textContent = agotado ? 'Agotado' : 'Agregar al carrito'
-  productModalAdd.className = `w-full font-heading text-sm tracking-widest uppercase border-2 px-10 py-3 transition-colors duration-300 ${agotado ? 'border-gray-300 text-gray-300 cursor-not-allowed' : 'border-black hover:bg-black hover:text-white cursor-pointer'}`
+  productModalAdd.className = `w-full font-heading text-sm tracking-widest uppercase border-2 px-10 py-3 rounded-xl transition-all duration-300 ${agotado ? 'border-gray-300 text-gray-300 cursor-not-allowed' : 'border-black hover:bg-black hover:text-white hover:scale-[1.02] active:scale-[0.98] cursor-pointer'}`
 
   productModalAdd.onclick = () => {
     if (!agotado) {

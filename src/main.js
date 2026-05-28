@@ -157,7 +157,7 @@ function renderProductCard(p, index, opts = {}) {
       <div class="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow hover:shadow-lg transition-shadow duration-300">
         <div class="aspect-[4/5] bg-[#F5F5F5] relative cursor-pointer open-detail group rounded-t-2xl" data-index="${index}">
           <div class="absolute inset-0 overflow-hidden rounded-t-2xl">
-            ${img ? `<img src="${img}" alt="${p.nombre}"${carousel ? '' : ' loading="lazy"'} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />` : '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg></div>'}
+            ${img ? `<img src="${img}" width="400" height="500" alt="${p.nombre}"${carousel ? '' : ' loading="lazy"'} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />` : '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg></div>'}
           </div>
           <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
             <span class="text-white text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 px-4 py-2">Ver más</span>
@@ -389,7 +389,7 @@ function updateCartUI() {
     const itemStockBajo = typeof itemStock === 'number' && itemStock <= 3
     return `
     <div class="flex gap-4 pb-4 border-b border-gray-100">
-      ${item.imagen ? `<img src="${item.imagen}" alt="${item.nombre}" loading="lazy" class="w-20 h-20 object-cover bg-[#F5F5F5]" />` : ''}
+      ${item.imagen ? `<img src="${item.imagen}" width="80" height="80" alt="${item.nombre}" loading="lazy" class="w-20 h-20 object-cover bg-[#F5F5F5]" />` : ''}
       <div class="flex-1 min-w-0">
         <h4 class="font-heading text-xs tracking-widest uppercase truncate">${item.nombre}</h4>
         ${item.color ? `<p class="font-body text-xs text-gray-400 mt-0.5">Color: ${item.color}</p>` : ''}
@@ -480,7 +480,7 @@ function updateCartUI() {
       return `
       <div class="flex items-center gap-3">
         <div class="w-14 h-14 bg-[#F5F5F5] flex-shrink-0 overflow-hidden rounded">
-          ${img ? `<img src="${img}" alt="${p.nombre}" loading="lazy" class="w-full h-full object-cover" />` : '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg></div>'}
+          ${img ? `<img src="${img}" width="56" height="56" alt="${p.nombre}" loading="lazy" class="w-full h-full object-cover" />` : '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg></div>'}
         </div>
         <div class="flex-1 min-w-0">
           <p class="font-heading text-[11px] tracking-widest uppercase truncate">${p.nombre}</p>
@@ -662,7 +662,7 @@ function openDetail(producto) {
   function renderFoto(index) {
     const f = fotos[index]
     if (f) {
-      productModalImage.innerHTML = `<img src="${f}" alt="${producto.nombre}" loading="lazy" class="w-full h-full object-cover transition-opacity duration-300" />`
+      productModalImage.innerHTML = `<img src="${f}" width="400" height="500" alt="${producto.nombre}" loading="lazy" class="w-full h-full object-cover transition-opacity duration-300" />`
     } else {
       productModalImage.innerHTML = '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>'
     }
@@ -671,7 +671,7 @@ function openDetail(producto) {
     if (fotos.length > 1) {
       thumbsEl.innerHTML = fotos.map((f, fi) => `
         <button class="thumb-btn flex-shrink-0 w-14 h-14 rounded border-2 overflow-hidden transition-all duration-200 ${fi === index ? 'border-black' : 'border-gray-200 hover:border-gray-400'}" data-foto-index="${fi}">
-          <img src="${f}" alt="" loading="lazy" class="w-full h-full object-cover" />
+          <img src="${f}" width="56" height="56" alt="" loading="lazy" class="w-full h-full object-cover" />
         </button>
       `).join('')
       thumbsEl.style.display = 'flex'
@@ -899,7 +899,7 @@ document.addEventListener('click', e => {
     })
     const fotosEl = document.getElementById('product-modal-image')
     const img = thumbBtn.querySelector('img')?.src
-    if (img) fotosEl.innerHTML = `<img src="${img}" alt="" class="w-full h-full object-cover transition-opacity duration-300" />`
+    if (img) fotosEl.innerHTML = `<img src="${img}" width="400" height="500" alt="" class="w-full h-full object-cover transition-opacity duration-300" />`
   }
 
   const colorBtn = e.target.closest('.color-btn')
@@ -1076,7 +1076,7 @@ function renderGracias() {
   container.innerHTML = pedido.items.map(i => `
     <div class="flex items-center gap-4 text-sm">
       <div class="w-14 h-14 bg-[#F5F5F5] flex-shrink-0 flex items-center justify-center overflow-hidden">
-        ${i.imagen ? `<img src="${i.imagen}" alt="${i.nombre}" loading="lazy" class="w-full h-full object-cover" />` : `<span class="font-heading text-[10px] tracking-widest uppercase text-gray-400">ED</span>`}
+        ${i.imagen ? `<img src="${i.imagen}" width="56" height="56" alt="${i.nombre}" loading="lazy" class="w-full h-full object-cover" />` : `<span class="font-heading text-[10px] tracking-widest uppercase text-gray-400">ED</span>`}
       </div>
       <div class="flex-1 min-w-0">
         <p class="font-heading text-xs tracking-widest uppercase truncate">${i.nombre}</p>

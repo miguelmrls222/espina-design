@@ -52,6 +52,16 @@
   animation-play-state: paused;
 }
 
+#site-header[data-promo-active] {
+  top: 3rem;
+}
+
+@media (min-width: 640px) {
+  #site-header[data-promo-active] {
+    top: 3.5rem;
+  }
+}
+
 #header-logo {
   filter: drop-shadow(0 4px 14px rgba(156,98,38,0.3)) brightness(1.12) contrast(1.05);
   will-change: filter;

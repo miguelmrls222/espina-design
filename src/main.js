@@ -1286,6 +1286,7 @@ function updatePromoTimer() {
 
   if (!_promoState) {
     bar.classList.add('hidden')
+    document.getElementById('site-header')?.removeAttribute('data-promo-active')
     clearInterval(_promoInterval)
     return
   }
@@ -1324,6 +1325,7 @@ function updatePromoTimer() {
 
   if (subtext) subtext.textContent = 'POR TIEMPO LIMITADO'
   bar.classList.remove('hidden')
+  document.getElementById('site-header')?.setAttribute('data-promo-active', '')
 }
 
 updatePromoTimer()

@@ -4,13 +4,21 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "generate": "node scripts/generate-catalog.mjs",
+    "predev": "npm run generate",
     "dev": "vite",
+    "prebuild": "npm run generate",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "tsx --test tests/*.test.ts",
+    "dev:pages": "vite build && wrangler pages dev dist"
   },
   "devDependencies": {
     "vite": "^8.0.12",
-    "wrangler": "^4.94.0"
+    "wrangler": "^4.94.0",
+    "tsx": "^4.23.0",
+    "typescript": "^7.0.2"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.0",

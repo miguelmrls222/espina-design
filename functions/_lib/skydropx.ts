@@ -54,11 +54,23 @@ interface CotizacionCruda {
 }
 
 const MENSAJE_ENVIO = 'No pudimos calcular el envío para tu código postal. Intenta de nuevo o escríbenos por WhatsApp.'
-const ESPERA_COTIZACION_MS = 8_000
+const ESPERA_COTIZACION_MS = 10_000
 const INTERVALO_COTIZACION_MS = 800
+const INTENTOS_COTIZACION = 2
+const PAUSA_REINTENTO_MS = 500
+const LIMITE_PARA_REINTENTAR_MS = 18_000
 
-function fallo(detalle: string): AppError {
-  return new AppError(502, 'envio_no_disponible', MENSAJE_ENVIO, detalle)
+const fallosTemporales = new WeakSet<AppError>()
+
+function fallo(detalle: string, temporal = false): AppError {
+  const error = new AppError(502, 'envio_no_disponible', MENSAJE_ENVIO, detalle)
+  if (temporal) fallosTemporales.add(error)
+  return error
+}
+
+function esTemporal(error: unknown): boolean {
+  if (!(error instanceof AppError)) return false
+  return error.code === 'servicio_externo' || fallosTemporales.has(error)
 }
 
 async function solicitar<T>(token: string, ruta: string, metodo: 'GET' | 'POST', cuerpo?: unknown): Promise<T> {
@@ -71,7 +83,7 @@ async function solicitar<T>(token: string, ruta: string, metodo: 'GET' | 'POST',
   )
   if (!respuesta.ok) {
     const texto = await respuesta.text().catch(() => '')
-    throw fallo(`SkyDropx ${metodo} ${ruta} -> ${respuesta.status} ${texto.slice(0, 300)}`)
+    throw fallo(`SkyDropx ${metodo} ${ruta} -> ${respuesta.status} ${texto.slice(0, 300)}`, respuesta.status >= 500 || respuesta.status === 429)
   }
   return (await respuesta.json()) as T
 }
@@ -93,7 +105,7 @@ export async function obtenerToken(env: Env): Promise<string> {
     },
     12_000,
   )
-  if (!respuesta.ok) throw fallo(`SkyDropx token -> ${respuesta.status}`)
+  if (!respuesta.ok) throw fallo(`SkyDropx token -> ${respuesta.status}`, respuesta.status >= 500 || respuesta.status === 429)
   const datos = (await respuesta.json()) as { access_token?: string }
   if (!datos.access_token) throw fallo('SkyDropx token sin access_token')
   return datos.access_token
@@ -122,6 +134,26 @@ function tarifaMasBarata(rates: readonly TarifaCruda[]): TarifaCruda | null {
 const esperar = (ms: number) => new Promise<void>(resolver => setTimeout(resolver, ms))
 
 export async function cotizarEnvio(env: Env, codigoPostalDestino: string): Promise<TarifaEnvio> {
+  const inicio = Date.now()
+  let ultimoError: unknown
+  for (let intento = 1; intento <= INTENTOS_COTIZACION; intento++) {
+    try {
+      return await intentarCotizacion(env, codigoPostalDestino)
+    } catch (error) {
+      ultimoError = error
+      const hayTiempo = Date.now() - inicio < LIMITE_PARA_REINTENTAR_MS
+      if (!esTemporal(error) || intento === INTENTOS_COTIZACION || !hayTiempo) break
+      console.warn(`SkyDropx: intento ${intento} falló, reintentando`, error instanceof AppError ? error.detalle || error.message : '')
+      await esperar(PAUSA_REINTENTO_MS)
+    }
+  }
+  if (ultimoError instanceof AppError && ultimoError.code === 'servicio_externo') {
+    throw fallo(`SkyDropx sin respuesta tras ${INTENTOS_COTIZACION} intentos: ${ultimoError.message}`)
+  }
+  throw ultimoError
+}
+
+async function intentarCotizacion(env: Env, codigoPostalDestino: string): Promise<TarifaEnvio> {
   const token = await obtenerToken(env)
   const zona = (await buscarZona(codigoPostalDestino)) ?? { estado: 'N/A', municipio: 'N/A', colonia: 'Centro' }
 
@@ -158,7 +190,7 @@ export async function cotizarEnvio(env: Env, codigoPostalDestino: string): Promi
     }
     await esperar(INTERVALO_COTIZACION_MS)
   }
-  if (!completa) throw fallo('Tiempo de espera agotado para la cotización')
+  if (!completa) throw fallo('Tiempo de espera agotado para la cotización', true)
 
   const tarifa = tarifaMasBarata(completa.rates ?? [])
   if (!tarifa || !tarifa.id) throw fallo('Sin tarifas disponibles para el destino')

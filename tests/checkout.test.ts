@@ -106,6 +106,48 @@ test('si SkyDropx falla NO crea la sesión de pago (502)', async () => {
   assert.equal(mock.llamadas.some(l => l.url.includes('stripe.com')), false)
 })
 
+test('reintenta la cotización si SkyDropx falla de forma temporal y luego responde', async () => {
+  let cotizaciones = 0
+  const mock = instalarFetch([
+    (l) => {
+      if (l.url.endsWith('/api/v1/quotations') && l.method === 'POST') {
+        cotizaciones++
+        return cotizaciones === 1 ? { status: 503, body: {} } : { body: { id: 'q1' } }
+      }
+      return undefined
+    },
+    ...skydropOk,
+    stripeOk,
+  ])
+  restaurar = mock.restaurar
+  const respuesta = await onRequest(contexto(peticionJson(URL_CHECKOUT, {
+    ...base, items: [{ slug: 'tarjetero-cactus', color: 'verde', cantidad: 1 }],
+  }), ENV))
+  assert.equal(respuesta.status, 200)
+  assert.equal(cotizaciones, 2)
+})
+
+test('no reintenta cuando SkyDropx rechaza la solicitud (4xx) ni cuando no hay tarifas', async () => {
+  let cotizaciones = 0
+  const mock = instalarFetch([
+    (l) => {
+      if (l.url.endsWith('/api/v1/quotations') && l.method === 'POST') {
+        cotizaciones++
+        return { status: 422, body: { message: 'dato inválido' } }
+      }
+      return undefined
+    },
+    ...skydropOk,
+    stripeOk,
+  ])
+  restaurar = mock.restaurar
+  const respuesta = await onRequest(contexto(peticionJson(URL_CHECKOUT, {
+    ...base, items: [{ slug: 'tarjetero-cactus', color: 'verde', cantidad: 1 }],
+  }), ENV))
+  assert.equal(respuesta.status, 502)
+  assert.equal(cotizaciones, 1)
+})
+
 test('errores de Stripe no filtran el mensaje original', async () => {
   const mock = instalarFetch([...skydropOk, (l) => (l.url.includes('stripe.com') ? { status: 400, body: { error: { code: 'x', message: 'detalle interno' } } } : undefined)])
   restaurar = mock.restaurar

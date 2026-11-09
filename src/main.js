@@ -1182,7 +1182,7 @@ function restablecerBotonPago() {
 async function iniciarCheckout() {
   mostrarErrorCheckout('')
   const controlador = new AbortController()
-  const limite = setTimeout(() => controlador.abort(), 30000)
+  const limite = setTimeout(() => controlador.abort(), 45000)
   try {
     const email = cartEmail ? cartEmail.value.trim() : ''
     if (!email || !/\S+@\S+\.\S+/.test(email)) {

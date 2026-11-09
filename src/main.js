@@ -1,6 +1,16 @@
 import './style.css'
-
-const BUILD = '20260526'
+import {
+  CANTIDAD_MAXIMA,
+  CROSS_SELL,
+  ENVIO_GRATIS_MINIMO,
+  PROMO,
+  buscarProductoPorNombre,
+  buscarProductoPorSlug,
+  calcularTotales,
+  isPromoActiva,
+  msRestantesPromo,
+  productosActivos,
+} from './data/pricing'
 
 const pages = {
   '': 'inicio',
@@ -95,11 +105,8 @@ window.addEventListener('popstate', () => navigate(window.location.pathname))
 
 // ─── Productos ───
 
-import crossSellSlugs from '/src/data/cross-sell.json'
-const productosModules = import.meta.glob('/src/data/productos/*.json', { eager: true })
-const productos = Object.values(productosModules)
-  .map(m => m.default || m)
-  .filter(p => p.activo !== false)
+const crossSellSlugs = CROSS_SELL
+const productos = productosActivos()
 
 function renderProductos() {
   const grid = document.getElementById('productos-grid')
@@ -155,7 +162,7 @@ function renderProductCard(p, index, opts = {}) {
   return `
     <div class="${wrapperClass} ${agotado ? 'opacity-50' : ''}">
       <div class="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow hover:shadow-lg transition-shadow duration-300">
-        <div class="aspect-[4/5] bg-[#F5F5F5] relative cursor-pointer open-detail group rounded-t-2xl" data-index="${index}">
+        <div class="aspect-[4/5] bg-[#F5F5F5] relative cursor-pointer open-detail group rounded-t-2xl" data-index="${index}" tabindex="-1">
           <div class="absolute inset-0 overflow-hidden rounded-t-2xl">
             ${img ? `<img src="${img}" width="400" height="500" alt="${p.nombre}"${carousel ? '' : ' loading="lazy"'} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />` : '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg></div>'}
           </div>
@@ -185,7 +192,7 @@ function renderProductCard(p, index, opts = {}) {
         </div>
         <div class="p-3 sm:p-4">
           <div class="flex items-center justify-between gap-2 mb-1">
-            <h3 class="font-heading text-xs sm:text-sm tracking-widest uppercase leading-none cursor-pointer open-detail flex-1 min-w-0" data-index="${index}">${p.nombre}</h3>
+            <h3 class="font-heading text-xs sm:text-sm tracking-widest uppercase leading-none cursor-pointer open-detail flex-1 min-w-0" data-index="${index}" tabindex="0" role="button" aria-label="Ver detalle de ${p.nombre}">${p.nombre}</h3>
             ${avg !== null ? `
             <div class="flex items-center gap-0.5 flex-shrink-0">
               <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
@@ -263,7 +270,53 @@ const colorMap = {
   'cafe oscuro': '#4a3728',
 }
 
-let cart = JSON.parse(localStorage.getItem('espina-cart') || '[]')
+function normalizarCarrito(crudo) {
+  if (!Array.isArray(crudo)) return []
+  const lineas = new Map()
+  for (const original of crudo.slice(0, 20)) {
+    if (!original || typeof original !== 'object') continue
+    // Acepta también el formato corto de metadata.cart: { n, c, col }
+    const item = {
+      slug: original.slug,
+      nombre: original.nombre ?? original.n,
+      color: original.color ?? original.col,
+      cantidad: original.cantidad ?? original.c,
+    }
+    const prod = (typeof item.slug === 'string' && buscarProductoPorSlug(item.slug)) ||
+      (typeof item.nombre === 'string' && buscarProductoPorNombre(item.nombre))
+    if (!prod || prod.stock === 'agotado') continue
+    const colores = prod.colores || []
+    const color = colores.includes(item.color) ? item.color : (colores[0] || '')
+    const cantidad = Math.min(CANTIDAD_MAXIMA, Math.max(1, Math.floor(Number(item.cantidad)) || 1))
+    const clave = prod.slug + '|' + color
+    const previa = lineas.get(clave)
+    if (previa) {
+      previa.cantidad = Math.min(CANTIDAD_MAXIMA, previa.cantidad + cantidad)
+    } else {
+      lineas.set(clave, {
+        slug: prod.slug,
+        nombre: prod.nombre,
+        precio: prod.precio,
+        imagen: prod.fotos?.[0] || '',
+        descripcion: prod.descripcion || '',
+        color,
+        cantidad,
+        stock: prod.stock,
+      })
+    }
+  }
+  return [...lineas.values()]
+}
+
+function leerCarritoGuardado() {
+  try {
+    return normalizarCarrito(JSON.parse(localStorage.getItem('espina-cart') || '[]'))
+  } catch {
+    return []
+  }
+}
+
+let cart = leerCarritoGuardado()
 
 const cartPanel = document.getElementById('cart-panel')
 const cartOverlay = document.getElementById('cart-overlay')
@@ -349,13 +402,6 @@ function saveCart() {
   updateCartUI()
 }
 
-// Cambia esta fecha para renovar la promo (formato: Año, Mes-1, Día, Hora, Minuto, Segundo)
-const PROMO_EXPIRES = new Date(2026, 4, 31, 23, 59, 59) // 31 de mayo 2026 23:59:59
-
-function isPromoActiva() {
-  return Date.now() < PROMO_EXPIRES.getTime()
-}
-
 function updateCartUI() {
   const count = cart.reduce((s, i) => s + i.cantidad, 0)
   cartCount.textContent = count
@@ -405,10 +451,7 @@ function updateCartUI() {
     </div>
   `}).join('')
 
-  const subtotal = cart.reduce((s, i) => s + i.precio * i.cantidad, 0)
-  const promo = isPromoActiva()
-  const descuento = promo ? Math.round(subtotal * 0.2) : 0
-  const total = subtotal - descuento
+  const { subtotal, descuento, total, promoActiva: promo } = calcularTotales(cart)
 
   let html = `
     <div class="flex justify-between mb-1 text-sm">
@@ -419,7 +462,7 @@ function updateCartUI() {
   if (promo && descuento > 0) {
     html += `
     <div class="flex justify-between mb-1 text-sm text-[#DC2626]">
-      <span class="font-heading tracking-wider uppercase">🔥 20% OFF</span>
+      <span class="font-heading tracking-wider uppercase">🔥 ${PROMO.porcentaje}% OFF</span>
       <span class="font-body">−$${descuento.toLocaleString('es-MX')} MXN</span>
     </div>
     <div class="flex justify-between mb-2 text-[10px] text-[#DC2626]/80">
@@ -437,7 +480,7 @@ function updateCartUI() {
   cartFooter.querySelector('.cart-totals').innerHTML = html
 
   // ─── Envío gratis ───
-  const envioMeta = 1250
+  const envioMeta = ENVIO_GRATIS_MINIMO
   const envioProgreso = Math.min(total / envioMeta, 1)
   const envioBar = document.getElementById('envio-progress')
   const envioIcon = document.getElementById('envio-icon')
@@ -622,10 +665,10 @@ function addToCart(nombre, precio, imagen, descripcion, color) {
   const stock = prod ? prod.stock : 'disponible'
   const exist = cart.find(i => i.nombre === nombre && i.color === color)
   if (exist) {
-    if (exist.cantidad >= 10) return
+    if (exist.cantidad >= CANTIDAD_MAXIMA) return
     exist.cantidad++
   } else {
-    cart.push({ nombre, precio, imagen, descripcion, color, cantidad: 1, stock })
+    cart.push({ slug: prod ? prod.slug : '', nombre, precio, imagen, descripcion, color, cantidad: 1, stock })
   }
   saveCart()
   openCart()
@@ -652,7 +695,7 @@ let colorSeleccionado = ''
 
 let fotoActual = 0
 
-function openDetail(producto) {
+function openDetail(producto, trigger) {
   const fotos = producto.fotos?.filter(Boolean) || []
   const img = fotos[0] || ''
   const agotado = producto.stock === 'agotado'
@@ -811,7 +854,7 @@ function openDetail(producto) {
 
   productModal.style.display = 'flex'
   document.body.style.overflow = 'hidden'
-  modalOpened(productModal, document.querySelector('.open-detail[data-index]'))
+  modalOpened(productModal, trigger || document.activeElement)
 }
 
 function closeDetail() {
@@ -885,7 +928,7 @@ document.addEventListener('click', e => {
   if (detailTrigger && !e.target.closest('.add-to-cart')) {
     const idx = parseInt(detailTrigger.dataset.index)
     const producto = productos[idx]
-    if (producto) openDetail(producto)
+    if (producto) openDetail(producto, detailTrigger)
   }
 
   const thumbBtn = e.target.closest('.thumb-btn')
@@ -960,7 +1003,7 @@ document.addEventListener('click', e => {
   const plus = e.target.closest('.qty-plus')
   if (plus) {
     const i = parseInt(plus.dataset.index)
-    if (cart[i].cantidad >= 10) return
+    if (cart[i].cantidad >= CANTIDAD_MAXIMA) return
     cart[i].cantidad++
     saveCart()
   }
@@ -1005,6 +1048,7 @@ document.addEventListener('click', e => {
     const producto = document.getElementById('product-modal-name')?.textContent || ''
     const nombre = document.getElementById('review-name')?.value.trim()
     const texto = document.getElementById('review-text')?.value.trim()
+    const website = document.getElementById('review-website')?.value || ''
     const starsEl = document.getElementById('review-stars')
     const puntuacion = parseInt(starsEl?.dataset?.selected || '0')
     const feedback = document.getElementById('review-feedback')
@@ -1016,16 +1060,25 @@ document.addEventListener('click', e => {
       return
     }
 
+    if (texto.length < 10) {
+      feedback.textContent = 'Tu comentario debe tener al menos 10 caracteres.'
+      feedback.className = 'font-body text-xs mt-2 text-red-500'
+      feedback.classList.remove('hidden')
+      return
+    }
+
     const btn = document.getElementById('review-submit')
     btn.disabled = true
     btn.textContent = 'Enviando…'
+    feedback.textContent = ''
+    feedback.classList.add('hidden')
 
     fetch('/api/submit-review', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ producto, nombre, puntuacion, texto }),
+      body: JSON.stringify({ producto, nombre, puntuacion, texto, website }),
     })
-      .then(r => r.json())
+      .then(r => r.json().catch(() => ({ ok: false })))
       .then(data => {
         if (data.ok) {
           feedback.textContent = '¡Gracias! Tu reseña será revisada y publicada pronto.'
@@ -1043,8 +1096,8 @@ document.addEventListener('click', e => {
           throw new Error(data.error || 'Error al enviar')
         }
       })
-      .catch(() => {
-        feedback.textContent = 'Error al enviar. Intenta de nuevo o escríbenos por WhatsApp.'
+      .catch(err => {
+        feedback.textContent = err.message && err.message !== 'Error al enviar' ? err.message : 'Error al enviar. Intenta de nuevo o escríbenos por WhatsApp.'
         feedback.className = 'font-body text-xs mt-2 text-red-500'
         feedback.classList.remove('hidden')
       })
@@ -1053,6 +1106,15 @@ document.addEventListener('click', e => {
         btn.textContent = 'Enviar reseña'
       })
   }
+})
+
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter' && e.key !== ' ') return
+  const trigger = e.target.closest?.('.open-detail[role="button"]')
+  if (!trigger) return
+  e.preventDefault()
+  const producto = productos[parseInt(trigger.dataset.index)]
+  if (producto) openDetail(producto, trigger)
 })
 
 // ─── Página Gracias ───
@@ -1093,65 +1155,92 @@ function renderGracias() {
   })
 }
 
+function mostrarErrorCheckout(mensaje) {
+  const el = document.getElementById('checkout-error')
+  if (!el) return
+  el.textContent = mensaje
+  el.classList.toggle('hidden', !mensaje)
+}
+
+function marcarCampoInvalido(campo, mensaje) {
+  mostrarErrorCheckout(mensaje)
+  if (!campo) return
+  campo.focus()
+  campo.setAttribute('aria-invalid', 'true')
+  campo.classList.add('border-red-400')
+  setTimeout(() => {
+    campo.removeAttribute('aria-invalid')
+    campo.classList.remove('border-red-400')
+  }, 3000)
+}
+
+function restablecerBotonPago() {
+  checkoutBtn.disabled = false
+  checkoutBtn.textContent = 'Pagar ahora'
+}
+
 async function iniciarCheckout() {
+  mostrarErrorCheckout('')
+  const controlador = new AbortController()
+  const limite = setTimeout(() => controlador.abort(), 30000)
   try {
     const email = cartEmail ? cartEmail.value.trim() : ''
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
-      cartEmail?.focus()
-      cartEmail?.classList.add('border-red-400')
-      setTimeout(() => cartEmail?.classList.remove('border-red-400'), 2000)
-      checkoutBtn.disabled = false
-      checkoutBtn.textContent = 'Pagar ahora'
+      marcarCampoInvalido(cartEmail, 'Ingresa un correo válido.')
+      restablecerBotonPago()
       return
     }
     saveEmail()
     const zip = cartZip ? cartZip.value.trim() : ''
-    if (!zip || !/^\d{5}$/.test(zip)) {
-      cartZip?.focus()
-      cartZip?.classList.add('border-red-400')
-      setTimeout(() => cartZip?.classList.remove('border-red-400'), 2000)
-      checkoutBtn.disabled = false
-      checkoutBtn.textContent = 'Pagar ahora'
+    if (!/^\d{5}$/.test(zip)) {
+      marcarCampoInvalido(cartZip, 'Ingresa un código postal de 5 dígitos.')
+      restablecerBotonPago()
       return
     }
     saveZip()
-    const telefono = cartPhone ? cartPhone.value.trim() : ''
+    const telefono = cartPhone ? cartPhone.value.replace(/\D/g, '') : ''
+    if (telefono.length < 10 || telefono.length > 13) {
+      marcarCampoInvalido(cartPhone, 'Ingresa un teléfono de 10 a 13 dígitos.')
+      restablecerBotonPago()
+      return
+    }
     checkoutBtn.textContent = 'Calculando envío…'
     gtagEvent('event', 'begin_checkout', {
       currency: 'MXN',
-      value: cart.reduce((t, i) => t + i.precio * i.cantidad, 0),
+      value: calcularTotales(cart).total,
       items: cart.map(i => ({ item_name: i.nombre, price: i.precio, quantity: i.cantidad }))
     })
-    const promo = isPromoActiva()
-    const aplicarDesc = promo
     const res = await fetch('/api/create-checkout', {
       method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      signal: controlador.signal,
       body: JSON.stringify({
         email,
         telefono,
         zip_to: zip,
-        items: cart.map(i => ({
-          nombre: i.nombre,
-          precio: aplicarDesc ? Math.round(i.precio * 0.8) : i.precio,
-          cantidad: i.cantidad,
-          imagen: i.imagen || '',
-          descripcion: i.descripcion || '',
-          color: i.color || '',
-        })),
+        promo: isPromoActiva(),
+        items: cart.map(i => ({ slug: i.slug, color: i.color || '', cantidad: i.cantidad })),
       }),
     })
 
-    const data = await res.json()
+    const data = await res.json().catch(() => ({}))
 
-    if (data.url) {
+    if (res.ok && data.ok && data.url) {
+      checkoutBtn.textContent = 'Redirigiendo a Stripe…'
       window.location.href = data.url
-    } else {
-      throw new Error(data.error || 'Error al crear el pago')
+      return
     }
+    if (data.code === 'promo_cambio') updateCartUI()
+    throw new Error(data.error || 'No pudimos iniciar el pago. Intenta de nuevo.')
   } catch (err) {
-    mostrarToast(err.message, 'error')
-    checkoutBtn.disabled = false
-    checkoutBtn.textContent = 'Pagar ahora'
+    const mensaje = err.name === 'AbortError'
+      ? 'El servidor tardó demasiado en responder. Intenta de nuevo.'
+      : err.message
+    mostrarErrorCheckout(mensaje)
+    mostrarToast(mensaje, 'error')
+    restablecerBotonPago()
+  } finally {
+    clearTimeout(limite)
   }
 }
 
@@ -1190,8 +1279,8 @@ let recoveryRedirect = false
 const cookieData = getCookie('espina_recovery')
 if (cookieData) {
   try {
-    const d = JSON.parse(cookieData)
-    if (Array.isArray(d) && d.length > 0) { cart = d; saveCart() }
+    const d = normalizarCarrito(JSON.parse(cookieData))
+    if (d.length > 0) { cart = d; saveCart() }
   } catch {}
   document.cookie = 'espina_recovery=; path=/; max-age=0; SameSite=Lax'
   window.history.replaceState({}, '', '/tienda')
@@ -1201,8 +1290,8 @@ if (cookieData) {
 const carritoEncoded = params.get('carrito')
 if (carritoEncoded) {
   try {
-    const data = JSON.parse(decodeURIComponent(carritoEncoded))
-    if (data && Array.isArray(data) && data.length > 0) { cart = data; saveCart() }
+    const data = normalizarCarrito(JSON.parse(decodeURIComponent(carritoEncoded)))
+    if (data.length > 0) { cart = data; saveCart() }
   } catch {}
   window.history.replaceState({}, '', '/tienda')
   recoveryRedirect = true
@@ -1231,6 +1320,7 @@ document.getElementById('newsletter-form')?.addEventListener('submit', async e =
   const input = document.getElementById('newsletter-email')
   const feedback = document.getElementById('newsletter-feedback')
   const email = input?.value.trim()
+  const website = document.getElementById('newsletter-website')?.value || ''
   if (!email || !/\S+@\S+\.\S+/.test(email)) {
     feedback.textContent = 'Ingresa un correo válido.'
     feedback.className = 'font-body text-xs mt-3 text-red-500'
@@ -1244,9 +1334,9 @@ document.getElementById('newsletter-form')?.addEventListener('submit', async e =
     const res = await fetch('/api/subscribe', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, website }),
     })
-    const data = await res.json()
+    const data = await res.json().catch(() => ({}))
     if (data.ok) {
       feedback.textContent = '¡Gracias! Ahora recibirás nuestras novedades.'
       feedback.className = 'font-body text-xs mt-3 text-green-600'
@@ -1256,7 +1346,7 @@ document.getElementById('newsletter-form')?.addEventListener('submit', async e =
       throw new Error(data.error || 'Error al suscribir')
     }
   } catch (err) {
-    feedback.textContent = 'Error al suscribir. ¿Ya estás registrado?'
+    feedback.textContent = err.message && err.message !== 'Error al suscribir' ? err.message : 'No pudimos suscribirte. Intenta de nuevo en unos minutos.'
     feedback.className = 'font-body text-xs mt-3 text-red-500'
     feedback.classList.remove('hidden')
   }
@@ -1291,7 +1381,7 @@ function updatePromoTimer() {
     return
   }
 
-  const remaining = Math.max(0, Math.floor((PROMO_EXPIRES.getTime() - Date.now()) / 1000))
+  const remaining = Math.floor(msRestantesPromo() / 1000)
 
   if (remaining <= 0) {
     bar.classList.add('hidden')
@@ -1311,7 +1401,7 @@ function updatePromoTimer() {
   secsEl.textContent = String(secs).padStart(2, '0')
 
   if (text) {
-    text.textContent = '🔥 20% OFF'
+    text.textContent = `🔥 ${PROMO.porcentaje}% OFF`
   }
 
   const cartCountdown = document.getElementById('cart-countdown')

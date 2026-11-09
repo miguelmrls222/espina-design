@@ -57,10 +57,6 @@
       ]
     }
     </script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Billetera Sahuaro","image":"https://espinadesign.com/images/products/billetera-sahuaro.jpg","description":"Diseño simple y elegante, muy práctico para quienes llevan consigo sus billetes y tarjetas esenciales.","sku":"billetera-sahuaro","brand":{"@type":"Brand","name":"Espina Design"},"offers":{"@type":"Offer","price":"789","priceCurrency":"MXN","availability":"https://schema.org/InStock"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"5.0","reviewCount":"2","bestRating":"5"}}</script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Tarjetero Agave","image":"https://espinadesign.com/images/products/img_7196-2.jpg","description":"Tarjetero muy practico y sencillo para billetes doblados y 8-10 tarjetas cómodamente.","sku":"tarjetero-agave","brand":{"@type":"Brand","name":"Espina Design"},"offers":{"@type":"Offer","price":"589","priceCurrency":"MXN","availability":"https://schema.org/InStock"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.5","reviewCount":"2","bestRating":"5"}}</script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Tarjetero Cactus","image":"https://espinadesign.com/images/products/img_5063.jpg","description":"Ideal para cargar ligero, practico, sencillo y con mucho estilo.","sku":"tarjetero-cactus","brand":{"@type":"Brand","name":"Espina Design"},"offers":{"@type":"Offer","price":"489","priceCurrency":"MXN","availability":"https://schema.org/InStock"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"5.0","reviewCount":"2","bestRating":"5"}}</script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Tarjetero Cardón","image":"https://espinadesign.com/images/products/tarjetero-cardon.jpg","description":"Diseño minimalista, súper práctico para quienes andan ligeros. Especial para tarjetas esenciales y pocos billetes.","sku":"tarjetero-cardon","brand":{"@type":"Brand","name":"Espina Design"},"offers":{"@type":"Offer","price":"589","priceCurrency":"MXN","availability":"https://schema.org/InStock"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.5","reviewCount":"2","bestRating":"5"}}</script>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-9BSPYSWER7"></script>
     <script>
@@ -69,7 +65,7 @@
       gtag('js', new Date());
       gtag('config', 'G-9BSPYSWER7');
     </script>
-    <script>!function(){var e=document.createElement('style');e.id='fouc-guard';e.textContent='body>*{display:none!important}';document.head.appendChild(e)}()</script>
+    <script>!function(){var e=document.createElement('style');e.id='fouc-guard';e.textContent='body>*{display:none!important}';document.head.appendChild(e);setTimeout(function(){e.remove()},4000)}()</script>
   </head>
   <body class="bg-[#f5f2ed] text-black">
     <div id="app">
@@ -207,12 +203,13 @@
               <h2 class="font-heading text-lg sm:text-xl md:text-2xl tracking-[0.15em] uppercase mb-3 text-black">Newsletter</h2>
               <p class="font-body text-sm text-gray-500 leading-relaxed mb-7 max-w-xs mx-auto">Nuevos diseños, ediciones limitadas y ofertas exclusivas.</p>
               <form id="newsletter-form" class="flex flex-col sm:flex-row gap-2 max-w-sm mx-auto">
-                <input type="email" id="newsletter-email" placeholder="tu@correo.com" required
+                <input type="text" id="newsletter-website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="absolute -left-[9999px] w-px h-px opacity-0" />
+                <input type="email" id="newsletter-email" placeholder="tu@correo.com" required autocomplete="email"
                   class="flex-1 border border-gray-200 px-4 py-3 text-sm font-body outline-none focus:border-black transition-colors bg-white" />
                 <button type="submit"
                   class="font-heading text-xs tracking-widest uppercase px-6 py-3 whitespace-nowrap bg-black text-white rounded-xl hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] transition-all duration-300">Suscribirme</button>
               </form>
-              <p id="newsletter-feedback" class="font-body text-xs mt-3 hidden"></p>
+              <p id="newsletter-feedback" role="status" aria-live="polite" class="font-body text-xs mt-3 hidden"></p>
               <p class="font-body text-[11px] text-gray-400 mt-4">Sin spam · 1 correo/semana · Cancela cuando quieras</p>
             </div>
           </section>
@@ -663,7 +660,7 @@
           </div>
           <div class="mb-3">
             <label class="font-heading text-[10px] tracking-widest uppercase text-gray-500 block mb-1.5">Teléfono de contacto</label>
-            <input type="tel" id="cart-phone" placeholder="ej. 5216621234567" inputmode="numeric" pattern="[0-9]{10,13}" maxlength="13" autocomplete="tel" class="w-full border border-gray-200 px-3 py-2 text-sm font-body outline-none focus:border-black transition-colors" />
+            <input type="tel" id="cart-phone" placeholder="ej. 6624142998" inputmode="numeric" pattern="[0-9]{10,13}" minlength="10" maxlength="13" required autocomplete="tel" class="w-full border border-gray-200 px-3 py-2 text-sm font-body outline-none focus:border-black transition-colors" />
           </div>
           <div class="flex items-center justify-center gap-2 mb-3">
             <svg class="w-4 h-4 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
@@ -672,6 +669,7 @@
           <button id="checkout-btn" class="w-full font-heading text-sm tracking-widest uppercase bg-black text-white rounded-xl px-10 py-3.5 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
             Pagar ahora
           </button>
+          <p id="checkout-error" role="alert" class="font-body text-xs text-red-600 text-center mt-2 hidden"></p>
           <div class="flex justify-center gap-4 mt-3">
             <a href="/envios" data-nav class="font-body text-[10px] text-gray-400 hover:text-black transition-colors">Envíos</a>
             <span class="text-gray-300">·</span>
@@ -733,11 +731,12 @@
                   </button>
                 </div>
               </div>
+              <input type="text" id="review-website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="absolute -left-[9999px] w-px h-px opacity-0" />
               <div class="mb-3">
-                <input type="text" id="review-name" placeholder="Tu nombre" class="w-full border border-gray-200 px-3 py-2 text-sm font-body outline-none focus:border-black transition-colors" />
+                <input type="text" id="review-name" maxlength="60" autocomplete="name" placeholder="Tu nombre" class="w-full border border-gray-200 px-3 py-2 text-sm font-body outline-none focus:border-black transition-colors" />
               </div>
               <div class="mb-3">
-                <textarea id="review-text" rows="3" placeholder="Escribe tu comentario..." class="w-full border border-gray-200 px-3 py-2 text-sm font-body outline-none focus:border-black transition-colors resize-none"></textarea>
+                <textarea id="review-text" rows="3" maxlength="1000" placeholder="Escribe tu comentario..." class="w-full border border-gray-200 px-3 py-2 text-sm font-body outline-none focus:border-black transition-colors resize-none"></textarea>
               </div>
               <div class="flex gap-2">
                 <button id="review-submit" class="flex-1 font-heading text-xs tracking-widest uppercase border-2 border-black text-black bg-transparent rounded-xl px-4 py-2 hover:bg-black hover:text-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
@@ -747,7 +746,7 @@
                   Cancelar
                 </button>
               </div>
-              <p id="review-feedback" class="font-body text-xs mt-2 hidden"></p>
+              <p id="review-feedback" role="status" aria-live="polite" class="font-body text-xs mt-2 hidden"></p>
             </div>
             <button id="product-modal-add" class="w-full font-heading text-sm tracking-widest uppercase bg-black text-white rounded-xl px-10 py-3.5 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] transition-all duration-300 disabled:opacity-50 overflow-hidden">
               Agregar al carrito

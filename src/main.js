@@ -442,9 +442,9 @@ function updateCartUI() {
         ${itemStockBajo ? `<p class="font-heading text-[10px] tracking-wider uppercase text-[#DC2626] mt-0.5">🔥 Solo quedan ${itemStock}</p>` : ''}
         <p class="text-sm text-gray-500 mt-1">$${(item.precio * item.cantidad).toLocaleString('es-MX')} MXN</p>
         <div class="flex items-center gap-3 mt-2">
-          <button class="qty-minus text-xs border border-gray-300 w-6 h-6 rounded hover:bg-gray-100 active:scale-90 transition-all duration-200" data-index="${i}" aria-label="Reducir cantidad">−</button>
+          <button class="qty-minus text-xs border border-gray-300 w-8 h-8 rounded hover:bg-gray-100 active:scale-90 transition-all duration-200" data-index="${i}" aria-label="Reducir cantidad">−</button>
           <span class="text-sm">${item.cantidad}</span>
-          <button class="qty-plus text-xs border border-gray-300 w-6 h-6 rounded hover:bg-gray-100 active:scale-90 transition-all duration-200" data-index="${i}" aria-label="Aumentar cantidad">+</button>
+          <button class="qty-plus text-xs border border-gray-300 w-8 h-8 rounded hover:bg-gray-100 active:scale-90 transition-all duration-200" data-index="${i}" aria-label="Aumentar cantidad">+</button>
           <button class="ml-auto text-xs text-gray-400 hover:text-black transition-colors remove-item" data-index="${i}">Eliminar</button>
         </div>
       </div>
@@ -644,9 +644,12 @@ function mostrarToast(texto, tipo) {
   const toast = document.getElementById('toast')
   const toastText = document.getElementById('toast-text')
   if (!toast) return
+  const carritoAbierto = cartPanel && cartPanel.style.display !== 'none'
+  if (carritoAbierto && tipo !== 'error') return
   toastText.textContent = texto
   toast.className = toast.className.replace(/bg-(black|red-600)/g, '').trim()
   toast.classList.add(tipo === 'error' ? 'bg-red-600' : 'bg-black')
+  toast.style.top = carritoAbierto ? '4.5rem' : ''
   toast.style.opacity = '1'
   toast.style.transform = 'translateY(0)'
   toast.classList.remove('pointer-events-none')
@@ -1162,17 +1165,51 @@ function mostrarErrorCheckout(mensaje) {
   el.classList.toggle('hidden', !mensaje)
 }
 
-function marcarCampoInvalido(campo, mensaje) {
-  mostrarErrorCheckout(mensaje)
-  if (!campo) return
-  campo.focus()
-  campo.setAttribute('aria-invalid', 'true')
-  campo.classList.add('border-red-400')
-  setTimeout(() => {
-    campo.removeAttribute('aria-invalid')
-    campo.classList.remove('border-red-400')
-  }, 3000)
+function mensajeDeCampo(campo) {
+  const valor = campo.value.trim()
+  if (campo === cartEmail) return /\S+@\S+\.\S+/.test(valor) ? '' : 'Ingresa un correo válido.'
+  if (campo === cartZip) return /^\d{5}$/.test(valor) ? '' : 'Ingresa un código postal de 5 dígitos.'
+  const digitos = valor.replace(/\D/g, '')
+  return digitos.length >= 10 && digitos.length <= 13 ? '' : 'Ingresa un teléfono de 10 a 13 dígitos.'
 }
+
+function mostrarErrorDeCampo(campo, mensaje) {
+  const idError = `${campo.id}-error`
+  let el = document.getElementById(idError)
+  if (!mensaje) {
+    campo.removeAttribute('aria-invalid')
+    campo.removeAttribute('aria-describedby')
+    el?.remove()
+    return
+  }
+  if (!el) {
+    el = document.createElement('p')
+    el.id = idError
+    el.className = 'field-error'
+    campo.insertAdjacentElement('afterend', el)
+  }
+  el.textContent = mensaje
+  campo.setAttribute('aria-invalid', 'true')
+  campo.setAttribute('aria-describedby', idError)
+}
+
+function marcarCampoInvalido(campo, mensaje) {
+  if (!campo) {
+    mostrarErrorCheckout(mensaje)
+    return
+  }
+  mostrarErrorDeCampo(campo, mensaje)
+  campo.focus()
+}
+
+;[cartEmail, cartZip, cartPhone].forEach(campo => {
+  campo?.addEventListener('blur', () => {
+    if (campo.value.trim()) mostrarErrorDeCampo(campo, mensajeDeCampo(campo))
+  })
+  campo?.addEventListener('input', () => {
+    if (campo.hasAttribute('aria-invalid')) mostrarErrorDeCampo(campo, mensajeDeCampo(campo))
+  })
+})
 
 function restablecerBotonPago() {
   checkoutBtn.disabled = false

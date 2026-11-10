@@ -1155,6 +1155,15 @@ function renderGracias() {
   })
 }
 
+const MARCADOR_IMAGEN_ROTA = '<div class="w-full h-full flex items-center justify-center text-gray-300 bg-[#F5F5F5]" role="img" aria-label="Imagen no disponible"><svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>'
+
+document.addEventListener('error', evento => {
+  const imagen = evento.target
+  if (!(imagen instanceof HTMLImageElement)) return
+  if (!imagen.closest('.open-detail, #product-modal-image, #cart-panel')) return
+  imagen.outerHTML = MARCADOR_IMAGEN_ROTA
+}, true)
+
 function mostrarErrorCheckout(mensaje) {
   const el = document.getElementById('checkout-error')
   if (!el) return

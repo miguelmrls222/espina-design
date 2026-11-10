@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -11,6 +11,7 @@ const archivos = readdirSync(carpeta)
   .sort()
 
 const SLUG_VALIDO = /^[a-z0-9]+(-[a-z0-9]+)*$/
+const LIMITE_AVISO_BYTES = 1.5 * 1048576
 const errores = []
 
 function normalizarFotos(valor) {
@@ -27,8 +28,12 @@ function leerProducto(nombreArchivo) {
   if (typeof producto.nombre !== 'string' || !producto.nombre.trim()) errores.push(`${nombreArchivo}: falta el nombre`)
   if (typeof producto.precio !== 'number' || !(producto.precio > 0)) errores.push(`${nombreArchivo}: el precio debe ser un número mayor que 0`)
   for (const foto of fotos) {
-    if (foto.startsWith('/') && !existsSync(join(raiz, 'public', decodeURIComponent(foto)))) {
+    if (!foto.startsWith('/')) continue
+    const ruta = join(raiz, 'public', decodeURIComponent(foto))
+    if (!existsSync(ruta)) {
       errores.push(`${nombreArchivo}: la imagen ${foto} no existe en public/ (revisa mayúsculas, espacios y extensión)`)
+    } else if (statSync(ruta).size > LIMITE_AVISO_BYTES) {
+      console.warn(`Aviso: ${foto} pesa ${(statSync(ruta).size / 1048576).toFixed(1)} MB; conviene reducirla a menos de 0.5 MB (ver docs/GUIA-IMAGENES.md)`)
     }
   }
   return { ...producto, fotos }

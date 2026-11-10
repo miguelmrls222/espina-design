@@ -137,20 +137,40 @@ function renderDestacados() {
     const prodIndex = productos.indexOf(p)
     return renderProductCard(p, prodIndex, {
       carousel: true,
-      btnClass: 'px-5 py-2',
-      titleClass: '',
     })
   }).join('')
 }
 
+const ICONO_SIN_FOTO = '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg></div>'
+
+const ETIQUETAS_CATEGORIA = {
+  billeteras: 'Billeteras y tarjeteros',
+  bolsos: 'Bolsos y carteras',
+  mochilas: 'Mochilas y bolsas',
+  accesorios: 'Accesorios',
+}
+
+function renderGaleriaTarjeta(p, fotos, carousel) {
+  if (fotos.length === 0) return ICONO_SIN_FOTO
+  const imagenes = fotos.map((foto, i) => `
+    <div class="galeria-item">
+      <img src="${foto}" width="400" height="500" alt="${p.nombre}${fotos.length > 1 ? ` — foto ${i + 1} de ${fotos.length}` : ''}"${i > 0 || !carousel ? ' loading="lazy"' : ''} decoding="async" class="w-full h-full object-cover" />
+    </div>`).join('')
+  const puntos = fotos.length > 1
+    ? `<div class="galeria-puntos" aria-hidden="true">${fotos.map((_, i) => `<span class="galeria-punto${i === 0 ? ' activo' : ''}"></span>`).join('')}</div>`
+    : ''
+  return `<div class="galeria-pista">${imagenes}</div>${puntos}`
+}
+
 function renderProductCard(p, index, opts = {}) {
-  const img = p.fotos?.[0] || ''
+  const fotos = (p.fotos || []).filter(Boolean)
+  const img = fotos[0] || ''
   const agotado = p.stock === 'agotado'
   const stockBajo = !agotado && typeof p.stock === 'number' && p.stock <= 3
   const { carousel = false } = opts
 
   const wrapperClass = carousel
-    ? 'flex-shrink-0 w-[220px] sm:w-[260px] snap-start'
+    ? 'flex-shrink-0 w-[240px] sm:w-[280px] snap-start'
     : ''
 
   let avg = null, total = 0
@@ -159,53 +179,53 @@ function renderProductCard(p, index, opts = {}) {
     avg = (p.resenas.reduce((s, r) => s + r.puntuacion, 0) / total)
   }
 
+  const subtitulo = p.materiales || ETIQUETAS_CATEGORIA[p.categoria] || ''
+  const detalle = p.tiempo_fabricacion ? `Hecho a mano · ${p.tiempo_fabricacion}` : 'Hecho a mano en Hermosillo'
+
   return `
-    <div class="${wrapperClass} ${agotado ? 'opacity-50' : ''}">
-      <div class="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow hover:shadow-lg transition-shadow duration-300">
-        <div class="aspect-[4/5] bg-[#F5F5F5] relative cursor-pointer open-detail group rounded-t-2xl" data-index="${index}" tabindex="-1">
-          <div class="absolute inset-0 overflow-hidden rounded-t-2xl">
-            ${img ? `<img src="${img}" width="400" height="500" alt="${p.nombre}"${carousel ? '' : ' loading="lazy"'} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />` : '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg></div>'}
-          </div>
-          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
-            <span class="text-white text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 px-4 py-2">Ver más</span>
-          </div>
+    <div class="${wrapperClass} ${agotado ? 'opacity-60' : ''}">
+      <article class="tarjeta-producto h-full flex flex-col rounded-3xl bg-white p-3 sm:p-4">
+        <div class="galeria aspect-[4/5] bg-[#F5F5F5] relative cursor-pointer open-detail rounded-2xl overflow-hidden" data-index="${index}" tabindex="-1">
+          ${renderGaleriaTarjeta(p, fotos, carousel)}
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
-          ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 font-heading">Solo quedan ' + p.stock + '</span>' : ''}
-          <div class="warranty-badge absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm flex items-center gap-1">
+          ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 rounded-full font-heading">Solo quedan ' + p.stock + '</span>' : ''}
+          <div class="warranty-badge absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm flex items-center gap-1 pointer-events-none">
             <svg class="w-3 h-3 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
             <span class="font-heading text-[9px] tracking-wide text-green-800 font-semibold">Garantía de 1 año</span>
           </div>
-          ${!agotado ? `
-          <div class="absolute bottom-2 right-2 z-10">
-            <button class="add-to-cart w-9 h-9 sm:w-10 sm:h-10 bg-black text-white rounded-xl flex items-center justify-center hover:bg-gray-800 hover:scale-105 active:scale-95 transition-all duration-300 shadow-md"
+        </div>
+        <div class="pt-4 px-1 flex-1 flex flex-col">
+          <div class="flex items-start justify-between gap-2">
+            <h3 class="font-heading text-base sm:text-lg leading-tight cursor-pointer open-detail flex-1 min-w-0" data-index="${index}" tabindex="0" role="button" aria-label="Ver detalle de ${p.nombre}">${p.nombre}</h3>
+            ${avg !== null ? `
+            <div class="flex items-center gap-0.5 flex-shrink-0 pt-0.5">
+              <svg class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <span class="font-body text-xs font-semibold text-gray-600 leading-none">${avg.toFixed(1)} (${total})</span>
+            </div>` : ''}
+          </div>
+          ${subtitulo ? `<p class="font-body text-sm text-gray-500 mt-1 leading-snug">${subtitulo}</p>` : ''}
+          ${p.colores?.length ? `
+          <div class="flex gap-1.5 mt-2.5">
+            ${p.colores.map(c => `<span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color:${colorMap[c] || '#ccc'}" title="${c}"></span>`).join('')}
+          </div>` : ''}
+          <div class="flex flex-wrap items-end justify-between gap-x-3 gap-y-3 mt-auto pt-4">
+            <div class="min-w-0">
+              <p class="font-heading text-2xl sm:text-[28px] leading-none tracking-tight">$${p.precio.toLocaleString('es-MX')}<span class="font-body text-xs text-gray-500 ml-1 tracking-normal">MXN</span></p>
+              <p class="font-body text-xs text-gray-500 mt-1.5">${detalle}</p>
+            </div>
+            ${!agotado ? `
+            <button class="add-to-cart w-full sm:w-auto bg-black text-white rounded-full px-6 py-3 font-heading text-sm flex items-center justify-center gap-2 hover:bg-gray-800 active:scale-95 transition-all duration-300 shadow-md"
               data-nombre="${p.nombre}"
               data-precio="${p.precio}"
               data-imagen="${img}"
               data-descripcion="${p.descripcion || ''}"
-              data-color="${p.colores?.[0] || ''}">
-              <svg class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M21 8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/>
-                <path d="M8 6V5a4 4 0 1 1 8 0v1"/>
-              </svg>
-            </button>
-          </div>` : ''}
-        </div>
-        <div class="p-3 sm:p-4">
-          <div class="flex items-center justify-between gap-2 mb-1">
-            <h3 class="font-heading text-xs sm:text-sm tracking-widest uppercase leading-none cursor-pointer open-detail flex-1 min-w-0" data-index="${index}" tabindex="0" role="button" aria-label="Ver detalle de ${p.nombre}">${p.nombre}</h3>
-            ${avg !== null ? `
-            <div class="flex items-center gap-0.5 flex-shrink-0">
-              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <span class="font-body text-[11px] sm:text-sm font-semibold sm:font-normal text-gray-600 leading-none">${avg.toFixed(1)} (${total})</span>
-            </div>` : ''}
+              data-color="${p.colores?.[0] || ''}"
+              aria-label="Agregar ${p.nombre} al carrito">
+              Agregar
+            </button>` : ''}
           </div>
-          <p class="font-body text-sm text-gray-500 mb-2">$${p.precio.toLocaleString('es-MX')} MXN</p>
-          ${p.colores?.length ? `
-          <div class="flex gap-1.5 mb-3">
-            ${p.colores.map(c => `<span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color:${colorMap[c] || '#ccc'}" title="${c}"></span>`).join('')}
-          </div>` : ''}
         </div>
-      </div>
+      </article>
     </div>
   `
 }
@@ -973,6 +993,8 @@ document.addEventListener('click', e => {
       addBtn.dataset.descripcion,
       addBtn.dataset.color || ''
     )
+    addBtn.textContent = 'Agregado ✓'
+    setTimeout(() => { addBtn.textContent = 'Agregar' }, 1500)
   }
 
   const crossellBtn = e.target.closest('.crossell-add')
@@ -1163,6 +1185,38 @@ document.addEventListener('error', evento => {
   if (!imagen.closest('.open-detail, #product-modal-image, #cart-panel')) return
   imagen.outerHTML = MARCADOR_IMAGEN_ROTA
 }, true)
+
+function indiceDeFoto(pista) {
+  return Math.round(pista.scrollLeft / Math.max(pista.clientWidth, 1))
+}
+
+document.addEventListener('scroll', evento => {
+  const pista = evento.target
+  if (!(pista instanceof HTMLElement) || !pista.classList.contains('galeria-pista')) return
+  const activo = indiceDeFoto(pista)
+  pista.parentElement.querySelectorAll('.galeria-punto').forEach((punto, i) => punto.classList.toggle('activo', i === activo))
+}, true)
+
+const puedeHacerHover = window.matchMedia('(hover: hover) and (pointer: fine)')
+
+document.addEventListener('mousemove', evento => {
+  if (!puedeHacerHover.matches || !(evento.target instanceof Element)) return
+  const galeria = evento.target.closest('.galeria')
+  const pista = galeria?.querySelector('.galeria-pista')
+  const total = pista?.children.length || 0
+  if (!pista || total < 2) return
+  const caja = galeria.getBoundingClientRect()
+  const indice = Math.min(total - 1, Math.max(0, Math.floor(((evento.clientX - caja.left) / caja.width) * total)))
+  if (indice !== indiceDeFoto(pista)) pista.scrollTo({ left: indice * pista.clientWidth, behavior: 'smooth' })
+})
+
+document.addEventListener('mouseout', evento => {
+  if (!puedeHacerHover.matches || !(evento.target instanceof Element)) return
+  const galeria = evento.target.closest('.galeria')
+  if (!galeria || galeria.contains(evento.relatedTarget)) return
+  const pista = galeria.querySelector('.galeria-pista')
+  if (pista && pista.children.length > 1) pista.scrollTo({ left: 0, behavior: 'smooth' })
+})
 
 function mostrarErrorCheckout(mensaje) {
   const el = document.getElementById('checkout-error')

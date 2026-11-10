@@ -23,7 +23,7 @@ async function processAbandoned(env) {
   const brevoKey = env.BREVO_API_KEY
   if (!stripeKey || !brevoKey) return
 
-  const MINUTOS_ESPERA = 0
+  const MINUTOS_ESPERA = 60
   const ahora = Math.floor(Date.now() / 1000)
   const desde = ahora - 86400 // últimas 24h
 

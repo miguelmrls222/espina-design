@@ -17,11 +17,12 @@ collections:
     folder: "src/data/productos"
     create: true
     format: "json"
+    identifier_field: "nombre"
     slug: "{{slug}}"
     sort: "precio:asc"
     fields:
       - { label: "Nombre del producto", name: "nombre", widget: "string" }
-      - { label: "Slug", name: "slug", widget: "string", hint: "Se genera automáticamente. Ej: billetera-clasica" }
+      - { label: "Slug", name: "slug", widget: "string", hint: "Solo minúsculas, números y guiones. Ej: billetera-clasica", pattern: ["^[a-z0-9]+(-[a-z0-9]+)*$", "Usa solo minúsculas, números y guiones (sin espacios ni acentos)"] }
       - label: "Categoría"
         name: "categoria"
         widget: "select"

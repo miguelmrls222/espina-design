@@ -143,12 +143,7 @@ function renderDestacados() {
 
 const ICONO_SIN_FOTO = '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg></div>'
 
-const ETIQUETAS_CATEGORIA = {
-  billeteras: 'Billeteras y tarjeteros',
-  bolsos: 'Bolsos y carteras',
-  mochilas: 'Mochilas y bolsas',
-  accesorios: 'Accesorios',
-}
+const MATERIAL_TARJETA = 'Cuero vacuno'
 
 function renderGaleriaTarjeta(p, fotos, carousel) {
   if (fotos.length === 0) return ICONO_SIN_FOTO
@@ -173,55 +168,37 @@ function renderProductCard(p, index, opts = {}) {
     ? 'flex-shrink-0 w-[240px] sm:w-[280px] snap-start'
     : ''
 
-  let avg = null, total = 0
-  if (p.resenas?.length) {
-    total = p.resenas.length
-    avg = (p.resenas.reduce((s, r) => s + r.puntuacion, 0) / total)
-  }
-
-  const subtitulo = p.materiales || ETIQUETAS_CATEGORIA[p.categoria] || ''
-  const detalle = p.tiempo_fabricacion ? `Hecho a mano · ${p.tiempo_fabricacion}` : 'Hecho a mano en Hermosillo'
-
   return `
     <div class="${wrapperClass} min-w-0 ${agotado ? 'opacity-60' : ''}">
-      <article class="tarjeta-producto @container h-full flex flex-col rounded-3xl bg-white p-3 sm:p-4">
+      <article class="tarjeta-producto h-full flex flex-col rounded-3xl bg-white p-3 sm:p-4">
         <div class="galeria aspect-[4/5] bg-[#F5F5F5] relative cursor-pointer open-detail rounded-2xl overflow-hidden" data-index="${index}" tabindex="-1">
           ${renderGaleriaTarjeta(p, fotos, carousel)}
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
           ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 rounded-full font-heading">Solo quedan ' + p.stock + '</span>' : ''}
-          <div class="warranty-badge absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm flex items-center gap-1 pointer-events-none">
+          <div class="warranty-badge absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm flex items-center gap-1 pointer-events-none" role="img" aria-label="Garantía de 1 año">
             <svg class="w-3 h-3 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-            <span class="font-heading text-[9px] tracking-wide text-green-800 font-semibold">Garantía de 1 año</span>
+            <span class="font-heading text-[10px] tracking-wide text-green-800 font-semibold whitespace-nowrap" aria-hidden="true"><span class="sm:hidden">1 año</span><span class="hidden sm:inline">Garantía de 1 año</span></span>
           </div>
         </div>
         <div class="pt-4 px-1 flex-1 flex flex-col">
-          <div class="flex items-start justify-between gap-2">
-            <h3 class="tarjeta-titulo font-heading text-base sm:text-lg cursor-pointer open-detail flex-1 min-w-0" title="${p.nombre}" data-index="${index}" tabindex="0" role="button" aria-label="Ver detalle de ${p.nombre}">${p.nombre}</h3>
-            ${avg !== null ? `
-            <div class="flex items-center gap-0.5 flex-shrink-0 pt-0.5">
-              <svg class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <span class="font-body text-xs font-semibold text-gray-600 leading-none">${avg.toFixed(1)} (${total})</span>
-            </div>` : ''}
-          </div>
-          <p data-zona="subtitulo" class="tarjeta-subtitulo font-body text-sm text-gray-500 mt-1"${subtitulo ? ` title="${subtitulo}"` : ' aria-hidden="true"'}>${subtitulo || '&nbsp;'}</p>
+          <h3 class="tarjeta-titulo font-heading text-base sm:text-lg cursor-pointer open-detail" title="${p.nombre}" data-index="${index}" tabindex="0" role="button" aria-label="Ver detalle de ${p.nombre}">${p.nombre}</h3>
+          <p data-zona="subtitulo" class="tarjeta-subtitulo font-body text-sm text-gray-500 mt-1">${MATERIAL_TARJETA}</p>
           <div data-zona="colores" class="flex items-center gap-1.5 mt-2.5 h-3.5">
             ${(p.colores || []).map(c => `<span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color:${colorMap[c] || '#ccc'}" title="${c}"></span>`).join('')}
           </div>
-          <div class="flex flex-col gap-3 @[17rem]:flex-row @[17rem]:items-end @[17rem]:justify-between mt-auto pt-4">
-            <div data-zona="precio" class="min-w-0 @[17rem]:flex-1">
-              <p class="font-heading text-2xl sm:text-[28px] leading-none tracking-tight whitespace-nowrap">$${p.precio.toLocaleString('es-MX')}<span class="font-body text-xs text-gray-500 ml-1 tracking-normal">MXN</span></p>
-              <p class="tarjeta-detalle font-body text-xs text-gray-500 mt-2">${detalle}</p>
-            </div>
-            ${!agotado ? `
-            <button class="add-to-cart w-full @[17rem]:w-auto @[17rem]:shrink-0 bg-black text-white rounded-full px-6 py-3 font-heading text-sm flex items-center justify-center gap-2 hover:bg-gray-800 active:scale-95 transition-all duration-300 shadow-md"
+          <div class="mt-auto pt-4">
+            <p data-zona="precio" class="font-heading text-2xl sm:text-[28px] leading-none tracking-tight whitespace-nowrap">$${p.precio.toLocaleString('es-MX')}<span class="font-body text-xs text-gray-500 ml-1 tracking-normal">MXN</span></p>
+            ${agotado
+              ? '<button type="button" disabled class="w-full mt-3 bg-gray-200 text-gray-500 rounded-full px-6 py-3 font-heading text-sm cursor-not-allowed">Agotado</button>'
+              : `<button type="button" class="add-to-cart w-full mt-3 bg-black text-white rounded-full px-6 py-3 font-heading text-sm flex items-center justify-center hover:bg-gray-800 hover:shadow-lg active:scale-[0.98] transition-all duration-300 shadow-md"
               data-nombre="${p.nombre}"
               data-precio="${p.precio}"
               data-imagen="${img}"
               data-descripcion="${p.descripcion || ''}"
               data-color="${p.colores?.[0] || ''}"
-              aria-label="Agregar ${p.nombre} al carrito">
-              Agregar
-            </button>` : ''}
+              aria-label="Comprar ${p.nombre}">
+              Comprar
+            </button>`}
           </div>
         </div>
       </article>
@@ -774,7 +751,6 @@ function openDetail(producto, trigger) {
   let metaHTML = ''
   if (producto.materiales) metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Materiales:</span> ${producto.materiales}</p>`
   if (producto.dimensiones) metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Medidas:</span> ${producto.dimensiones}</p>`
-  if (producto.tiempo_fabricacion) metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Fabricación:</span> ${producto.tiempo_fabricacion}</p>`
   if (producto.stock) {
     const estados = { disponible: 'Disponible', agotado: 'Agotado', 'bajo-pedido': 'Bajo pedido' }
     metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Stock:</span> ${estados[producto.stock] || producto.stock}</p>`
@@ -993,7 +969,7 @@ document.addEventListener('click', e => {
       addBtn.dataset.color || ''
     )
     addBtn.textContent = 'Agregado ✓'
-    setTimeout(() => { addBtn.textContent = 'Agregar' }, 1500)
+    setTimeout(() => { addBtn.textContent = 'Comprar' }, 1500)
   }
 
   const crossellBtn = e.target.closest('.crossell-add')

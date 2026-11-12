@@ -7,13 +7,17 @@
   "fotos": [
     "/images/products/img_7196-2.jpg"
   ],
-  "colores": ["verde", "gris", "vino", "cafe oscuro"],
+  "colores": [
+    "verde",
+    "gris",
+    "vino",
+    "cafe oscuro"
+  ],
   "activo": true,
   "categoria": "billeteras",
   "materiales": "Cuero",
   "dimensiones": "11 cm × 7 cm",
   "stock": "disponible",
-  "tiempo_fabricacion": "3-10 días hábiles",
   "resenas": [
     {
       "nombre": "María L.",

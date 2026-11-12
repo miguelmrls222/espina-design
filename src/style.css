@@ -259,8 +259,7 @@ button {
 }
 
 .tarjeta-titulo,
-.tarjeta-subtitulo,
-.tarjeta-detalle {
+.tarjeta-subtitulo {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -279,13 +278,6 @@ button {
   height: 1.4em;
   -webkit-line-clamp: 1;
   line-clamp: 1;
-}
-
-.tarjeta-detalle {
-  line-height: 1.25;
-  min-height: 2.5em;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
 }
 
 .galeria-pista {

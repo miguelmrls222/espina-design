@@ -183,8 +183,8 @@ function renderProductCard(p, index, opts = {}) {
   const detalle = p.tiempo_fabricacion ? `Hecho a mano · ${p.tiempo_fabricacion}` : 'Hecho a mano en Hermosillo'
 
   return `
-    <div class="${wrapperClass} ${agotado ? 'opacity-60' : ''}">
-      <article class="tarjeta-producto h-full flex flex-col rounded-3xl bg-white p-3 sm:p-4">
+    <div class="${wrapperClass} min-w-0 ${agotado ? 'opacity-60' : ''}">
+      <article class="tarjeta-producto @container h-full flex flex-col rounded-3xl bg-white p-3 sm:p-4">
         <div class="galeria aspect-[4/5] bg-[#F5F5F5] relative cursor-pointer open-detail rounded-2xl overflow-hidden" data-index="${index}" tabindex="-1">
           ${renderGaleriaTarjeta(p, fotos, carousel)}
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
@@ -196,25 +196,24 @@ function renderProductCard(p, index, opts = {}) {
         </div>
         <div class="pt-4 px-1 flex-1 flex flex-col">
           <div class="flex items-start justify-between gap-2">
-            <h3 class="font-heading text-base sm:text-lg leading-tight cursor-pointer open-detail flex-1 min-w-0" data-index="${index}" tabindex="0" role="button" aria-label="Ver detalle de ${p.nombre}">${p.nombre}</h3>
+            <h3 class="tarjeta-titulo font-heading text-base sm:text-lg cursor-pointer open-detail flex-1 min-w-0" title="${p.nombre}" data-index="${index}" tabindex="0" role="button" aria-label="Ver detalle de ${p.nombre}">${p.nombre}</h3>
             ${avg !== null ? `
             <div class="flex items-center gap-0.5 flex-shrink-0 pt-0.5">
               <svg class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
               <span class="font-body text-xs font-semibold text-gray-600 leading-none">${avg.toFixed(1)} (${total})</span>
             </div>` : ''}
           </div>
-          ${subtitulo ? `<p class="font-body text-sm text-gray-500 mt-1 leading-snug">${subtitulo}</p>` : ''}
-          ${p.colores?.length ? `
-          <div class="flex gap-1.5 mt-2.5">
-            ${p.colores.map(c => `<span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color:${colorMap[c] || '#ccc'}" title="${c}"></span>`).join('')}
-          </div>` : ''}
-          <div class="flex flex-wrap items-end justify-between gap-x-3 gap-y-3 mt-auto pt-4">
-            <div class="min-w-0">
-              <p class="font-heading text-2xl sm:text-[28px] leading-none tracking-tight">$${p.precio.toLocaleString('es-MX')}<span class="font-body text-xs text-gray-500 ml-1 tracking-normal">MXN</span></p>
-              <p class="font-body text-xs text-gray-500 mt-1.5">${detalle}</p>
+          <p data-zona="subtitulo" class="tarjeta-subtitulo font-body text-sm text-gray-500 mt-1"${subtitulo ? ` title="${subtitulo}"` : ' aria-hidden="true"'}>${subtitulo || '&nbsp;'}</p>
+          <div data-zona="colores" class="flex items-center gap-1.5 mt-2.5 h-3.5">
+            ${(p.colores || []).map(c => `<span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color:${colorMap[c] || '#ccc'}" title="${c}"></span>`).join('')}
+          </div>
+          <div class="flex flex-col gap-3 @[17rem]:flex-row @[17rem]:items-end @[17rem]:justify-between mt-auto pt-4">
+            <div data-zona="precio" class="min-w-0 @[17rem]:flex-1">
+              <p class="font-heading text-2xl sm:text-[28px] leading-none tracking-tight whitespace-nowrap">$${p.precio.toLocaleString('es-MX')}<span class="font-body text-xs text-gray-500 ml-1 tracking-normal">MXN</span></p>
+              <p class="tarjeta-detalle font-body text-xs text-gray-500 mt-2">${detalle}</p>
             </div>
             ${!agotado ? `
-            <button class="add-to-cart w-full sm:w-auto bg-black text-white rounded-full px-6 py-3 font-heading text-sm flex items-center justify-center gap-2 hover:bg-gray-800 active:scale-95 transition-all duration-300 shadow-md"
+            <button class="add-to-cart w-full @[17rem]:w-auto @[17rem]:shrink-0 bg-black text-white rounded-full px-6 py-3 font-heading text-sm flex items-center justify-center gap-2 hover:bg-gray-800 active:scale-95 transition-all duration-300 shadow-md"
               data-nombre="${p.nombre}"
               data-precio="${p.precio}"
               data-imagen="${img}"

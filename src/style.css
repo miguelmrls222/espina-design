@@ -251,10 +251,41 @@ button {
 }
 
 @media (hover: hover) {
-  .tarjeta-producto:hover {
+  .tarjeta-producto:hover,
+  .tarjeta-producto:focus-within {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05), 0 20px 44px -10px rgba(0, 0, 0, 0.2);
     transform: translateY(-2px);
   }
+}
+
+.tarjeta-titulo,
+.tarjeta-subtitulo,
+.tarjeta-detalle {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.tarjeta-titulo {
+  line-height: 1.25;
+  min-height: 2.5em;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.tarjeta-subtitulo {
+  line-height: 1.4;
+  height: 1.4em;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+}
+
+.tarjeta-detalle {
+  line-height: 1.25;
+  min-height: 2.5em;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .galeria-pista {

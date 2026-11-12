@@ -29,10 +29,10 @@ Si el CMS guarda una sola foto como texto en lugar de lista, el sitio lo corrige
 
 ## Opción A: desde el panel (espinadesign.com/admin)
 
-1. Abre el producto y ve al campo **Fotos**.
-2. Pulsa para elegir imágenes y selecciona varias a la vez (o súbelas una por una).
-3. Ordénalas: la primera es la portada.
-4. Guarda y publica el cambio (modo editorial: Draft, In review, Ready y Publish).
+1. Entra a **Productos** y abre una pieza o pulsa **Nuevo Producto**.
+2. En **Fotos del producto** pulsa **Añadir foto**. Cada foto es su propio recuadro: pulsa **Elegir una imagen** y sube el archivo desde tu computadora o teléfono. Repite hasta tener de 3 a 5 fotos (mínimo 1, máximo 5).
+3. La primera foto es la portada. Para cambiar el orden, arrastra los recuadros o usa las flechas; para quitar una, usa el icono de basura.
+4. Llena el resto de los campos y guarda. El cambio pasa por **Borrador, En revisión, Listo y Publicar** antes de aparecer en la tienda.
 
 ## Opción B: directamente en GitHub
 

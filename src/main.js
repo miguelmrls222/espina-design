@@ -157,6 +157,28 @@ function renderGaleriaTarjeta(p, fotos, carousel) {
   return `<div class="galeria-pista">${imagenes}</div>${puntos}`
 }
 
+function renderGaleriaFicha(p, fotos) {
+  const imagenes = fotos.map((foto, i) => `
+    <div class="galeria-item">
+      <img src="${foto}" width="400" height="500" alt="${p.nombre}${fotos.length > 1 ? ` — foto ${i + 1} de ${fotos.length}` : ''}"${i > 0 ? ' loading="lazy"' : ''} decoding="async" class="w-full h-full object-cover" />
+    </div>`).join('')
+  const puntos = fotos.length > 1
+    ? `<div class="galeria-puntos" aria-hidden="true">${fotos.map((_, i) => `<span class="galeria-punto${i === 0 ? ' activo' : ''}"></span>`).join('')}</div>`
+    : ''
+  return `<div class="galeria-pista">${imagenes}</div>${puntos}`
+}
+
+function marcarMiniatura(indice) {
+  document.querySelectorAll('.thumb-btn').forEach((boton, i) => {
+    const activa = i === indice
+    boton.classList.toggle('border-black', activa)
+    boton.classList.toggle('border-gray-200', !activa)
+    boton.classList.toggle('hover:border-gray-400', !activa)
+    if (activa) boton.setAttribute('aria-current', 'true')
+    else boton.removeAttribute('aria-current')
+  })
+}
+
 function renderProductCard(p, index, opts = {}) {
   const fotos = (p.fotos || []).filter(Boolean)
   const img = fotos[0] || ''
@@ -689,37 +711,32 @@ const productModalMeta = document.getElementById('product-modal-meta')
 const productModalAdd = document.getElementById('product-modal-add')
 let colorSeleccionado = ''
 
-let fotoActual = 0
 
 function openDetail(producto, trigger) {
   const fotos = producto.fotos?.filter(Boolean) || []
   const img = fotos[0] || ''
   const agotado = producto.stock === 'agotado'
 
-  fotoActual = 0
+  const thumbsEl = document.getElementById('product-modal-thumbs')
 
-  function renderFoto(index) {
-    const f = fotos[index]
-    if (f) {
-      productModalImage.innerHTML = `<img src="${f}" width="400" height="500" alt="${producto.nombre}" loading="lazy" class="w-full h-full object-cover transition-opacity duration-300" />`
-    } else {
-      productModalImage.innerHTML = '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>'
-    }
-
-    const thumbsEl = document.getElementById('product-modal-thumbs')
-    if (fotos.length > 1) {
-      thumbsEl.innerHTML = fotos.map((f, fi) => `
-        <button class="thumb-btn flex-shrink-0 w-14 h-14 rounded border-2 overflow-hidden transition-all duration-200 ${fi === index ? 'border-black' : 'border-gray-200 hover:border-gray-400'}" data-foto-index="${fi}">
-          <img src="${f}" width="56" height="56" alt="" loading="lazy" class="w-full h-full object-cover" />
-        </button>
-      `).join('')
-      thumbsEl.style.display = 'flex'
-    } else {
-      thumbsEl.style.display = 'none'
-    }
+  if (fotos.length) {
+    productModalImage.innerHTML = renderGaleriaFicha(producto, fotos)
+  } else {
+    productModalImage.innerHTML = ICONO_SIN_FOTO
   }
 
-  renderFoto(0)
+  if (fotos.length > 1) {
+    thumbsEl.innerHTML = fotos.map((foto, i) => `
+      <button type="button" class="thumb-btn flex-shrink-0 w-14 h-14 rounded border-2 overflow-hidden transition-all duration-200 ${i === 0 ? 'border-black' : 'border-gray-200 hover:border-gray-400'}" data-foto-index="${i}" aria-label="Ver foto ${i + 1} de ${fotos.length}"${i === 0 ? ' aria-current="true"' : ''}>
+        <img src="${foto}" width="56" height="56" alt="" loading="lazy" class="w-full h-full object-cover" />
+      </button>
+    `).join('')
+    thumbsEl.style.display = 'flex'
+  } else {
+    thumbsEl.innerHTML = ''
+    thumbsEl.style.display = 'none'
+  }
+
 
   productModalName.textContent = producto.nombre
   productModalPrice.textContent = `$${producto.precio.toLocaleString('es-MX')} MXN`
@@ -901,7 +918,8 @@ document.addEventListener('click', e => {
 
   const modalImage = e.target.closest('#product-modal-image')
   if (modalImage) {
-    const img = modalImage.querySelector('img')
+    const pista = modalImage.querySelector('.galeria-pista')
+    const img = pista ? pista.children[indiceDeFoto(pista)]?.querySelector('img') : modalImage.querySelector('img')
     if (img && img.src) {
       document.getElementById('image-zoom-img').src = img.src
       document.getElementById('image-zoom-overlay').style.display = 'flex'
@@ -928,16 +946,10 @@ document.addEventListener('click', e => {
 
   const thumbBtn = e.target.closest('.thumb-btn')
   if (thumbBtn) {
-    const fi = parseInt(thumbBtn.dataset.fotoIndex)
-    const thumbs = document.querySelectorAll('.thumb-btn')
-    thumbs.forEach((t, i) => {
-      t.classList.toggle('border-black', i === fi)
-      t.classList.toggle('border-gray-200', i !== fi)
-      t.classList.toggle('hover:border-gray-400', i !== fi)
-    })
-    const fotosEl = document.getElementById('product-modal-image')
-    const img = thumbBtn.querySelector('img')?.src
-    if (img) fotosEl.innerHTML = `<img src="${img}" width="400" height="500" alt="" class="w-full h-full object-cover transition-opacity duration-300" />`
+    const pista = document.querySelector('#product-modal-image .galeria-pista')
+    const indice = parseInt(thumbBtn.dataset.fotoIndex)
+    if (pista) pista.scrollTo({ left: indice * pista.clientWidth, behavior: 'smooth' })
+    marcarMiniatura(indice)
   }
 
   const colorBtn = e.target.closest('.color-btn')
@@ -1170,6 +1182,7 @@ document.addEventListener('scroll', evento => {
   if (!(pista instanceof HTMLElement) || !pista.classList.contains('galeria-pista')) return
   const activo = indiceDeFoto(pista)
   pista.parentElement.querySelectorAll('.galeria-punto').forEach((punto, i) => punto.classList.toggle('activo', i === activo))
+  if (pista.parentElement.id === 'product-modal-image') marcarMiniatura(activo)
 }, true)
 
 const puedeHacerHover = window.matchMedia('(hover: hover) and (pointer: fine)')

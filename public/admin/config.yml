@@ -5,6 +5,7 @@ backend:
   base_url: https://espinadesign.com
   auth_endpoint: auth
 
+locale: "es"
 publish_mode: editorial_workflow
 
 media_folder: "public/images/products"
@@ -14,27 +15,49 @@ collections:
   - name: "productos"
     label: "Productos"
     label_singular: "Producto"
+    description: "Agrega o edita las piezas de la tienda. Cada cambio se revisa antes de publicarse."
     folder: "src/data/productos"
     create: true
     format: "json"
     identifier_field: "nombre"
     slug: "{{slug}}"
     sort: "precio:asc"
+    summary: "{{nombre}} · ${{precio}}"
+    editor:
+      preview: false
     fields:
-      - { label: "Nombre del producto", name: "nombre", widget: "string" }
-      - { label: "Slug", name: "slug", widget: "string", hint: "Solo minúsculas, números y guiones. Ej: billetera-clasica", pattern: ["^[a-z0-9]+(-[a-z0-9]+)*$", "Usa solo minúsculas, números y guiones (sin espacios ni acentos)"] }
-      - label: "Categoría"
-        name: "categoria"
-        widget: "select"
-        options:
-          - { label: "Billeteras y Tarjeteros", value: "billeteras" }
-          - { label: "Bolsos y Carteras", value: "bolsos" }
-          - { label: "Mochilas y Bolsas", value: "mochilas" }
-          - { label: "Accesorios", value: "accesorios" }
-      - { label: "Precio (MXN)", name: "precio", widget: "number", value_type: "float", min: 0 }
-      - { label: "Descripción", name: "descripcion", widget: "text" }
-      - { label: "Materiales", name: "materiales", widget: "string" }
-      - { label: "Fotos", name: "fotos", widget: "image", multiple: true }
+      - label: "Nombre del producto"
+        name: "nombre"
+        widget: "string"
+        hint: "Como lo verá el cliente. Ej: Tarjetero Cactus"
+
+      - label: "Enlace corto (slug)"
+        name: "slug"
+        widget: "string"
+        hint: "Solo minúsculas, números y guiones, sin espacios ni acentos. Ej: tarjetero-cactus"
+        pattern: ["^[a-z0-9]+(-[a-z0-9]+)*$", "Usa solo minúsculas, números y guiones (sin espacios ni acentos)"]
+
+      - label: "Fotos del producto"
+        name: "fotos"
+        widget: "list"
+        label_singular: "foto"
+        add_to_top: false
+        min: 1
+        max: 5
+        hint: "Sube de 3 a 5 fotos: frente, interior, costuras y vista lateral. La primera es la portada; arrastra para cambiar el orden. Mejor en JPG de unos 1600 px y menos de 0.5 MB cada una."
+        field:
+          label: "Foto"
+          name: "foto"
+          widget: "image"
+          choose_url: false
+
+      - label: "Precio (MXN)"
+        name: "precio"
+        widget: "number"
+        value_type: "float"
+        min: 0
+        hint: "Solo el número, sin signo de pesos. Ej: 789"
+
       - label: "Colores disponibles"
         name: "colores"
         widget: "select"
@@ -44,19 +67,45 @@ collections:
           - { label: "Gris", value: "gris" }
           - { label: "Vino", value: "vino" }
           - { label: "Café oscuro", value: "cafe oscuro" }
-      - label: "Stock"
+
+      - label: "Descripción"
+        name: "descripcion"
+        widget: "text"
+        hint: "Un párrafo corto con lo que hace especial a la pieza."
+
+      - label: "Categoría"
+        name: "categoria"
+        widget: "select"
+        options:
+          - { label: "Billeteras y Tarjeteros", value: "billeteras" }
+          - { label: "Bolsos y Carteras", value: "bolsos" }
+          - { label: "Mochilas y Bolsas", value: "mochilas" }
+          - { label: "Accesorios", value: "accesorios" }
+
+      - label: "Disponibilidad"
         name: "stock"
         widget: "select"
+        default: "disponible"
         options:
           - { label: "Disponible", value: "disponible" }
           - { label: "Agotado", value: "agotado" }
           - { label: "Bajo pedido", value: "bajo-pedido" }
-      - { label: "Destacado en inicio", name: "destacado", widget: "boolean", default: false }
-      - { label: "Activo", name: "activo", widget: "boolean", default: true }
+
+      - label: "Materiales (ficha del producto)"
+        name: "materiales"
+        widget: "string"
+        required: false
+        hint: "Se muestra en la página de detalle. En las tarjetas siempre aparece Cuero vacuno."
+
+      - { label: "Destacado en inicio", name: "destacado", widget: "boolean", default: false, hint: "Aparece en el carrusel de la página principal." }
+      - { label: "Visible en la tienda", name: "activo", widget: "boolean", default: true, hint: "Desactívalo para ocultar la pieza sin borrarla." }
+
       - label: "Reseñas"
         name: "resenas"
         widget: "list"
         required: false
+        collapsed: true
+        label_singular: "reseña"
         summary: "{{fields.nombre}} — {{fields.puntuacion}} estrellas"
         fields:
           - { label: "Nombre del cliente", name: "nombre", widget: "string" }

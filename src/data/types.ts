@@ -18,7 +18,6 @@ export interface Producto {
   materiales?: string
   dimensiones?: string
   stock?: string | number
-  tiempo_fabricacion?: string
   resenas?: Resena[]
 }
 

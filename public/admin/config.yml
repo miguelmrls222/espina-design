@@ -34,7 +34,6 @@ collections:
       - { label: "Precio (MXN)", name: "precio", widget: "number", value_type: "float", min: 0 }
       - { label: "Descripción", name: "descripcion", widget: "text" }
       - { label: "Materiales", name: "materiales", widget: "string" }
-      - { label: "Tiempo de fabricación", name: "tiempo_fabricacion", widget: "string", required: false }
       - { label: "Fotos", name: "fotos", widget: "image", multiple: true }
       - label: "Colores disponibles"
         name: "colores"

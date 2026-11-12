@@ -7,13 +7,17 @@
   "fotos": [
     "/images/products/tarjetero-cardon.jpg"
   ],
-  "colores": ["verde", "gris", "vino", "cafe oscuro"],
+  "colores": [
+    "verde",
+    "gris",
+    "vino",
+    "cafe oscuro"
+  ],
   "activo": true,
   "categoria": "billeteras",
   "materiales": "Cuero vegetal 100%",
   "dimensiones": "10 cm × 7 cm",
   "stock": "disponible",
-  "tiempo_fabricacion": "3-5 días",
   "resenas": [
     {
       "nombre": "Laura P.",

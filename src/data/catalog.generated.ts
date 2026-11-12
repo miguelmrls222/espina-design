@@ -21,7 +21,6 @@ export const CATALOGO: readonly Producto[] = [
     "materiales": "Cuero vegetal 100%",
     "dimensiones": "10 cm × 8 cm",
     "stock": "disponible",
-    "tiempo_fabricacion": "3-5 días",
     "resenas": [
       {
         "nombre": "Carlos M.",
@@ -57,7 +56,6 @@ export const CATALOGO: readonly Producto[] = [
     "materiales": "Cuero",
     "dimensiones": "11 cm × 7 cm",
     "stock": "disponible",
-    "tiempo_fabricacion": "3-10 días hábiles",
     "resenas": [
       {
         "nombre": "María L.",
@@ -93,7 +91,6 @@ export const CATALOGO: readonly Producto[] = [
     "materiales": "Cuero",
     "dimensiones": "8 cm × 6 cm",
     "stock": "disponible",
-    "tiempo_fabricacion": "3-10 días hábiles",
     "resenas": [
       {
         "nombre": "Sofía H.",
@@ -129,7 +126,6 @@ export const CATALOGO: readonly Producto[] = [
     "materiales": "Cuero vegetal 100%",
     "dimensiones": "10 cm × 7 cm",
     "stock": "disponible",
-    "tiempo_fabricacion": "3-5 días",
     "resenas": [
       {
         "nombre": "Laura P.",
@@ -160,8 +156,7 @@ export const CATALOGO: readonly Producto[] = [
     ],
     "categoria": "billeteras",
     "materiales": "Cuero vacuno.",
-    "stock": "disponible",
-    "tiempo_fabricacion": "3-5 días hábiles"
+    "stock": "disponible"
   }
 ]
 

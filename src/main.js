@@ -751,7 +751,6 @@ function openDetail(producto, trigger) {
   let metaHTML = ''
   if (producto.materiales) metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Materiales:</span> ${producto.materiales}</p>`
   if (producto.dimensiones) metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Medidas:</span> ${producto.dimensiones}</p>`
-  if (producto.tiempo_fabricacion) metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Fabricación:</span> ${producto.tiempo_fabricacion}</p>`
   if (producto.stock) {
     const estados = { disponible: 'Disponible', agotado: 'Agotado', 'bajo-pedido': 'Bajo pedido' }
     metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Stock:</span> ${estados[producto.stock] || producto.stock}</p>`

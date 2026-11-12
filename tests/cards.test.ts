@@ -50,3 +50,13 @@ test('un producto agotado conserva el botón (deshabilitado) para no romper la a
 test('la elevación al pasar el cursor usa transform y no cambia el layout', () => {
   assert.match(css, /\.tarjeta-producto:hover[\s\S]*?transform:\s*translateY\(-2px\)/)
 })
+
+test('el catálogo, los tipos, el CMS y la ficha ya no tienen días de elaboración', () => {
+  const tipos = readFileSync(new URL('../src/data/types.ts', import.meta.url), 'utf8')
+  const cms = readFileSync(new URL('../public/admin/config.yml', import.meta.url), 'utf8')
+  const catalogo = readFileSync(new URL('../src/data/catalog.generated.ts', import.meta.url), 'utf8')
+  for (const [nombre, texto] of [['types.ts', tipos], ['config.yml', cms], ['catálogo', catalogo], ['main.js', js]]) {
+    assert.doesNotMatch(texto, /tiempo_fabricacion/, nombre)
+  }
+  assert.doesNotMatch(js, /Fabricación:/)
+})

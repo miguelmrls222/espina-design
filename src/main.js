@@ -143,7 +143,11 @@ function renderDestacados() {
 
 const ICONO_SIN_FOTO = '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg></div>'
 
-const CLASES_BOTON = 'w-full min-h-11 rounded-full px-3 py-2 font-heading text-[13px] leading-tight text-center flex items-center justify-center active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:shadow-none'
+// Carrito con "+" (se usa antes del texto en los botones de agregar)
+const ICONO_CARRITO_MAS = '<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h2.5l2.2 11.2a1.5 1.5 0 0 0 1.5 1.2h9.2a1.5 1.5 0 0 0 1.5-1.1L20.5 7H5.4"/><circle cx="9" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/><path d="M12.5 8.5v4M10.5 10.5h4"/></svg>'
+const conIcono = texto => `${ICONO_CARRITO_MAS}<span class="text-center">${texto}</span>`
+
+const CLASES_BOTON = 'w-full min-h-11 gap-1.5 rounded-full px-2 sm:px-3 py-2 font-heading text-[12px] sm:text-[13px] leading-tight @[11rem]:whitespace-nowrap text-center flex items-center justify-center active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:shadow-none'
 const MATERIAL_TARJETA = 'Cuero vacuno'
 
 function renderGaleriaTarjeta(p, fotos, carousel) {
@@ -218,7 +222,7 @@ function renderProductCard(p, index, opts = {}) {
                 aria-label="Comprar ahora ${p.nombre}">Comprar ahora</button>
               <button type="button" class="add-to-cart ${CLASES_BOTON} bg-stone-200 text-black hover:bg-stone-300"${agotado ? ' disabled' : ''}
                 ${datosProducto}
-                aria-label="Agregar ${p.nombre} al carrito">Agregar al carrito</button>
+                aria-label="Agregar ${p.nombre} al carrito">${conIcono('Agregar al carrito')}</button>
             </div>
           </div>
         </div>
@@ -531,13 +535,13 @@ function updateCartUI() {
           <p class="font-heading text-[11px] tracking-widest uppercase truncate">${p.nombre}</p>
           <p class="font-body text-xs text-gray-500">$${p.precio.toLocaleString('es-MX')} MXN</p>
         </div>
-        <button class="crossell-add font-heading text-[10px] tracking-widest uppercase border border-black px-3 py-1.5 rounded-xl hover:bg-black hover:text-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex-shrink-0 disabled:opacity-75 disabled:cursor-not-allowed"
+        <button class="crossell-add inline-flex items-center gap-1.5 font-heading text-[10px] tracking-widest uppercase bg-stone-200 text-black min-h-9 px-3 py-1.5 rounded-xl hover:bg-stone-300 active:scale-[0.98] transition-all duration-300 flex-shrink-0 disabled:opacity-75 disabled:cursor-not-allowed"
           data-nombre="${p.nombre}"
           data-precio="${p.precio}"
           data-imagen="${img}"
           data-descripcion="${p.descripcion || ''}"
           data-color="${p.colores?.[0] || ''}">
-          + Agregar
+          ${conIcono('Agregar')}
         </button>
       </div>`
     }).join('')
@@ -774,8 +778,8 @@ function openDetail(producto, trigger) {
   })
 
   productModalAdd.disabled = agotado
-  productModalAdd.textContent = agotado ? 'Agotado' : 'Agregar al carrito'
-  productModalAdd.className = `shrink-0 min-h-11 font-heading text-sm rounded-full px-5 sm:px-7 py-2.5 transition-all duration-300 ${agotado ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-[#1D4ED8] text-white hover:bg-[#1E40AF] hover:shadow-md active:scale-[0.98] cursor-pointer'}`
+  productModalAdd.innerHTML = agotado ? 'Agotado' : conIcono('Agregar al carrito')
+  productModalAdd.className = `shrink-0 inline-flex items-center justify-center gap-2 min-h-11 font-heading text-sm rounded-full px-5 sm:px-7 py-2.5 transition-all duration-300 ${agotado ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-[#1D4ED8] text-white hover:bg-[#1E40AF] hover:shadow-md active:scale-[0.98] cursor-pointer'}`
 
   productModalAdd.onclick = () => {
     if (!agotado) {
@@ -912,7 +916,7 @@ document.addEventListener('click', e => {
       addBtn.dataset.color || ''
     )
     addBtn.textContent = 'Agregado ✓'
-    setTimeout(() => { addBtn.textContent = 'Agregar al carrito' }, 1500)
+    setTimeout(() => { addBtn.innerHTML = conIcono('Agregar al carrito') }, 1500)
   }
 
   const comprarBtn = e.target.closest('.comprar-ahora')
@@ -939,7 +943,7 @@ document.addEventListener('click', e => {
     crossellBtn.textContent = 'Agregado'
     setTimeout(() => {
       crossellBtn.disabled = false
-      crossellBtn.textContent = '+ Agregar'
+      crossellBtn.innerHTML = conIcono('Agregar')
     }, 1500)
   }
 

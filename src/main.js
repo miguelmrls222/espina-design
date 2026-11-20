@@ -143,7 +143,7 @@ function renderDestacados() {
 
 const ICONO_SIN_FOTO = '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg></div>'
 
-const CLASES_BOTON = 'w-full @[19rem]:w-auto @[19rem]:flex-1 min-h-11 rounded-full px-3 py-2 font-heading text-[13px] leading-tight text-center flex items-center justify-center active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:shadow-none'
+const CLASES_BOTON = 'w-full min-h-11 rounded-full px-3 py-2 font-heading text-[13px] leading-tight text-center flex items-center justify-center active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:shadow-none'
 const MATERIAL_TARJETA = 'Cuero vacuno'
 
 function renderGaleriaTarjeta(p, fotos, carousel) {
@@ -212,7 +212,7 @@ function renderProductCard(p, index, opts = {}) {
           </div>
           <div class="mt-auto pt-3">
             <p data-zona="precio" class="font-heading text-xl sm:text-2xl leading-none tracking-tight whitespace-nowrap">$${p.precio.toLocaleString('es-MX')}<span class="font-body text-xs text-gray-500 ml-1 tracking-normal">MXN</span></p>
-            <div data-zona="acciones" class="mt-2.5 flex flex-col @[19rem]:flex-row gap-2">
+            <div data-zona="acciones" class="mt-2.5 flex flex-col gap-2">
               <button type="button" class="comprar-ahora ${CLASES_BOTON} bg-[#1D4ED8] text-white hover:bg-[#1E40AF] shadow-sm hover:shadow-md"${agotado ? ' disabled' : ''}
                 ${datosProducto}
                 aria-label="Comprar ahora ${p.nombre}">Comprar ahora</button>
@@ -225,21 +225,6 @@ function renderProductCard(p, index, opts = {}) {
       </article>
     </div>
   `
-}
-
-function renderEstrellas(p) {
-  if (!p.resenas || p.resenas.length === 0) return ''
-  const avg = p.resenas.reduce((s, r) => s + r.puntuacion, 0) / p.resenas.length
-  const full = Math.round(avg)
-  return `
-    <div class="flex items-center gap-0.5 mb-2">
-      ${Array.from({ length: 5 }, (_, i) =>
-        i < full
-          ? '<svg class="w-3 h-3 text-amber-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'
-          : '<svg class="w-3 h-3 text-gray-200" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'
-      ).join('')}
-      <span class="font-body text-[10px] text-gray-400 ml-0.5">${avg.toFixed(1)} (${p.resenas.length})</span>
-    </div>`
 }
 
 // ─── Testimonios ───
@@ -747,7 +732,7 @@ function openDetail(producto, trigger) {
 
 
   productModalName.textContent = producto.nombre
-  productModalPrice.textContent = `$${producto.precio.toLocaleString('es-MX')} MXN`
+  productModalPrice.innerHTML = `$${producto.precio.toLocaleString('es-MX')}<span class="font-body text-xs text-gray-500 ml-1 tracking-normal">MXN</span>`
   productModalDesc.textContent = producto.descripcion || ''
 
   const coloresEl = document.getElementById('product-modal-colores')
@@ -788,45 +773,9 @@ function openDetail(producto, trigger) {
     items: [{ item_name: producto.nombre, price: producto.precio, item_category: producto.categoria }]
   })
 
-  const reviewsEl = document.getElementById('product-modal-reviews')
-  const resenas = producto.resenas
-  if (resenas && resenas.length > 0) {
-    reviewsEl.innerHTML = `
-      <p class="font-heading text-xs tracking-widest uppercase text-black mb-3">Reseñas</p>
-      <div class="space-y-3">
-        ${resenas.map(r => {
-          const estrellas = Array.from({ length: 5 }, (_, i) =>
-            i < r.puntuacion
-              ? `<svg class="w-3.5 h-3.5 text-black flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`
-              : `<svg class="w-3.5 h-3.5 text-gray-300 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`
-          ).join('')
-          return `
-            <div class="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
-              <div class="flex items-center gap-2 mb-1">
-                <div class="flex items-center gap-0.5">${estrellas}</div>
-                <span class="font-heading text-[11px] tracking-wider uppercase text-black">${r.nombre}</span>
-                ${r.fecha ? `<span class="font-body text-[10px] text-gray-400">${r.fecha}</span>` : ''}
-              </div>
-              <p class="font-body text-xs text-gray-600 leading-relaxed">${r.texto}</p>
-            </div>
-          `
-        }).join('')}
-      </div>
-      <button id="toggle-review-btn" class="mt-3 font-heading text-[10px] tracking-widest uppercase border border-black px-4 py-2 rounded-xl hover:bg-black hover:text-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
-        Dejar reseña
-      </button>
-    `
-    reviewsEl.classList.remove('hidden')
-  } else {
-    reviewsEl.innerHTML = `<button id="toggle-review-btn" class="font-heading text-[10px] tracking-widest uppercase border border-black px-4 py-2 rounded-xl hover:bg-black hover:text-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
-      Dejar reseña
-    </button>`
-    reviewsEl.classList.remove('hidden')
-  }
-
   productModalAdd.disabled = agotado
   productModalAdd.textContent = agotado ? 'Agotado' : 'Agregar al carrito'
-  productModalAdd.className = `w-full font-heading text-sm tracking-widest uppercase rounded-xl px-10 py-3.5 overflow-hidden transition-all duration-300 ${agotado ? 'bg-gray-300 text-gray-400 cursor-not-allowed' : 'bg-black text-white hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] cursor-pointer'}`
+  productModalAdd.className = `shrink-0 min-h-11 font-heading text-sm rounded-full px-5 sm:px-7 py-2.5 transition-all duration-300 ${agotado ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-[#1D4ED8] text-white hover:bg-[#1E40AF] hover:shadow-md active:scale-[0.98] cursor-pointer'}`
 
   productModalAdd.onclick = () => {
     if (!agotado) {
@@ -841,10 +790,6 @@ function openDetail(producto, trigger) {
   const ldScript = document.createElement('script')
   ldScript.id = 'ld-product'
   ldScript.type = 'application/ld+json'
-  const totalResenas = producto.resenas?.length || 0
-  const avgResena = totalResenas > 0
-    ? (producto.resenas.reduce((s, r) => s + r.puntuacion, 0) / totalResenas).toFixed(1)
-    : null
   const ld = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -861,14 +806,6 @@ function openDetail(producto, trigger) {
       url: `https://espinadesign.com/tienda`,
     },
   }
-  if (avgResena && totalResenas > 0) {
-    ld.aggregateRating = {
-      '@type': 'AggregateRating',
-      ratingValue: avgResena,
-      reviewCount: totalResenas,
-      bestRating: '5',
-    }
-  }
   ldScript.textContent = JSON.stringify(ld)
   document.head.appendChild(ldScript)
 
@@ -883,20 +820,6 @@ function closeDetail() {
   modalClosed(productModal)
   const zoomOverlay = document.getElementById('image-zoom-overlay')
   if (zoomOverlay) zoomOverlay.style.display = 'none'
-  const form = document.getElementById('product-modal-review-form')
-  if (form) {
-    form.classList.add('hidden')
-    document.getElementById('review-name').value = ''
-    document.getElementById('review-text').value = ''
-    document.querySelectorAll('.review-star').forEach(b => {
-      b.classList.add('text-gray-300')
-      b.classList.remove('text-black')
-    })
-    const starsEl = document.getElementById('review-stars')
-    delete starsEl.dataset.selected
-    const feedback = document.getElementById('review-feedback')
-    feedback.classList.add('hidden')
-  }
 }
 
 document.addEventListener('click', e => {
@@ -1049,90 +972,6 @@ document.addEventListener('click', e => {
     }
     cart.splice(i, 1)
     saveCart()
-  }
-
-  if (e.target.closest('#toggle-review-btn')) {
-    const form = document.getElementById('product-modal-review-form')
-    form.classList.toggle('hidden')
-  }
-
-  if (e.target.closest('#review-cancel')) {
-    document.getElementById('product-modal-review-form').classList.add('hidden')
-  }
-
-  const starBtn = e.target.closest('.review-star')
-  if (starBtn) {
-    const val = parseInt(starBtn.dataset.val)
-    document.querySelectorAll('.review-star').forEach(b => {
-      const bv = parseInt(b.dataset.val)
-      b.classList.toggle('text-black', bv <= val)
-      b.classList.toggle('text-gray-300', bv > val)
-    })
-    document.getElementById('review-stars').dataset.selected = val
-  }
-
-  if (e.target.closest('#review-submit')) {
-    const form = document.getElementById('product-modal-review-form')
-    const producto = document.getElementById('product-modal-name')?.textContent || ''
-    const nombre = document.getElementById('review-name')?.value.trim()
-    const texto = document.getElementById('review-text')?.value.trim()
-    const website = document.getElementById('review-website')?.value || ''
-    const starsEl = document.getElementById('review-stars')
-    const puntuacion = parseInt(starsEl?.dataset?.selected || '0')
-    const feedback = document.getElementById('review-feedback')
-
-    if (!nombre || !texto || puntuacion === 0) {
-      feedback.textContent = 'Completa todos los campos y selecciona una puntuación.'
-      feedback.className = 'font-body text-xs mt-2 text-red-500'
-      feedback.classList.remove('hidden')
-      return
-    }
-
-    if (texto.length < 10) {
-      feedback.textContent = 'Tu comentario debe tener al menos 10 caracteres.'
-      feedback.className = 'font-body text-xs mt-2 text-red-500'
-      feedback.classList.remove('hidden')
-      return
-    }
-
-    const btn = document.getElementById('review-submit')
-    btn.disabled = true
-    btn.textContent = 'Enviando…'
-    feedback.textContent = ''
-    feedback.classList.add('hidden')
-
-    fetch('/api/submit-review', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ producto, nombre, puntuacion, texto, website }),
-    })
-      .then(r => r.json().catch(() => ({ ok: false })))
-      .then(data => {
-        if (data.ok) {
-          feedback.textContent = '¡Gracias! Tu reseña será revisada y publicada pronto.'
-          feedback.className = 'font-body text-xs mt-2 text-green-600'
-          feedback.classList.remove('hidden')
-          document.getElementById('review-name').value = ''
-          document.getElementById('review-text').value = ''
-          document.querySelectorAll('.review-star').forEach(b => {
-            b.classList.add('text-gray-300')
-            b.classList.remove('text-black')
-          })
-          delete starsEl.dataset.selected
-          setTimeout(() => form.classList.add('hidden'), 2500)
-        } else {
-          throw new Error(data.error || 'Error al enviar')
-        }
-      })
-      .catch(err => {
-        feedback.textContent = err.message && err.message !== 'Error al enviar' ? err.message : 'Error al enviar. Intenta de nuevo o escríbenos por WhatsApp.'
-        feedback.className = 'font-body text-xs mt-2 text-red-500'
-        feedback.classList.remove('hidden')
-      })
-      .finally(() => {
-        btn.disabled = false
-        btn.textContent = 'Enviar reseña'
-      })
   }
 })
 

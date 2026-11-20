@@ -18,7 +18,7 @@ test('index.html no repite productos fuera del ItemList', () => {
   assert.equal(sueltos.length, 0)
 })
 
-test('los datos estructurados coinciden con el catálogo (precio y reseñas)', () => {
+test('los datos estructurados coinciden con el catálogo (precio, sin reseñas)', () => {
   const lista = bloquesLd().find(bloque => bloque['@type'] === 'ItemList') as
     | { itemListElement: Array<{ item: { sku: string; offers: { price: string }; aggregateRating?: { ratingValue: string; reviewCount: string } } }> }
     | undefined
@@ -29,12 +29,7 @@ test('los datos estructurados coinciden con el catálogo (precio y reseñas)', (
     const producto = productos.find(p => p.slug === item.sku)
     assert.ok(producto, `SKU desconocido: ${item.sku}`)
     assert.equal(Number(item.offers.price), producto.precio, `precio de ${item.sku}`)
-    const resenas = producto.resenas ?? []
-    if (resenas.length > 0) {
-      const promedio = resenas.reduce((suma, r) => suma + r.puntuacion, 0) / resenas.length
-      assert.equal(Number(item.aggregateRating?.reviewCount), resenas.length)
-      assert.equal(Number(item.aggregateRating?.ratingValue), Number(promedio.toFixed(1)))
-    }
+    assert.equal(item.aggregateRating, undefined, `sin calificaciones visibles no hay aggregateRating (${item.sku})`)
   }
 })
 

@@ -22,7 +22,8 @@ test('el material de la tarjeta es siempre "Cuero vacuno"', () => {
 })
 
 test('la tarjeta ya no muestra estrellas ni días de elaboración', () => {
-  const tarjeta = js.slice(js.indexOf('function renderProductCard'), js.indexOf('function renderEstrellas'))
+  const inicio = js.indexOf('function renderProductCard')
+  const tarjeta = js.slice(inicio, js.indexOf('// ─── Testimonios', inicio))
   assert.doesNotMatch(tarjeta, /resenas|text-amber|tiempo_fabricacion|Hecho a mano/)
   assert.doesNotMatch(css, /tarjeta-detalle/)
 })
@@ -33,7 +34,8 @@ test('el sello de garantía muestra "1 año" en móvil y el texto completo en es
 })
 
 test('el orden es título, material, colores, precio y botones, anclados abajo', () => {
-  const tarjeta = js.slice(js.indexOf('function renderProductCard'), js.indexOf('function renderEstrellas'))
+  const inicio = js.indexOf('function renderProductCard')
+  const tarjeta = js.slice(inicio, js.indexOf('// ─── Testimonios', inicio))
   const orden = ['tarjeta-titulo', 'data-zona="subtitulo"', 'data-zona="colores"', 'data-zona="precio"', 'data-zona="acciones"']
     .map(marca => tarjeta.indexOf(marca))
   assert.deepEqual([...orden].sort((a, b) => a - b), orden)
@@ -42,7 +44,8 @@ test('el orden es título, material, colores, precio y botones, anclados abajo',
 })
 
 test('cada tarjeta tiene "Comprar ahora" (azul, texto blanco) y "Agregar al carrito" (gris, texto negro)', () => {
-  const tarjeta = js.slice(js.indexOf('function renderProductCard'), js.indexOf('function renderEstrellas'))
+  const inicio = js.indexOf('function renderProductCard')
+  const tarjeta = js.slice(inicio, js.indexOf('// ─── Testimonios', inicio))
   assert.match(tarjeta, /comprar-ahora \$\{CLASES_BOTON\} bg-\[#1D4ED8\] text-white hover:bg-\[#1E40AF\]/)
   assert.match(tarjeta, /add-to-cart \$\{CLASES_BOTON\} bg-stone-200 text-black hover:bg-stone-300/)
   assert.match(tarjeta, />Comprar ahora<\/button>/)
@@ -52,7 +55,8 @@ test('cada tarjeta tiene "Comprar ahora" (azul, texto blanco) y "Agregar al carr
 
 test('los botones miden al menos 44 px de alto y se apilan o se ponen en fila según el ancho de la tarjeta', () => {
   assert.match(js, /const CLASES_BOTON = '[^']*min-h-11/)
-  assert.match(js, /flex flex-col @\[19rem\]:flex-row gap-2/)
+  assert.match(js, /data-zona="acciones" class="mt-2\.5 flex flex-col gap-2"/)
+  assert.doesNotMatch(js, /@\[19rem\]:flex-row/)
 })
 
 test('"Comprar ahora" agrega la pieza, abre el carrito y lleva al correo del pago', () => {
@@ -64,7 +68,8 @@ test('"Comprar ahora" agrega la pieza, abre el carrito y lleva al correo del pag
 })
 
 test('un producto agotado conserva ambos botones deshabilitados para no romper la alineación', () => {
-  const tarjeta = js.slice(js.indexOf('function renderProductCard'), js.indexOf('function renderEstrellas'))
+  const inicio = js.indexOf('function renderProductCard')
+  const tarjeta = js.slice(inicio, js.indexOf('// ─── Testimonios', inicio))
   assert.equal((tarjeta.match(/\$\{agotado \? ' disabled' : ''\}/g) || []).length, 2)
   assert.match(js, /disabled:opacity-50 disabled:cursor-not-allowed/)
 })
@@ -77,4 +82,24 @@ test('el catálogo, los tipos, el CMS y la ficha ya no tienen días de elaboraci
     assert.doesNotMatch(texto, /tiempo_fabricacion/, nombre)
   }
   assert.doesNotMatch(js, /Fabricación:/)
+})
+
+test('modal: sin reseñas, barra inferior fija con precio a la izquierda y botón azul a la derecha', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8')
+  const js = readFileSync(new URL('../src/main.js', import.meta.url), 'utf8')
+  assert.doesNotMatch(html, /product-modal-reviews|product-modal-review-form|Dejar reseña/)
+  assert.doesNotMatch(js, /resenas|review|Estrellas|aggregateRating/)
+  const barra = html.slice(html.indexOf('sticky bottom-0'), html.indexOf('<!-- MENÚ -->'))
+  assert.ok(barra.indexOf('id="product-modal-price"') < barra.indexOf('id="product-modal-add"'))
+  assert.match(barra, /justify-between/)
+  assert.match(barra, /font-heading text-xl sm:text-2xl leading-none tracking-tight/)
+  assert.match(barra, /bg-\[#1D4ED8\] text-white hover:bg-\[#1E40AF\]/)
+  assert.match(barra, />Agregar al carrito</)
+})
+
+test('icono del carrito: carrito de supermercado (ruedas), no bolsa', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8')
+  const boton = html.slice(html.indexOf('id="cart-btn"'), html.indexOf('id="cart-count"'))
+  assert.match(boton, /<circle[^>]*cx="9"[\s\S]*<circle[^>]*cx="17"/)
+  assert.doesNotMatch(boton, /M21 8a2 2/)
 })

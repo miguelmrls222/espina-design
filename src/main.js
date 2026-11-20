@@ -1,4 +1,5 @@
 import './style.css'
+import { folioDesdeSesion } from './data/folio'
 import {
   CANTIDAD_MAXIMA,
   CROSS_SELL,
@@ -912,37 +913,119 @@ document.addEventListener('keydown', e => {
 
 // ─── Página Gracias ───
 
+const formatoMoneda = n => `$${Number(n).toLocaleString('es-MX')} MXN`
+
+function escribirFila(id, texto) {
+  const fila = document.getElementById(`${id}-row`)
+  const valor = document.getElementById(id)
+  if (!fila || !valor) return
+  if (!texto) {
+    fila.classList.add('hidden')
+    fila.classList.remove('flex')
+    return
+  }
+  valor.textContent = texto
+  fila.classList.remove('hidden')
+  fila.classList.add('flex')
+}
+
+function pintarResumenPedido({ folio, fecha, email, destino, subtotal, envio, total }) {
+  escribirFila('order-folio', folio)
+  escribirFila('order-fecha', fecha)
+  escribirFila('order-email', email)
+  escribirFila('order-destino', destino)
+  const set = (id, texto) => { const el = document.getElementById(id); if (el) el.textContent = texto }
+  set('gracias-subtotal', formatoMoneda(subtotal))
+  set('gracias-envio', envio === 0 ? 'Envío gratis' : envio == null ? 'Incluido en tu pago' : formatoMoneda(envio))
+  set('gracias-total', total == null ? 'Consulta tu correo' : formatoMoneda(total))
+  const envioEl = document.getElementById('gracias-envio')
+  if (envioEl) envioEl.classList.toggle('text-green-700', envio === 0)
+}
+
+async function copiarFolio() {
+  const folio = document.getElementById('order-folio')?.textContent || ''
+  const boton = document.getElementById('order-copy')
+  const estado = document.getElementById('order-copy-status')
+  if (!folio || !boton) return
+  let ok = false
+  try {
+    await navigator.clipboard.writeText(folio)
+    ok = true
+  } catch {
+    const t = document.createElement('textarea')
+    t.value = folio
+    t.setAttribute('readonly', '')
+    t.style.position = 'fixed'
+    t.style.opacity = '0'
+    document.body.appendChild(t)
+    t.select()
+    try { ok = document.execCommand('copy') } catch {}
+    t.remove()
+  }
+  boton.textContent = ok ? '¡Copiado!' : 'Copia manual'
+  if (estado) estado.textContent = ok ? 'Folio copiado' : 'No se pudo copiar'
+  setTimeout(() => { boton.textContent = 'Copiar' }, 1500)
+}
+
+document.getElementById('order-copy')?.addEventListener('click', copiarFolio)
+
 function renderGracias() {
   const raw = sessionStorage.getItem('ultimo_pedido')
   const container = document.getElementById('gracias-items')
-  const ref = document.getElementById('order-ref')
-  const emailEl = document.getElementById('order-email')
   if (!container) return
   if (!raw) {
     container.innerHTML = ''
-    if (ref) ref.textContent = ''
-    if (emailEl) emailEl.textContent = ''
+    pintarResumenPedido({ folio: '', fecha: '', email: '', destino: '', subtotal: 0, envio: null, total: null })
     return
   }
   const pedido = JSON.parse(raw)
-  const email = pedido.email || ''
-  if (ref) ref.textContent = `${pedido.session_id ? `Pedido: ${pedido.session_id}` : ''}${pedido.fecha ? `  •  ${pedido.fecha}` : ''}`
-  if (emailEl) emailEl.textContent = email ? `📧 ${email}` : ''
+  const subtotalLocal = pedido.items.reduce((t, i) => t + (i.precio || 0) * (i.cantidad || 0), 0)
   container.innerHTML = pedido.items.map(i => `
-    <div class="flex items-center gap-4 text-sm">
-      <div class="w-14 h-14 bg-[#F5F5F5] flex-shrink-0 flex items-center justify-center overflow-hidden">
+    <div class="flex items-center gap-3 text-sm">
+      <div class="w-14 h-14 rounded bg-[#F5F5F5] flex-shrink-0 flex items-center justify-center overflow-hidden">
         ${i.imagen ? `<img src="${i.imagen}" width="56" height="56" alt="${i.nombre}" loading="lazy" class="w-full h-full object-cover" />` : `<span class="font-heading text-[10px] tracking-widest uppercase text-gray-400">ED</span>`}
       </div>
       <div class="flex-1 min-w-0">
         <p class="font-heading text-xs tracking-widest uppercase truncate">${i.nombre}</p>
-        <p class="font-body text-xs text-gray-500">${i.color || ''} × ${i.cantidad}</p>
+        <p class="font-body text-xs text-gray-500">${i.color ? `${i.color} · ` : ''}Cantidad: ${i.cantidad} · ${MATERIAL_TARJETA}</p>
       </div>
-      <p class="font-heading text-xs tracking-widest">$${(i.precio * i.cantidad).toLocaleString('es-MX')}</p>
+      <p class="font-heading text-xs tracking-wide tabular-nums whitespace-nowrap">${formatoMoneda(i.precio * i.cantidad)}</p>
     </div>
   `).join('')
+
+  // Primero lo que ya sabemos en el navegador; luego se afina con los datos reales de Stripe.
+  pintarResumenPedido({
+    folio: folioDesdeSesion(pedido.session_id),
+    fecha: pedido.fecha || '',
+    email: pedido.email || '',
+    destino: '',
+    subtotal: subtotalLocal,
+    envio: subtotalLocal >= ENVIO_GRATIS_MINIMO ? 0 : null,
+    total: subtotalLocal >= ENVIO_GRATIS_MINIMO ? subtotalLocal : null,
+  })
+  if (pedido.session_id) {
+    fetch(`/api/pedido?session_id=${encodeURIComponent(pedido.session_id)}`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => {
+        if (!d || !d.ok) return
+        const destino = d.destino && (d.destino.ciudad || d.destino.estado)
+          ? [d.destino.ciudad, d.destino.estado].filter(Boolean).join(', ') + (d.destino.cp ? ` · CP ${d.destino.cp}` : '')
+          : ''
+        pintarResumenPedido({
+          folio: d.folio || folioDesdeSesion(pedido.session_id),
+          fecha: d.fecha ? new Date(d.fecha).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' }) : pedido.fecha || '',
+          email: d.email || pedido.email || '',
+          destino,
+          subtotal: d.subtotal,
+          envio: d.envio,
+          total: d.total,
+        })
+      })
+      .catch(() => {})
+  }
   gtagEvent('event', 'purchase', {
     transaction_id: pedido.session_id || '',
-    value: pedido.items.reduce((t, i) => t + (i.precio || 0) * (i.cantidad || 0), 0),
+    value: subtotalLocal,
     currency: 'MXN',
     items: pedido.items.map(i => ({ item_name: i.nombre, price: i.precio, quantity: i.cantidad }))
   })

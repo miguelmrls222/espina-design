@@ -184,6 +184,9 @@ function marcarMiniatura(indice) {
   })
 }
 
+// Ancho único de tarjeta: lo comparten "Productos más vendidos" y la TIENDA
+const ANCHO_TARJETA = 'w-[240px] sm:w-[280px]'
+
 function renderProductCard(p, index, opts = {}) {
   const fotos = (p.fotos || []).filter(Boolean)
   const img = fotos[0] || ''
@@ -193,8 +196,8 @@ function renderProductCard(p, index, opts = {}) {
   const datosProducto = `data-nombre="${p.nombre}" data-precio="${p.precio}" data-imagen="${img}" data-descripcion="${p.descripcion || ''}" data-color="${p.colores?.[0] || ''}"`
 
   const wrapperClass = carousel
-    ? 'flex-shrink-0 w-[240px] sm:w-[280px] snap-start'
-    : ''
+    ? `flex-shrink-0 ${ANCHO_TARJETA} snap-start`
+    : ANCHO_TARJETA
 
   return `
     <div class="${wrapperClass} min-w-0 ${agotado ? 'opacity-60' : ''}">

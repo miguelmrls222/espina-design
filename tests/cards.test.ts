@@ -117,12 +117,19 @@ test('carrito: "Pagar ahora" azul con texto blanco; sugeridos en gris con texto 
   assert.match(js, /class="crossell-add [^"]*bg-stone-200 text-black[^"]*hover:bg-stone-300/)
 })
 
-test('carrito: "Pagar ahora" sin mayúsculas forzadas y "Envio gratis" como texto verde sin icono', () => {
+test('carrito: "Pagar ahora" sin mayúsculas forzadas y "Envío gratis" como texto verde sin icono', () => {
   const boton = html.slice(html.indexOf('id="checkout-btn"'), html.indexOf('</button>', html.indexOf('id="checkout-btn"')))
   assert.doesNotMatch(boton.split('>')[0], /uppercase/)
   assert.match(boton, />\s*Pagar ahora\s*$/)
-  assert.match(html, /<p id="envio-success" class="[^"]*text-green-700[^"]*">Envio gratis<\/p>/)
+  assert.match(html, /<p id="envio-success" class="[^"]*text-green-700[^"]*">Envío gratis<\/p>/)
   assert.doesNotMatch(html.match(/<p id="envio-success"[^]*?<\/p>/)![0], /uppercase|<svg/)
   assert.doesNotMatch(js, /lanzarConfetti|sonidoConfetti/)
   assert.match(js, /envioIcon\.className = 'hidden'/)
+})
+
+test('TIENDA y "Productos más vendidos" comparten el mismo ancho de tarjeta', () => {
+  assert.match(js, /const ANCHO_TARJETA = 'w-\[240px\] sm:w-\[280px\]'/)
+  assert.match(js, /flex-shrink-0 \$\{ANCHO_TARJETA\} snap-start/)
+  assert.match(js, /: ANCHO_TARJETA\b/)
+  assert.match(html, /id="productos-grid" class="grid grid-cols-\[repeat\(auto-fill,240px\)\] sm:grid-cols-\[repeat\(auto-fill,280px\)\] [^"]*items-stretch/)
 })

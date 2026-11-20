@@ -6,12 +6,13 @@
     "/images/products/billetera-bifold-sahuaro-4.jpg",
     "/images/products/billetera-bifold-sahuaro-2.jpg"
   ],
-  "precio": 789,
+  "precio": 949,
   "colores": [
-    "verde"
+    "negro"
   ],
   "descripcion": "Diseño simple y elegante, muy práctico para quienes llevan consigo sus billetes y tarjetas esenciales.",
   "categoria": "billeteras",
+  "cantidad_disponible": 1,
   "stock": "disponible",
   "materiales": "Cuero vegetal 100%",
   "destacado": true,

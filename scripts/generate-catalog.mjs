@@ -27,6 +27,13 @@ function leerProducto(nombreArchivo) {
   }
   if (typeof producto.nombre !== 'string' || !producto.nombre.trim()) errores.push(`${nombreArchivo}: falta el nombre`)
   if (typeof producto.precio !== 'number' || !(producto.precio > 0)) errores.push(`${nombreArchivo}: el precio debe ser un número mayor que 0`)
+  if (producto.cantidad_disponible !== undefined && producto.cantidad_disponible !== null && producto.cantidad_disponible !== '') {
+    const n = Number(producto.cantidad_disponible)
+    if (!Number.isInteger(n) || n < 0) errores.push(`${nombreArchivo}: las piezas disponibles deben ser un número entero de 0 en adelante`)
+    else producto.cantidad_disponible = n
+  } else {
+    delete producto.cantidad_disponible
+  }
   for (const foto of fotos) {
     if (!foto.startsWith('/')) continue
     const ruta = join(raiz, 'public', decodeURIComponent(foto))

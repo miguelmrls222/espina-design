@@ -18,6 +18,8 @@ export interface Producto {
   materiales?: string
   dimensiones?: string
   stock?: string | number
+  /** Piezas disponibles. Si no existe, no hay límite numérico (se usa solo `stock`). */
+  cantidad_disponible?: number
   resenas?: Resena[]
 }
 

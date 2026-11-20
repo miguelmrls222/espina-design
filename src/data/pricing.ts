@@ -65,8 +65,20 @@ export function buscarProductoPorNombre(nombre: string): Producto | undefined {
   return CATALOGO.find(p => p.activo !== false && normalizar(p.nombre) === objetivo)
 }
 
+/** Piezas disponibles, o null si el producto no tiene límite numérico. */
+export function cantidadDisponible(producto: Producto): number | null {
+  const valor = producto.cantidad_disponible ?? (typeof producto.stock === 'number' ? producto.stock : undefined)
+  return typeof valor === 'number' && Number.isFinite(valor) && valor >= 0 ? Math.floor(valor) : null
+}
+
 export function estaDisponible(producto: Producto): boolean {
-  return producto.stock !== 'agotado'
+  return producto.stock !== 'agotado' && cantidadDisponible(producto) !== 0
+}
+
+/** Máximo de piezas que se pueden comprar de un producto (suma de todos sus colores). */
+export function limiteCompra(producto: Producto): number {
+  const disponibles = cantidadDisponible(producto)
+  return disponibles === null ? CANTIDAD_MAXIMA : Math.min(CANTIDAD_MAXIMA, disponibles)
 }
 
 export function formatearMonto(valor: number): string {

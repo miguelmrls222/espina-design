@@ -7,8 +7,11 @@ import {
   PROMO,
   buscarProductoPorNombre,
   buscarProductoPorSlug,
+  cantidadDisponible,
   calcularTotales,
+  estaDisponible,
   isPromoActiva,
+  limiteCompra,
   msRestantesPromo,
   productosActivos,
 } from './data/pricing'
@@ -191,8 +194,8 @@ const ANCHO_TARJETA = 'w-[240px] sm:w-[280px]'
 function renderProductCard(p, index, opts = {}) {
   const fotos = (p.fotos || []).filter(Boolean)
   const img = fotos[0] || ''
-  const agotado = p.stock === 'agotado'
-  const stockBajo = !agotado && typeof p.stock === 'number' && p.stock <= 3
+  const agotado = !estaDisponible(p)
+  const textoStock = agotado ? '' : textoPocasPiezas(p)
   const { carousel = false } = opts
   const datosProducto = `data-nombre="${p.nombre}" data-precio="${p.precio}" data-imagen="${img}" data-descripcion="${p.descripcion || ''}" data-color="${p.colores?.[0] || ''}"`
 
@@ -206,7 +209,7 @@ function renderProductCard(p, index, opts = {}) {
         <div class="galeria aspect-square bg-[#F5F5F5] relative cursor-pointer open-detail rounded-2xl overflow-hidden" data-index="${index}" tabindex="-1">
           ${renderGaleriaTarjeta(p, fotos, carousel)}
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
-          ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 rounded-full font-heading">Solo quedan ' + p.stock + '</span>' : ''}
+          ${textoStock ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 rounded-full font-heading">' + textoStock + '</span>' : ''}
           <div class="warranty-badge absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm flex items-center gap-1 pointer-events-none" role="img" aria-label="Garantía de 1 año">
             <svg class="w-3 h-3 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
             <span class="font-heading text-[10px] tracking-wide text-green-800 font-semibold whitespace-nowrap" aria-hidden="true"><span class="sm:hidden">1 año</span><span class="hidden sm:inline">Garantía de 1 año</span></span>
@@ -216,7 +219,7 @@ function renderProductCard(p, index, opts = {}) {
           <h3 class="tarjeta-titulo font-heading text-base sm:text-lg cursor-pointer open-detail" title="${p.nombre}" data-index="${index}" tabindex="0" role="button" aria-label="Ver detalle de ${p.nombre}">${p.nombre}</h3>
           <p data-zona="subtitulo" class="tarjeta-subtitulo font-body text-sm text-gray-500 mt-1">${MATERIAL_TARJETA}</p>
           <div data-zona="colores" class="flex items-center gap-1.5 mt-2 h-3.5">
-            ${(p.colores || []).map(c => `<span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color:${colorMap[c] || '#ccc'}" title="${c}"></span>`).join('')}
+            ${(p.colores || []).map(c => `<span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="${estiloColor(c)}" title="${etiquetaColor(c)}"></span>`).join('')}
           </div>
           <div class="mt-auto pt-3">
             <p data-zona="precio" class="font-heading text-xl sm:text-2xl leading-none tracking-tight whitespace-nowrap">$${p.precio.toLocaleString('es-MX')}<span class="font-body text-xs text-gray-500 ml-1 tracking-normal">MXN</span></p>
@@ -278,6 +281,24 @@ const colorMap = {
   'gris': '#8c8c8c',
   'vino': '#722f37',
   'cafe oscuro': '#4a3728',
+  'negro': '#1A1A1A',
+}
+
+const ETIQUETA_COLOR = { 'cafe oscuro': 'Café oscuro' }
+const etiquetaColor = c => ETIQUETA_COLOR[c] || (c ? c.charAt(0).toUpperCase() + c.slice(1) : '')
+// El negro necesita un aro interior claro para distinguirse del borde en la selección
+const estiloColor = c => `background-color:${colorMap[c] || '#ccc'}${c === 'negro' ? ';box-shadow:inset 0 0 0 2px rgba(255,255,255,.3)' : ''}`
+
+// ─── Stock ───
+
+function unidadesEnCarrito(slug) {
+  return cart.filter(i => i.slug === slug).reduce((t, i) => t + i.cantidad, 0)
+}
+
+function textoPocasPiezas(prod) {
+  const n = cantidadDisponible(prod)
+  if (n === null || n < 1 || n > 3) return ''
+  return n === 1 ? 'Última pieza' : `Solo quedan ${n}`
 }
 
 function normalizarCarrito(crudo) {
@@ -294,14 +315,16 @@ function normalizarCarrito(crudo) {
     }
     const prod = (typeof item.slug === 'string' && buscarProductoPorSlug(item.slug)) ||
       (typeof item.nombre === 'string' && buscarProductoPorNombre(item.nombre))
-    if (!prod || prod.stock === 'agotado') continue
+    if (!prod || !estaDisponible(prod)) continue
     const colores = prod.colores || []
     const color = colores.includes(item.color) ? item.color : (colores[0] || '')
-    const cantidad = Math.min(CANTIDAD_MAXIMA, Math.max(1, Math.floor(Number(item.cantidad)) || 1))
+    const yaEnCarrito = [...lineas.values()].filter(l => l.slug === prod.slug).reduce((t, l) => t + l.cantidad, 0)
+    const cantidad = Math.min(limiteCompra(prod) - yaEnCarrito, Math.max(1, Math.floor(Number(item.cantidad)) || 1))
+    if (cantidad < 1) continue
     const clave = prod.slug + '|' + color
     const previa = lineas.get(clave)
     if (previa) {
-      previa.cantidad = Math.min(CANTIDAD_MAXIMA, previa.cantidad + cantidad)
+      previa.cantidad += cantidad
     } else {
       lineas.set(clave, {
         slug: prod.slug,
@@ -441,15 +464,15 @@ function updateCartUI() {
   giftSection?.classList.remove('hidden')
   timelineSection?.classList.remove('hidden')
   cartItems.innerHTML = cart.map((item, i) => {
-    const itemStock = item.stock
-    const itemStockBajo = typeof itemStock === 'number' && itemStock <= 3
+    const prodItem = productos.find(p => p.slug === item.slug)
+    const avisoStock = prodItem ? textoPocasPiezas(prodItem) : ''
     return `
     <div class="flex gap-4 pb-4 border-b border-gray-100">
       ${item.imagen ? `<img src="${item.imagen}" width="80" height="80" alt="${item.nombre}" loading="lazy" class="w-20 h-20 object-cover bg-[#F5F5F5]" />` : ''}
       <div class="flex-1 min-w-0">
         <h4 class="font-heading text-xs tracking-widest uppercase truncate">${item.nombre}</h4>
-        ${item.color ? `<p class="font-body text-xs text-gray-400 mt-0.5">Color: ${item.color}</p>` : ''}
-        ${itemStockBajo ? `<p class="font-heading text-[10px] tracking-wider uppercase text-[#DC2626] mt-0.5">🔥 Solo quedan ${itemStock}</p>` : ''}
+        ${item.color ? `<p class="font-body text-xs text-gray-400 mt-0.5">Color: ${etiquetaColor(item.color)}</p>` : ''}
+        ${avisoStock ? `<p class="font-heading text-[10px] tracking-wider uppercase text-[#DC2626] mt-0.5">${avisoStock}</p>` : ''}
         <p class="text-sm text-gray-500 mt-1">$${(item.precio * item.cantidad).toLocaleString('es-MX')} MXN</p>
         <div class="flex items-center gap-3 mt-2">
           <button class="qty-minus text-xs border border-gray-300 w-6 h-6 rounded hover:bg-gray-100 active:scale-90 transition-all duration-200" data-index="${i}" aria-label="Reducir cantidad">−</button>
@@ -519,7 +542,7 @@ function updateCartUI() {
   const sugeridos = crossSellSlugs
     .map(slug => productos.find(p => p.slug === slug))
     .filter(Boolean)
-    .filter(p => !cartNames.includes(p.nombre) && p.stock !== 'agotado')
+    .filter(p => !cartNames.includes(p.nombre) && estaDisponible(p))
     .slice(0, 2)
   if (sugeridos.length > 0) {
     crossellSection?.classList.remove('hidden')
@@ -599,7 +622,12 @@ function mostrarToast(texto, tipo) {
 function addToCart(nombre, precio, imagen, descripcion, color) {
   color = color || ''
   const prod = productos.find(p => p.nombre === nombre)
-  if (prod && prod.stock === 'agotado') return
+  if (prod && !estaDisponible(prod)) return
+  if (prod && unidadesEnCarrito(prod.slug) >= limiteCompra(prod)) {
+    const n = cantidadDisponible(prod)
+    mostrarToast(n !== null && n < CANTIDAD_MAXIMA ? `Solo hay ${n} ${n === 1 ? 'pieza disponible' : 'piezas disponibles'} de ${prod.nombre}` : `Máximo ${CANTIDAD_MAXIMA} piezas por artículo`)
+    return
+  }
   const stock = prod ? prod.stock : 'disponible'
   const exist = cart.find(i => i.nombre === nombre && i.color === color)
   if (exist) {
@@ -635,7 +663,7 @@ let colorSeleccionado = ''
 function openDetail(producto, trigger) {
   const fotos = producto.fotos?.filter(Boolean) || []
   const img = fotos[0] || ''
-  const agotado = producto.stock === 'agotado'
+  const agotado = !estaDisponible(producto)
 
   const thumbsEl = document.getElementById('product-modal-thumbs')
 
@@ -669,15 +697,14 @@ function openDetail(producto, trigger) {
     coloresEl.classList.remove('hidden')
     colorSeleccionado = producto.colores[0]
     const nameEl = document.getElementById('color-selected-name')
-    if (nameEl) nameEl.textContent = colorSeleccionado
+    if (nameEl) nameEl.textContent = etiquetaColor(colorSeleccionado)
     swatchesEl.innerHTML = producto.colores.map(c => {
-      const hex = colorMap[c] || '#ccc'
       return `
-        <button class="color-btn w-8 h-8 rounded-full border-2 transition-all duration-200 ${c === colorSeleccionado ? 'border-black scale-110' : 'border-gray-200 hover:border-gray-400'}"
-          style="background-color:${hex}"
+        <button class="color-btn w-8 h-8 rounded-full border-2 transition-all duration-200 ${c === colorSeleccionado ? 'border-black scale-110 ring-2 ring-offset-2 ring-black/60' : 'border-gray-200 hover:border-gray-400'}"
+          style="${estiloColor(c)}"
           data-color="${c}"
-          title="${c}">
-          <span class="sr-only">${c}</span>
+          title="${etiquetaColor(c)}">
+          <span class="sr-only">${etiquetaColor(c)}</span>
         </button>
       `
     }).join('')
@@ -688,9 +715,15 @@ function openDetail(producto, trigger) {
   let metaHTML = ''
   if (producto.materiales) metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Materiales:</span> ${producto.materiales}</p>`
   if (producto.dimensiones) metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Medidas:</span> ${producto.dimensiones}</p>`
-  if (producto.stock) {
+  {
     const estados = { disponible: 'Disponible', agotado: 'Agotado', 'bajo-pedido': 'Bajo pedido' }
-    metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Stock:</span> ${estados[producto.stock] || producto.stock}</p>`
+    const n = cantidadDisponible(producto)
+    const estado = !estaDisponible(producto)
+      ? 'Agotado'
+      : n !== null
+        ? (n === 1 ? 'Última pieza' : `${n} piezas disponibles`)
+        : estados[producto.stock] || producto.stock
+    if (estado) metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Stock:</span> ${estado}</p>`
   }
   productModalMeta.innerHTML = metaHTML
 
@@ -729,7 +762,7 @@ function openDetail(producto, trigger) {
       '@type': 'Offer',
       price: producto.precio,
       priceCurrency: 'MXN',
-      availability: producto.stock === 'agotado' ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
+      availability: !estaDisponible(producto) ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
       url: `https://espinadesign.com/tienda`,
     },
   }
@@ -813,14 +846,14 @@ document.addEventListener('click', e => {
   const colorBtn = e.target.closest('.color-btn')
   if (colorBtn) {
     document.querySelectorAll('.color-btn').forEach(b => {
-      b.classList.remove('border-black', 'scale-110')
+      b.classList.remove('border-black', 'scale-110', 'ring-2', 'ring-offset-2', 'ring-black/60')
       b.classList.add('border-gray-200', 'hover:border-gray-400')
     })
     colorBtn.classList.remove('border-gray-200', 'hover:border-gray-400')
-    colorBtn.classList.add('border-black', 'scale-110')
+    colorBtn.classList.add('border-black', 'scale-110', 'ring-2', 'ring-offset-2', 'ring-black/60')
     colorSeleccionado = colorBtn.dataset.color
     const nameEl = document.getElementById('color-selected-name')
-    if (nameEl) nameEl.textContent = colorSeleccionado
+    if (nameEl) nameEl.textContent = etiquetaColor(colorSeleccionado)
   }
 
   if (e.target.closest('#checkout-btn')) {
@@ -881,7 +914,12 @@ document.addEventListener('click', e => {
   const plus = e.target.closest('.qty-plus')
   if (plus) {
     const i = parseInt(plus.dataset.index)
-    if (cart[i].cantidad >= CANTIDAD_MAXIMA) return
+    const prodItem = productos.find(p => p.slug === cart[i].slug)
+    const tope = prodItem ? limiteCompra(prodItem) : CANTIDAD_MAXIMA
+    if (unidadesEnCarrito(cart[i].slug) >= tope) {
+      mostrarToast(prodItem && tope < CANTIDAD_MAXIMA ? `Solo hay ${tope} ${tope === 1 ? 'pieza disponible' : 'piezas disponibles'} de ${prodItem.nombre}` : `Máximo ${CANTIDAD_MAXIMA} piezas por artículo`)
+      return
+    }
     cart[i].cantidad++
     saveCart()
   }
@@ -987,7 +1025,7 @@ function renderGracias() {
       </div>
       <div class="flex-1 min-w-0">
         <p class="font-heading text-xs tracking-widest uppercase truncate">${i.nombre}</p>
-        <p class="font-body text-xs text-gray-500">${i.color ? `${i.color} · ` : ''}Cantidad: ${i.cantidad} · ${MATERIAL_TARJETA}</p>
+        <p class="font-body text-xs text-gray-500">${i.color ? `${etiquetaColor(i.color)} · ` : ''}Cantidad: ${i.cantidad} · ${MATERIAL_TARJETA}</p>
       </div>
       <p class="font-heading text-xs tracking-wide tabular-nums whitespace-nowrap">${formatoMoneda(i.precio * i.cantidad)}</p>
     </div>

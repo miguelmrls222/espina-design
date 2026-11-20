@@ -8,7 +8,7 @@ const js = readFileSync(new URL('../src/main.js', import.meta.url), 'utf8')
 
 test('la cuadrícula estira las tarjetas para que midan lo mismo en cada fila', () => {
   assert.match(html, /id="productos-grid" class="grid [^"]*items-stretch/)
-  assert.match(js, /<article class="tarjeta-producto h-full flex flex-col/)
+  assert.match(js, /<article class="tarjeta-producto @container h-full flex flex-col/)
 })
 
 test('el título reserva exactamente 2 líneas y el material 1 línea', () => {
@@ -32,23 +32,41 @@ test('el sello de garantía muestra "1 año" en móvil y el texto completo en es
   assert.match(js, /warranty-badge[^"]*"[^>]*aria-label="Garantía de 1 año"/)
 })
 
-test('el orden es título, material, colores, precio y botón Comprar, anclados abajo', () => {
+test('el orden es título, material, colores, precio y botones, anclados abajo', () => {
   const tarjeta = js.slice(js.indexOf('function renderProductCard'), js.indexOf('function renderEstrellas'))
-  const orden = ['tarjeta-titulo', 'data-zona="subtitulo"', 'data-zona="colores"', 'data-zona="precio"', 'add-to-cart']
+  const orden = ['tarjeta-titulo', 'data-zona="subtitulo"', 'data-zona="colores"', 'data-zona="precio"', 'data-zona="acciones"']
     .map(marca => tarjeta.indexOf(marca))
   assert.deepEqual([...orden].sort((a, b) => a - b), orden)
   assert.ok(orden.every(i => i > 0))
-  assert.match(tarjeta, /mt-auto pt-4/)
-  assert.match(tarjeta, /\n\s+Comprar\n/)
-  assert.doesNotMatch(tarjeta, />\s*Agregar\s*</)
+  assert.match(tarjeta, /mt-auto pt-3/)
 })
 
-test('un producto agotado conserva el botón (deshabilitado) para no romper la alineación', () => {
-  assert.match(js, /disabled class="w-full mt-3[^"]*"[^>]*>Agotado<\/button>/)
+test('cada tarjeta tiene "Comprar ahora" (azul, texto blanco) y "Agregar al carrito" (gris, texto negro)', () => {
+  const tarjeta = js.slice(js.indexOf('function renderProductCard'), js.indexOf('function renderEstrellas'))
+  assert.match(tarjeta, /comprar-ahora \$\{CLASES_BOTON\} bg-\[#1D4ED8\] text-white hover:bg-\[#1E40AF\]/)
+  assert.match(tarjeta, /add-to-cart \$\{CLASES_BOTON\} bg-stone-200 text-black hover:bg-stone-300/)
+  assert.match(tarjeta, />Comprar ahora<\/button>/)
+  assert.match(tarjeta, />Agregar al carrito<\/button>/)
+  assert.ok(tarjeta.indexOf('Comprar ahora</button>') < tarjeta.indexOf('Agregar al carrito</button>'))
 })
 
-test('la elevación al pasar el cursor usa transform y no cambia el layout', () => {
-  assert.match(css, /\.tarjeta-producto:hover[\s\S]*?transform:\s*translateY\(-2px\)/)
+test('los botones miden al menos 44 px de alto y se apilan o se ponen en fila según el ancho de la tarjeta', () => {
+  assert.match(js, /const CLASES_BOTON = '[^']*min-h-11/)
+  assert.match(js, /flex flex-col @\[19rem\]:flex-row gap-2/)
+})
+
+test('"Comprar ahora" agrega la pieza, abre el carrito y lleva al correo del pago', () => {
+  const funcion = js.slice(js.indexOf('function comprarAhora'), js.indexOf('function gtagEvent'))
+  assert.match(funcion, /addToCart\(nombre, precio, imagen, descripcion, color\)/)
+  assert.match(funcion, /openCart\(\)/)
+  assert.match(funcion, /cartEmail\?\.scrollIntoView/)
+  assert.match(js, /closest\('\.comprar-ahora'\)/)
+})
+
+test('un producto agotado conserva ambos botones deshabilitados para no romper la alineación', () => {
+  const tarjeta = js.slice(js.indexOf('function renderProductCard'), js.indexOf('function renderEstrellas'))
+  assert.equal((tarjeta.match(/\$\{agotado \? ' disabled' : ''\}/g) || []).length, 2)
+  assert.match(js, /disabled:opacity-50 disabled:cursor-not-allowed/)
 })
 
 test('el catálogo, los tipos, el CMS y la ficha ya no tienen días de elaboración', () => {

@@ -49,8 +49,8 @@ test('cada tarjeta tiene "Comprar ahora" (azul, texto blanco) y "Agregar al carr
   assert.match(tarjeta, /comprar-ahora \$\{CLASES_BOTON\} bg-\[#1D4ED8\] text-white hover:bg-\[#1E40AF\]/)
   assert.match(tarjeta, /add-to-cart \$\{CLASES_BOTON\} bg-stone-200 text-black hover:bg-stone-300/)
   assert.match(tarjeta, />Comprar ahora<\/button>/)
-  assert.match(tarjeta, />Agregar al carrito<\/button>/)
-  assert.ok(tarjeta.indexOf('Comprar ahora</button>') < tarjeta.indexOf('Agregar al carrito</button>'))
+  assert.match(tarjeta, /conIcono\('Agregar al carrito'\)\}<\/button>/)
+  assert.ok(tarjeta.indexOf('Comprar ahora</button>') < tarjeta.indexOf("conIcono('Agregar al carrito')"))
 })
 
 test('los botones miden al menos 44 px de alto y se apilan o se ponen en fila según el ancho de la tarjeta', () => {
@@ -94,7 +94,7 @@ test('modal: sin reseñas, barra inferior fija con precio a la izquierda y botó
   assert.match(barra, /justify-between/)
   assert.match(barra, /font-heading text-xl sm:text-2xl leading-none tracking-tight/)
   assert.match(barra, /bg-\[#1D4ED8\] text-white hover:bg-\[#1E40AF\]/)
-  assert.match(barra, />Agregar al carrito</)
+  assert.match(barra, /<span>Agregar al carrito<\/span>/)
 })
 
 test('icono del carrito: carrito de supermercado (ruedas), no bolsa', () => {
@@ -102,4 +102,17 @@ test('icono del carrito: carrito de supermercado (ruedas), no bolsa', () => {
   const boton = html.slice(html.indexOf('id="cart-btn"'), html.indexOf('id="cart-count"'))
   assert.match(boton, /<circle[^>]*cx="9"[\s\S]*<circle[^>]*cx="17"/)
   assert.doesNotMatch(boton, /M21 8a2 2/)
+})
+
+test('botones "Agregar" llevan el icono de carrito con "+" antes del texto', () => {
+  assert.match(js, /const ICONO_CARRITO_MAS = '<svg[^']*M12\.5 8\.5v4M10\.5 10\.5h4/)
+  assert.match(js, /\$\{conIcono\('Agregar al carrito'\)\}<\/button>/)
+  assert.match(js, /productModalAdd\.innerHTML = agotado \? 'Agotado' : conIcono\('Agregar al carrito'\)/)
+  assert.match(js, /\$\{conIcono\('Agregar'\)\}/)
+  assert.match(html, /id="product-modal-add"[^>]*>\s*<svg[\s\S]*?<\/svg><span>Agregar al carrito<\/span>/)
+})
+
+test('carrito: "Pagar ahora" azul con texto blanco; sugeridos en gris con texto negro', () => {
+  assert.match(html, /id="checkout-btn" class="[^"]*bg-\[#1D4ED8\] text-white hover:bg-\[#1E40AF\]/)
+  assert.match(js, /class="crossell-add [^"]*bg-stone-200 text-black[^"]*hover:bg-stone-300/)
 })

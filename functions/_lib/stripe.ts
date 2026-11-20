@@ -20,6 +20,8 @@ export interface SesionStripe {
   id: string
   url?: string | null
   payment_status?: string
+  created?: number
+  amount_total?: number | null
   metadata?: Record<string, string> | null
   customer_details?: { email?: string | null } | null
   shipping_details?: DetalleEnvioStripe | null

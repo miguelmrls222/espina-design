@@ -386,24 +386,72 @@
         </section>
 
         <!-- GRACIAS -->
-        <section id="page-gracias" class="page-section min-h-screen px-6 pb-16 hidden">
-          <div class="max-w-lg mx-auto text-center">
-            <div class="w-16 h-16 mx-auto mb-6 rounded-full bg-green-100 flex items-center justify-center">
-              <svg class="w-8 h-8 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
+        <section id="page-gracias" class="page-section min-h-screen px-4 sm:px-6 pb-28 hidden">
+          <div class="max-w-lg mx-auto">
+            <div class="text-center">
+              <div class="w-14 h-14 mx-auto mb-5 rounded-full bg-green-100 flex items-center justify-center">
+                <svg class="w-7 h-7 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <h1 class="font-heading text-2xl tracking-widest uppercase mb-2">¡Gracias por tu compra!</h1>
+              <p class="font-body text-sm text-gray-600 leading-relaxed mb-8">Recibirás un correo con los detalles de tu pedido y el número de seguimiento.</p>
             </div>
-            <h1 class="font-heading text-2xl tracking-widest uppercase mb-3">¡Gracias por tu compra!</h1>
-            <p class="font-body text-sm text-gray-600 leading-relaxed mb-2">
-              Recibirás un correo con los detalles de tu pedido y el número de seguimiento.
-            </p>
-            <p id="order-email" class="font-body text-xs text-gray-500 mb-1"></p>
-            <p id="order-ref" class="font-body text-xs text-gray-400 mb-8"></p>
-            <div class="border-t border-gray-100 pt-8 mb-8">
-              <h2 class="font-heading text-sm tracking-widest uppercase mb-6">Tu pedido</h2>
+
+            <!-- Datos de la orden -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-4 sm:p-5 mb-5">
+              <h2 class="font-heading text-xs tracking-widest uppercase text-gray-500 mb-3">Datos del pedido</h2>
+              <dl class="divide-y divide-gray-100 font-body text-sm">
+                <div id="order-folio-row" class="hidden items-center justify-between gap-3 py-2.5">
+                  <dt class="text-gray-500 shrink-0">Folio</dt>
+                  <dd class="flex items-center gap-2 min-w-0">
+                    <span id="order-folio" class="font-heading tracking-wider tabular-nums break-all text-right"></span>
+                    <button id="order-copy" type="button" class="shrink-0 min-h-8 px-2.5 rounded-full bg-stone-200 text-black font-heading text-[10px] tracking-widest uppercase hover:bg-stone-300 active:scale-[0.98] transition-all" aria-label="Copiar folio">Copiar</button>
+                  </dd>
+                </div>
+                <div id="order-fecha-row" class="hidden items-center justify-between gap-3 py-2.5">
+                  <dt class="text-gray-500 shrink-0">Fecha</dt>
+                  <dd id="order-fecha" class="text-right tabular-nums"></dd>
+                </div>
+                <div id="order-email-row" class="hidden items-center justify-between gap-3 py-2.5">
+                  <dt class="text-gray-500 shrink-0">Correo</dt>
+                  <dd id="order-email" class="text-right break-all min-w-0"></dd>
+                </div>
+                <div id="order-destino-row" class="hidden items-center justify-between gap-3 py-2.5">
+                  <dt class="text-gray-500 shrink-0">Envío a</dt>
+                  <dd id="order-destino" class="text-right"></dd>
+                </div>
+              </dl>
+              <span id="order-copy-status" class="sr-only" role="status" aria-live="polite"></span>
+            </div>
+
+            <!-- Tu pedido -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-4 sm:p-5 mb-5">
+              <h2 class="font-heading text-xs tracking-widest uppercase text-gray-500 mb-4">Tu pedido</h2>
               <div id="gracias-items" class="space-y-4 text-left"></div>
+              <dl class="mt-5 pt-4 border-t border-gray-100 space-y-2 font-body text-sm tabular-nums">
+                <div class="flex justify-between gap-3"><dt class="text-gray-500">Subtotal</dt><dd id="gracias-subtotal"></dd></div>
+                <div class="flex justify-between gap-3"><dt class="text-gray-500">Envío</dt><dd id="gracias-envio"></dd></div>
+                <div class="flex justify-between gap-3 pt-2 border-t border-gray-100 font-heading tracking-wide text-base"><dt>Total pagado</dt><dd id="gracias-total"></dd></div>
+              </dl>
             </div>
-            <div id="gracias-upsell" class="border-t border-gray-100 pt-8 mb-8">
+
+            <!-- Próximos pasos -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-4 sm:p-5 mb-5">
+              <h2 class="font-heading text-xs tracking-widest uppercase text-gray-500 mb-4">Próximos pasos</h2>
+              <ol class="space-y-4 font-body text-sm">
+                <li class="flex gap-3"><span class="w-6 h-6 shrink-0 rounded-full bg-black text-white font-heading text-[11px] flex items-center justify-center">1</span><div><p class="font-heading text-xs tracking-widest uppercase">Confirmación</p><p class="text-gray-500 mt-0.5">Te enviamos un correo con el resumen de tu compra.</p></div></li>
+                <li class="flex gap-3"><span class="w-6 h-6 shrink-0 rounded-full bg-black text-white font-heading text-[11px] flex items-center justify-center">2</span><div><p class="font-heading text-xs tracking-widest uppercase">Preparación artesanal</p><p class="text-gray-500 mt-0.5">Preparamos tu pieza a mano, con cuidado.</p></div></li>
+                <li class="flex gap-3"><span class="w-6 h-6 shrink-0 rounded-full bg-black text-white font-heading text-[11px] flex items-center justify-center">3</span><div><p class="font-heading text-xs tracking-widest uppercase">Envío y seguimiento</p><p class="text-gray-500 mt-0.5">Te mandamos la guía por correo para seguir tu paquete.</p></div></li>
+              </ol>
+            </div>
+
+            <!-- Navegación -->
+            <div class="flex flex-col sm:flex-row gap-3 mb-10">
+              <a href="/tienda" data-nav class="flex-1 min-h-11 flex items-center justify-center font-heading text-xs tracking-widest uppercase bg-black text-white rounded-xl px-6 py-3 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] transition-all duration-300">Volver a la tienda</a>
+              <a href="https://wa.me/526624142998" target="_blank" rel="noopener" class="flex-1 min-h-11 flex items-center justify-center font-heading text-xs tracking-widest uppercase border-2 border-black text-black bg-transparent rounded-xl px-6 py-3 hover:bg-black hover:text-white active:scale-[0.98] transition-all duration-300">¿Dudas? WhatsApp</a>
+            </div>
+
+            <!-- También te puede interesar -->
+            <div id="gracias-upsell" class="pt-8 border-t border-gray-200 mb-6">
               <h2 class="font-heading text-sm tracking-widest uppercase mb-6 text-center">También te puede interesar</h2>
               <div class="flex items-center gap-4 bg-[#F9F9F9] p-4 rounded">
                 <div class="w-20 h-20 bg-[#F5F5F5] flex-shrink-0 overflow-hidden">
@@ -411,51 +459,12 @@
                 </div>
                 <div class="flex-1 min-w-0 text-left">
                   <p class="font-heading text-xs tracking-widest uppercase">Tarjetero Cactus</p>
-                  <p class="font-body text-sm text-gray-500 mt-0.5">$489 MXN</p>
+                  <p class="font-body text-sm text-gray-500 mt-0.5 tabular-nums">$489 MXN</p>
                   <p class="font-body text-[11px] text-gray-400 mt-0.5 leading-tight">Ideal para cargar ligero, práctico y con mucho estilo.</p>
                 </div>
-                <a href="/tienda" data-nav class="flex-shrink-0 font-heading text-[10px] tracking-widest uppercase bg-black text-white rounded-xl px-4 py-2 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] transition-all duration-300">Ver</a>
+                <a href="/tienda" data-nav class="flex-shrink-0 min-h-9 flex items-center font-heading text-[10px] tracking-widest uppercase bg-black text-white rounded-xl px-4 py-2 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] transition-all duration-300">Ver</a>
               </div>
             </div>
-            <div class="border-t border-gray-100 pt-8 mb-8">
-              <div class="flex items-start justify-between max-w-xs mx-auto">
-                <div class="flex flex-col items-center text-center flex-1">
-                  <div class="w-10 h-10 rounded-full border-2 border-black flex items-center justify-center bg-white">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                  </div>
-                  <p class="font-heading text-[10px] tracking-widest uppercase mt-2">Ordenado</p>
-                </div>
-                <div class="flex-1 flex items-center justify-center pt-4">
-                  <div class="h-px w-full bg-gray-300"></div>
-                </div>
-                <div class="flex flex-col items-center text-center flex-1">
-                  <div class="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center bg-white">
-                    <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                  </div>
-                  <p class="font-heading text-[10px] tracking-widest uppercase mt-2">En camino</p>
-                <p class="font-body text-[10px] text-gray-500 mt-0.5">2-3 días</p>
-                </div>
-                <div class="flex-1 flex items-center justify-center pt-4">
-                  <div class="h-px w-full bg-gray-300"></div>
-                </div>
-                <div class="flex flex-col items-center text-center flex-1">
-                  <div class="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center bg-white">
-                    <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                  </div>
-                  <p class="font-heading text-[10px] tracking-widest uppercase mt-2">Entregado</p>
-                <p class="font-body text-[10px] text-gray-500 mt-0.5">4-6 días</p>
-                </div>
-              </div>
-            </div>
-            <p class="font-body text-sm text-gray-500 leading-relaxed mb-8">
-              ¿Tienes dudas sobre tu pedido? Escríbenos por WhatsApp y te atenderemos a la brevedad.
-            </p>
-            <a href="https://wa.me/526624142998" target="_blank" class="inline-block font-heading text-xs tracking-widest uppercase border-2 border-black text-black bg-transparent rounded-xl px-8 py-3 hover:bg-black hover:text-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
-              Contactar por WhatsApp
-            </a>
-            <a href="/tienda" data-nav class="block font-heading text-xs tracking-widest uppercase mt-6 text-gray-500 hover:text-black transition-colors">
-              Seguir comprando
-            </a>
           </div>
         </section>
 

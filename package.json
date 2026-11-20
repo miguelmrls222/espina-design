@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json",
     "test": "tsx --test tests/*.test.ts",
-    "dev:pages": "vite build && wrangler pages dev dist"
+    "dev:pages": "vite build && wrangler pages dev dist",
+    "imagenes": "node scripts/optimizar-imagenes.mjs"
   },
   "devDependencies": {
     "vite": "^8.0.12",

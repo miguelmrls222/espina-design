@@ -1,3 +1,4 @@
+import { revisarImagen } from './tipo-imagen.mjs'
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -39,6 +40,8 @@ function leerProducto(nombreArchivo) {
     const ruta = join(raiz, 'public', decodeURIComponent(foto))
     if (!existsSync(ruta)) {
       errores.push(`${nombreArchivo}: la imagen ${foto} no existe en public/ (revisa mayúsculas, espacios y extensión)`)
+    } else if (revisarImagen(foto, readFileSync(ruta).subarray(0, 32))) {
+      errores.push(`${nombreArchivo}: ${revisarImagen(foto, readFileSync(ruta).subarray(0, 32))}`)
     } else if (statSync(ruta).size > LIMITE_AVISO_BYTES) {
       console.warn(`Aviso: ${foto} pesa ${(statSync(ruta).size / 1048576).toFixed(1)} MB; conviene reducirla a menos de 0.5 MB (ver docs/GUIA-IMAGENES.md)`)
     }

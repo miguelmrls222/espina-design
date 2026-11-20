@@ -3,9 +3,11 @@ import {
   LINEAS_MAXIMAS,
   MONEDA,
   buscarProductoPorSlug,
+  cantidadDisponible,
   calcularTotales,
   estaDisponible,
   isPromoActiva,
+  limiteCompra,
   precioUnitario,
 } from '../../src/data/pricing'
 import type { Producto } from '../../src/data/types'
@@ -58,6 +60,19 @@ function parsearLineas(valor: unknown): LineaPedido[] {
       throw new AppError(400, 'cantidad_excedida', `Máximo ${CANTIDAD_MAXIMA} piezas por artículo.`)
     }
     lineas.set(clave, { producto, color: colorFinal, cantidad: total })
+  }
+  const porProducto = new Map<string, number>()
+  for (const linea of lineas.values()) {
+    const acumulado = (porProducto.get(linea.producto.slug) ?? 0) + linea.cantidad
+    porProducto.set(linea.producto.slug, acumulado)
+    if (acumulado > limiteCompra(linea.producto)) {
+      const quedan = cantidadDisponible(linea.producto) ?? CANTIDAD_MAXIMA
+      throw new AppError(
+        409,
+        'stock_insuficiente',
+        `Solo quedan ${quedan} ${quedan === 1 ? 'pieza' : 'piezas'} de ${linea.producto.nombre}. Ajusta tu carrito e intenta de nuevo.`,
+      )
+    }
   }
   return [...lineas.values()]
 }

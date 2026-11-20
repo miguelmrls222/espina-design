@@ -67,6 +67,7 @@ collections:
           - { label: "Gris", value: "gris" }
           - { label: "Vino", value: "vino" }
           - { label: "Café oscuro", value: "cafe oscuro" }
+          - { label: "Negro", value: "negro" }
 
       - label: "Descripción"
         name: "descripcion"
@@ -82,6 +83,14 @@ collections:
           - { label: "Mochilas y Bolsas", value: "mochilas" }
           - { label: "Accesorios", value: "accesorios" }
 
+      - label: "Piezas disponibles"
+        name: "cantidad_disponible"
+        widget: "number"
+        value_type: "int"
+        min: 0
+        required: false
+        hint: "Cuántas piezas tienes. Con 0 el producto se muestra como Agotado y no se puede comprar; el cliente nunca podrá pedir más de las que pongas. Déjalo vacío para no limitar."
+
       - label: "Disponibilidad"
         name: "stock"
         widget: "select"
@@ -90,6 +99,7 @@ collections:
           - { label: "Disponible", value: "disponible" }
           - { label: "Agotado", value: "agotado" }
           - { label: "Bajo pedido", value: "bajo-pedido" }
+        hint: "Elige Agotado para bloquear la compra sin importar las piezas disponibles."
 
       - label: "Materiales (ficha del producto)"
         name: "materiales"

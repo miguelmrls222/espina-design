@@ -1,68 +1,205 @@
-// Abandoned Cart Recovery Worker — ejecutar cada 60 minutos
-// Deploy como Worker separado con wrangler deploy, NO como Pages Function
+// Recuperación de carritos abandonados (WhatsApp + correo) — Cron Worker
+// Deploy como Worker separado (wrangler deploy en workers/), NO como Pages Function.
+//
+// Fuente de verdad del carrito: la Checkout Session de Stripe. create-checkout la crea con
+// status "open", el teléfono en metadata.telefono y el carrito en metadata.cart. Mientras
+// siga "open" el pedido no se completó; al pagar pasa a "complete" y al vencer a "expired".
+// KV (ABANDONED_CARTS) guarda solo el estado de los recordatorios: wa:<id> y sent:<id>.
+//
+// Secretos: STRIPE_SECRET_KEY, BREVO_API_KEY, WHATSAPP_TOKEN, WHATSAPP_PHONE_NUMBER_ID
+// Variables: WHATSAPP_TEMPLATE (default carrito_abandonado), WHATSAPP_LANG (default es_MX)
+// Opcional: CRON_SECRET para disparar manualmente con el header X-Cron-Secret.
 
-// KV namespace: ABANDONED_CARTS
-// Secrets: STRIPE_SECRET_KEY, BREVO_API_KEY
+const MINUTOS_ESPERA = 60
+const VENTANA_HORAS = 24
+const SITIO = 'https://espinadesign.com'
+const GRAPH_API = 'https://graph.facebook.com/v21.0'
+const MAX_INTENTOS_WHATSAPP = 3
+const TTL_ESTADO_SEGUNDOS = 7 * 86400
+const ZONA_UTC_OFFSET_HORAS = -7
+const HORA_INICIO_ENVIOS = 9
+const HORA_FIN_ENVIOS = 21
+const TIMEOUT_MS = 8000
 
 export default {
   async scheduled(event, env, ctx) {
-    await processAbandoned(env)
+    ctx.waitUntil(procesarCarritos(env))
   },
 
   async fetch(request, env) {
-    if (request.headers.get('X-Cron-Secret') === env.CRON_SECRET) {
-      await processAbandoned(env)
+    const secreto = env.CRON_SECRET
+    if (secreto && request.headers.get('X-Cron-Secret') === secreto) {
+      await procesarCarritos(env)
       return new Response('OK')
     }
     return new Response('Unauthorized', { status: 401 })
   },
 }
 
-async function processAbandoned(env) {
-  const stripeKey = env.STRIPE_SECRET_KEY
-  const brevoKey = env.BREVO_API_KEY
-  if (!stripeKey || !brevoKey) return
+async function procesarCarritos(env) {
+  if (!env.STRIPE_SECRET_KEY) return
 
-  const MINUTOS_ESPERA = 0
   const ahora = Math.floor(Date.now() / 1000)
-  const desde = ahora - 86400 // últimas 24h
+  const sesiones = await listarSesiones(env.STRIPE_SECRET_KEY, ahora - VENTANA_HORAS * 3600, ahora)
+  const compradores = identificadoresDeCompras(sesiones)
+  const dentroDeHorario = esHorarioDeEnvio(ahora * 1000)
 
-  let hasMore = true
-  let startingAfter = null
+  for (const sesion of sesiones) {
+    if (sesion.status !== 'open' || !sesion.metadata?.cart) continue
+    if ((ahora - sesion.created) / 60 < MINUTOS_ESPERA) continue
 
-  while (hasMore) {
-    let url = `https://api.stripe.com/v1/checkout/sessions?limit=100&created[gte]=${desde}&created[lte]=${ahora}&expand[]=data.line_items`
-    if (startingAfter) url += `&starting_after=${startingAfter}`
+    const email = normalizarEmail(sesion.customer_email)
+    const telefono = normalizarTelefonoMx(sesion.metadata?.telefono)
+    if ((email && compradores.has(email)) || (telefono && compradores.has(telefono))) continue
 
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${stripeKey}` },
-    })
-    if (!res.ok) break
-
-    const body = await res.json()
-    for (const session of body.data || []) {
-      // Solo sesiones abiertas (no pagadas) con email
-      if (session.status !== 'open') continue
-      if (!session.customer_email) continue
-      if (!session.metadata?.cart) continue
-
-      const creadaEn = session.created
-      const edadMinutos = (ahora - creadaEn) / 60
-      if (edadMinutos < MINUTOS_ESPERA) continue
-
-      // Verificar si ya enviamos email
-      const yaEnviado = await env.ABANDONED_CARTS?.get(`sent:${session.id}`)
-      if (yaEnviado) continue
-
-      // Enviar email via Brevo
-      const ok = await enviarEmailRecuperacion(session, brevoKey)
-      if (ok) {
-        await env.ABANDONED_CARTS?.put(`sent:${session.id}`, '1', { expirationTtl: 604800 })
-      }
+    if (telefono && dentroDeHorario && env.WHATSAPP_TOKEN && env.WHATSAPP_PHONE_NUMBER_ID) {
+      await recordarPorWhatsApp(env, sesion, telefono)
     }
+    if (email && env.BREVO_API_KEY) {
+      await recordarPorCorreo(env, sesion)
+    }
+  }
+}
 
-    hasMore = body.has_more
-    if (body.data?.length) startingAfter = body.data[body.data.length - 1].id
+async function listarSesiones(stripeKey, desde, hasta) {
+  const sesiones = []
+  let despuesDe = null
+  for (;;) {
+    let url = `https://api.stripe.com/v1/checkout/sessions?limit=100&created[gte]=${desde}&created[lte]=${hasta}`
+    if (despuesDe) url += `&starting_after=${despuesDe}`
+    const res = await fetchConTiempo(url, { headers: { Authorization: `Bearer ${stripeKey}` } })
+    if (!res || !res.ok) break
+    const cuerpo = await res.json()
+    const datos = cuerpo.data || []
+    sesiones.push(...datos)
+    if (!cuerpo.has_more || !datos.length) break
+    despuesDe = datos[datos.length - 1].id
+  }
+  return sesiones
+}
+
+// Quien ya completó otra compra en la ventana no debe recibir recordatorio por un carrito anterior.
+function identificadoresDeCompras(sesiones) {
+  const ids = new Set()
+  for (const s of sesiones) {
+    if (s.status !== 'complete') continue
+    const email = normalizarEmail(s.customer_email)
+    const telefono = normalizarTelefonoMx(s.metadata?.telefono)
+    if (email) ids.add(email)
+    if (telefono) ids.add(telefono)
+  }
+  return ids
+}
+
+function esHorarioDeEnvio(ms) {
+  const hora = new Date(ms + ZONA_UTC_OFFSET_HORAS * 3600 * 1000).getUTCHours()
+  return hora >= HORA_INICIO_ENVIOS && hora < HORA_FIN_ENVIOS
+}
+
+function normalizarEmail(valor) {
+  return typeof valor === 'string' && valor.includes('@') ? valor.trim().toLowerCase() : ''
+}
+
+// Devuelve 52 + 10 dígitos (formato aceptado por WhatsApp Cloud API) o '' si no es un número mexicano válido.
+function normalizarTelefonoMx(valor) {
+  let digitos = String(valor || '').replace(/\D/g, '')
+  if (digitos.length === 13 && digitos.startsWith('521')) digitos = '52' + digitos.slice(3)
+  if (digitos.length === 10) digitos = '52' + digitos
+  return /^52\d{10}$/.test(digitos) ? digitos : ''
+}
+
+async function fetchConTiempo(url, init) {
+  const controlador = new AbortController()
+  const temporizador = setTimeout(() => controlador.abort(), TIMEOUT_MS)
+  try {
+    return await fetch(url, { ...init, signal: controlador.signal })
+  } catch {
+    return null
+  } finally {
+    clearTimeout(temporizador)
+  }
+}
+
+function leerCarrito(sesion) {
+  try {
+    const items = JSON.parse(sesion.metadata?.cart || '[]')
+    return Array.isArray(items) ? items : []
+  } catch {
+    return []
+  }
+}
+
+function resumenCarrito(sesion) {
+  const texto = leerCarrito(sesion)
+    .map(i => `${i.n}${i.col ? ` (${i.col})` : ''} x${i.c || 1}`)
+    .join(', ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  return texto.length > 200 ? `${texto.slice(0, 197)}...` : texto || 'tus productos'
+}
+
+// ---------- WhatsApp (Meta Cloud API, plantilla aprobada) ----------
+
+async function recordarPorWhatsApp(env, sesion, telefono) {
+  if (!env.ABANDONED_CARTS) return
+  const clave = `wa:${sesion.id}`
+  const previo = JSON.parse((await env.ABANDONED_CARTS.get(clave)) || 'null')
+  if (previo && (previo.estado === 'enviado' || previo.estado === 'fallido')) return
+  const intentos = (previo?.intentos || 0) + 1
+  if (intentos > MAX_INTENTOS_WHATSAPP) return
+
+  await env.ABANDONED_CARTS.put(clave, JSON.stringify({ estado: 'enviando', intentos }), { expirationTtl: TTL_ESTADO_SEGUNDOS })
+  const resultado = await enviarWhatsApp(env, { telefono, resumen: resumenCarrito(sesion), sessionId: sesion.id })
+  const estado = resultado.ok ? 'enviado' : resultado.temporal && intentos < MAX_INTENTOS_WHATSAPP ? 'reintentar' : 'fallido'
+  const registro = { estado, intentos, enviadoEn: resultado.ok ? Date.now() : undefined, error: resultado.ok ? undefined : resultado.detalle }
+  await env.ABANDONED_CARTS.put(clave, JSON.stringify(registro), { expirationTtl: TTL_ESTADO_SEGUNDOS })
+  if (!resultado.ok) console.warn(`WhatsApp ${sesion.id}: ${estado} (${resultado.detalle})`)
+}
+
+export async function enviarWhatsApp(env, { telefono, resumen, sessionId }) {
+  const payload = {
+    messaging_product: 'whatsapp',
+    to: telefono,
+    type: 'template',
+    template: {
+      name: env.WHATSAPP_TEMPLATE || 'carrito_abandonado',
+      language: { code: env.WHATSAPP_LANG || 'es_MX' },
+      components: [
+        { type: 'body', parameters: [{ type: 'text', text: resumen }] },
+        { type: 'button', sub_type: 'url', index: '0', parameters: [{ type: 'text', text: sessionId }] },
+      ],
+    },
+  }
+  const peticion = {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', Authorization: `Bearer ${env.WHATSAPP_TOKEN}` },
+    body: JSON.stringify(payload),
+  }
+  const url = `${GRAPH_API}/${env.WHATSAPP_PHONE_NUMBER_ID}/messages`
+
+  let ultimo = { ok: false, temporal: true, detalle: 'sin respuesta' }
+  for (let intento = 0; intento < 2; intento++) {
+    if (intento) await new Promise(r => setTimeout(r, 1000))
+    const res = await fetchConTiempo(url, peticion)
+    if (!res) {
+      ultimo = { ok: false, temporal: true, detalle: 'sin respuesta de WhatsApp' }
+      continue
+    }
+    if (res.ok) return { ok: true }
+    const temporal = res.status >= 500 || res.status === 429
+    ultimo = { ok: false, temporal, detalle: `HTTP ${res.status}` }
+    if (!temporal) break
+  }
+  return ultimo
+}
+
+// ---------- Correo (Brevo) ----------
+
+async function recordarPorCorreo(env, sesion) {
+  if (!env.ABANDONED_CARTS) return
+  if (await env.ABANDONED_CARTS.get(`sent:${sesion.id}`)) return
+  if (await enviarEmailRecuperacion(sesion, env.BREVO_API_KEY)) {
+    await env.ABANDONED_CARTS.put(`sent:${sesion.id}`, '1', { expirationTtl: TTL_ESTADO_SEGUNDOS })
   }
 }
 

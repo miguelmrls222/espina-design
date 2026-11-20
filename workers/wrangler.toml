@@ -4,8 +4,12 @@ compatibility_date = "2026-05-24"
 workers_dev = true
 
 [triggers]
-crons = ["0 * * * *"]
+crons = ["*/15 * * * *"]
 
 [[kv_namespaces]]
 binding = "ABANDONED_CARTS"
 id = "f40bfc293df9405698bced289901d1c4"
+
+[vars]
+WHATSAPP_TEMPLATE = "carrito_abandonado"
+WHATSAPP_LANG = "es_MX"

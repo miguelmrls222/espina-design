@@ -143,6 +143,7 @@ function renderDestacados() {
 
 const ICONO_SIN_FOTO = '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg></div>'
 
+const CLASES_BOTON = 'w-full @[19rem]:w-auto @[19rem]:flex-1 min-h-11 rounded-full px-3 py-2 font-heading text-[13px] leading-tight text-center flex items-center justify-center active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:shadow-none'
 const MATERIAL_TARJETA = 'Cuero vacuno'
 
 function renderGaleriaTarjeta(p, fotos, carousel) {
@@ -185,6 +186,7 @@ function renderProductCard(p, index, opts = {}) {
   const agotado = p.stock === 'agotado'
   const stockBajo = !agotado && typeof p.stock === 'number' && p.stock <= 3
   const { carousel = false } = opts
+  const datosProducto = `data-nombre="${p.nombre}" data-precio="${p.precio}" data-imagen="${img}" data-descripcion="${p.descripcion || ''}" data-color="${p.colores?.[0] || ''}"`
 
   const wrapperClass = carousel
     ? 'flex-shrink-0 w-[240px] sm:w-[280px] snap-start'
@@ -192,8 +194,8 @@ function renderProductCard(p, index, opts = {}) {
 
   return `
     <div class="${wrapperClass} min-w-0 ${agotado ? 'opacity-60' : ''}">
-      <article class="tarjeta-producto h-full flex flex-col rounded-3xl bg-white p-3 sm:p-4">
-        <div class="galeria aspect-[4/5] bg-[#F5F5F5] relative cursor-pointer open-detail rounded-2xl overflow-hidden" data-index="${index}" tabindex="-1">
+      <article class="tarjeta-producto @container h-full flex flex-col rounded-3xl bg-white p-2.5 sm:p-3">
+        <div class="galeria aspect-square bg-[#F5F5F5] relative cursor-pointer open-detail rounded-2xl overflow-hidden" data-index="${index}" tabindex="-1">
           ${renderGaleriaTarjeta(p, fotos, carousel)}
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
           ${stockBajo ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 rounded-full font-heading">Solo quedan ' + p.stock + '</span>' : ''}
@@ -202,25 +204,22 @@ function renderProductCard(p, index, opts = {}) {
             <span class="font-heading text-[10px] tracking-wide text-green-800 font-semibold whitespace-nowrap" aria-hidden="true"><span class="sm:hidden">1 año</span><span class="hidden sm:inline">Garantía de 1 año</span></span>
           </div>
         </div>
-        <div class="pt-4 px-1 flex-1 flex flex-col">
+        <div class="pt-3 px-1 flex-1 flex flex-col">
           <h3 class="tarjeta-titulo font-heading text-base sm:text-lg cursor-pointer open-detail" title="${p.nombre}" data-index="${index}" tabindex="0" role="button" aria-label="Ver detalle de ${p.nombre}">${p.nombre}</h3>
           <p data-zona="subtitulo" class="tarjeta-subtitulo font-body text-sm text-gray-500 mt-1">${MATERIAL_TARJETA}</p>
-          <div data-zona="colores" class="flex items-center gap-1.5 mt-2.5 h-3.5">
+          <div data-zona="colores" class="flex items-center gap-1.5 mt-2 h-3.5">
             ${(p.colores || []).map(c => `<span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color:${colorMap[c] || '#ccc'}" title="${c}"></span>`).join('')}
           </div>
-          <div class="mt-auto pt-4">
-            <p data-zona="precio" class="font-heading text-2xl sm:text-[28px] leading-none tracking-tight whitespace-nowrap">$${p.precio.toLocaleString('es-MX')}<span class="font-body text-xs text-gray-500 ml-1 tracking-normal">MXN</span></p>
-            ${agotado
-              ? '<button type="button" disabled class="w-full mt-3 bg-gray-200 text-gray-500 rounded-full px-6 py-3 font-heading text-sm cursor-not-allowed">Agotado</button>'
-              : `<button type="button" class="add-to-cart w-full mt-3 bg-black text-white rounded-full px-6 py-3 font-heading text-sm flex items-center justify-center hover:bg-gray-800 hover:shadow-lg active:scale-[0.98] transition-all duration-300 shadow-md"
-              data-nombre="${p.nombre}"
-              data-precio="${p.precio}"
-              data-imagen="${img}"
-              data-descripcion="${p.descripcion || ''}"
-              data-color="${p.colores?.[0] || ''}"
-              aria-label="Comprar ${p.nombre}">
-              Comprar
-            </button>`}
+          <div class="mt-auto pt-3">
+            <p data-zona="precio" class="font-heading text-xl sm:text-2xl leading-none tracking-tight whitespace-nowrap">$${p.precio.toLocaleString('es-MX')}<span class="font-body text-xs text-gray-500 ml-1 tracking-normal">MXN</span></p>
+            <div data-zona="acciones" class="mt-2.5 flex flex-col @[19rem]:flex-row gap-2">
+              <button type="button" class="comprar-ahora ${CLASES_BOTON} bg-[#1D4ED8] text-white hover:bg-[#1E40AF] shadow-sm hover:shadow-md"${agotado ? ' disabled' : ''}
+                ${datosProducto}
+                aria-label="Comprar ahora ${p.nombre}">Comprar ahora</button>
+              <button type="button" class="add-to-cart ${CLASES_BOTON} bg-stone-200 text-black hover:bg-stone-300"${agotado ? ' disabled' : ''}
+                ${datosProducto}
+                aria-label="Agregar ${p.nombre} al carrito">Agregar al carrito</button>
+            </div>
           </div>
         </div>
       </article>
@@ -654,6 +653,15 @@ function closeCart() {
   modalClosed(cartPanel)
 }
 
+function comprarAhora(nombre, precio, imagen, descripcion, color) {
+  addToCart(nombre, precio, imagen, descripcion, color)
+  if (cartPanel.style.display !== 'flex') openCart()
+  setTimeout(() => {
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) cartEmail?.focus({ preventScroll: true })
+    cartEmail?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  }, 350)
+}
+
 function gtagEvent(...args) {
   if (typeof gtag === 'function') gtag(...args)
 }
@@ -972,7 +980,7 @@ document.addEventListener('click', e => {
   }
 
   const addBtn = e.target.closest('.add-to-cart')
-  if (addBtn) {
+  if (addBtn && !addBtn.disabled) {
     addToCart(
       addBtn.dataset.nombre,
       parseFloat(addBtn.dataset.precio),
@@ -981,7 +989,18 @@ document.addEventListener('click', e => {
       addBtn.dataset.color || ''
     )
     addBtn.textContent = 'Agregado ✓'
-    setTimeout(() => { addBtn.textContent = 'Comprar' }, 1500)
+    setTimeout(() => { addBtn.textContent = 'Agregar al carrito' }, 1500)
+  }
+
+  const comprarBtn = e.target.closest('.comprar-ahora')
+  if (comprarBtn && !comprarBtn.disabled) {
+    comprarAhora(
+      comprarBtn.dataset.nombre,
+      parseFloat(comprarBtn.dataset.precio),
+      comprarBtn.dataset.imagen,
+      comprarBtn.dataset.descripcion,
+      comprarBtn.dataset.color || ''
+    )
   }
 
   const crossellBtn = e.target.closest('.crossell-add')

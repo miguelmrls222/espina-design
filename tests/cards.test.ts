@@ -49,8 +49,8 @@ test('cada tarjeta tiene "Comprar ahora" (azul, texto blanco) y "Agregar al carr
   assert.match(tarjeta, /comprar-ahora \$\{CLASES_BOTON\} bg-\[#1D4ED8\] text-white hover:bg-\[#1E40AF\]/)
   assert.match(tarjeta, /add-to-cart \$\{CLASES_BOTON\} bg-stone-200 text-black hover:bg-stone-300/)
   assert.match(tarjeta, />Comprar ahora<\/button>/)
-  assert.match(tarjeta, /conIcono\('Agregar al carrito'\)\}<\/button>/)
-  assert.ok(tarjeta.indexOf('Comprar ahora</button>') < tarjeta.indexOf("conIcono('Agregar al carrito')"))
+  assert.match(tarjeta, /conIcono\('Agregar al carrito', [^)]*\)\}<\/button>/)
+  assert.ok(tarjeta.indexOf('Comprar ahora</button>') < tarjeta.indexOf("conIcono('Agregar al carrito'"))
 })
 
 test('los botones miden al menos 44 px de alto y se apilan o se ponen en fila según el ancho de la tarjeta', () => {
@@ -106,7 +106,7 @@ test('icono del carrito: carrito de supermercado (ruedas), no bolsa', () => {
 
 test('botones "Agregar" llevan el icono de carrito con "+" antes del texto', () => {
   assert.match(js, /const ICONO_CARRITO_MAS = '<svg[^']*M12\.5 8\.5v4M10\.5 10\.5h4/)
-  assert.match(js, /\$\{conIcono\('Agregar al carrito'\)\}<\/button>/)
+  assert.match(js, /\$\{conIcono\('Agregar al carrito', [^)]*\)\}<\/button>/)
   assert.match(js, /productModalAdd\.innerHTML = agotado \? 'Agotado' : conIcono\('Agregar al carrito'\)/)
   assert.match(js, /\$\{conIcono\('Agregar'\)\}/)
   assert.match(html, /id="product-modal-add"[^>]*>\s*<svg[\s\S]*?<\/svg><span>Agregar al carrito<\/span>/)
@@ -127,9 +127,9 @@ test('carrito: "Pagar ahora" sin mayúsculas forzadas y "Envío gratis" como tex
   assert.match(js, /envioIcon\.className = 'hidden'/)
 })
 
-test('TIENDA y "Productos más vendidos" comparten el mismo ancho de tarjeta', () => {
-  assert.match(js, /const ANCHO_TARJETA = 'w-\[240px\] sm:w-\[280px\]'/)
-  assert.match(js, /flex-shrink-0 \$\{ANCHO_TARJETA\} snap-start/)
-  assert.match(js, /: ANCHO_TARJETA\b/)
-  assert.match(html, /id="productos-grid" class="grid grid-cols-\[repeat\(auto-fill,240px\)\] sm:grid-cols-\[repeat\(auto-fill,280px\)\] [^"]*items-stretch/)
+test('TIENDA vuelve a la cuadrícula fluida y los botones nunca parten el texto', () => {
+  assert.match(html, /id="productos-grid" class="grid grid-cols-2 lg:grid-cols-3 items-stretch gap-6 sm:gap-8"/)
+  assert.match(js, /\? `flex-shrink-0 \$\{ANCHO_TARJETA\} snap-start`\s*: ''/)
+  assert.match(js, /const CLASES_BOTON = '[^']*whitespace-nowrap/)
+  assert.doesNotMatch(js, /@\[11rem\]:whitespace-nowrap/)
 })

@@ -145,9 +145,9 @@ const ICONO_SIN_FOTO = '<div class="w-full h-full flex items-center justify-cent
 
 // Carrito con "+" (se usa antes del texto en los botones de agregar)
 const ICONO_CARRITO_MAS = '<svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h2.5l2.2 11.2a1.5 1.5 0 0 0 1.5 1.2h9.2a1.5 1.5 0 0 0 1.5-1.1L20.5 7H5.4"/><circle cx="9" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/><path d="M12.5 8.5v4M10.5 10.5h4"/></svg>'
-const conIcono = texto => `${ICONO_CARRITO_MAS}<span class="text-center">${texto}</span>`
+const conIcono = (texto, claseIcono = '') => `${claseIcono ? ICONO_CARRITO_MAS.replace('class="', `class="${claseIcono} `) : ICONO_CARRITO_MAS}<span class="text-center">${texto}</span>`
 
-const CLASES_BOTON = 'w-full min-h-11 gap-1.5 rounded-full px-2 sm:px-3 py-2 font-heading text-[12px] sm:text-[13px] leading-tight @[11rem]:whitespace-nowrap text-center flex items-center justify-center active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:shadow-none'
+const CLASES_BOTON = 'w-full min-h-11 gap-1.5 rounded-full px-0.5 @[7.5rem]:px-1.5 sm:px-3 py-2 font-heading text-[9.5px] @[7.5rem]:text-[11px] @[10rem]:text-[12px] @[13rem]:text-[13px] leading-tight whitespace-nowrap overflow-hidden text-center flex items-center justify-center active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:shadow-none'
 const MATERIAL_TARJETA = 'Cuero vacuno'
 
 function renderGaleriaTarjeta(p, fotos, carousel) {
@@ -184,7 +184,7 @@ function marcarMiniatura(indice) {
   })
 }
 
-// Ancho único de tarjeta: lo comparten "Productos más vendidos" y la TIENDA
+// Ancho de las tarjetas del carrusel "Productos más vendidos" (la TIENDA usa el ancho fluido de su cuadrícula)
 const ANCHO_TARJETA = 'w-[240px] sm:w-[280px]'
 
 function renderProductCard(p, index, opts = {}) {
@@ -197,7 +197,7 @@ function renderProductCard(p, index, opts = {}) {
 
   const wrapperClass = carousel
     ? `flex-shrink-0 ${ANCHO_TARJETA} snap-start`
-    : ANCHO_TARJETA
+    : ''
 
   return `
     <div class="${wrapperClass} min-w-0 ${agotado ? 'opacity-60' : ''}">
@@ -225,7 +225,7 @@ function renderProductCard(p, index, opts = {}) {
                 aria-label="Comprar ahora ${p.nombre}">Comprar ahora</button>
               <button type="button" class="add-to-cart ${CLASES_BOTON} bg-stone-200 text-black hover:bg-stone-300"${agotado ? ' disabled' : ''}
                 ${datosProducto}
-                aria-label="Agregar ${p.nombre} al carrito">${conIcono('Agregar al carrito')}</button>
+                aria-label="Agregar ${p.nombre} al carrito">${conIcono('Agregar al carrito', 'hidden @[10rem]:block')}</button>
             </div>
           </div>
         </div>
@@ -838,7 +838,7 @@ document.addEventListener('click', e => {
       addBtn.dataset.color || ''
     )
     addBtn.textContent = 'Agregado ✓'
-    setTimeout(() => { addBtn.innerHTML = conIcono('Agregar al carrito') }, 1500)
+    setTimeout(() => { addBtn.innerHTML = conIcono('Agregar al carrito', 'hidden @[10rem]:block') }, 1500)
   }
 
   const comprarBtn = e.target.closest('.comprar-ahora')

@@ -1,17 +1,20 @@
 {
-  "precio": 780,
-  "destacado": false,
-  "nombre": "Tarjetero Desert Money Clip",
+  "nombre": "Tarjetero Desierto Money Clip",
   "slug": "tarjetero-dmc",
-  "descripcion": "Tarjetero sencillo y muy práctico. Cuenta con un moneyclip para llevar con seguridad tus billetes o tickets importantes. Capacidad para 12-16 tarjetas y algunos billetes.",
   "fotos": [
-    "/images/products/tarjetero-money-clip.jpg"
+    "/images/products/tarjetero-desierto-moneyclip-1.jpg",
+    "/images/products/tarjetero-desierto-moneyclip-2.jpg",
+    "/images/products/tarjetero-desierto-moneyclip-3.jpg"
   ],
-  "activo": true,
+  "precio": 889,
   "colores": [
     "vino"
   ],
+  "descripcion": "Tarjetero sencillo y muy práctico. Cuenta con un moneyclip para llevar con seguridad tus billetes o tickets importantes. Capacidad para 10-16 tarjetas y algunos billetes.",
   "categoria": "billeteras",
-  "materiales": "Cuero vacuno.",
-  "stock": "disponible"
+  "cantidad_disponible": 1,
+  "stock": "disponible",
+  "materiales": "Cuero vacuno 100%",
+  "destacado": false,
+  "activo": true
 }

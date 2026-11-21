@@ -1,35 +1,23 @@
 {
-  "precio": 589,
-  "destacado": true,
   "nombre": "Tarjetero Cardón",
   "slug": "tarjetero-cardon",
-  "descripcion": "Diseño minimalista, súper práctico para quienes andan ligeros. Especial para tarjetas esenciales y pocos billetes.",
   "fotos": [
-    "/images/products/tarjetero-cardon.jpg"
+    "/images/products/tarjetero-cardon-1.jpg",
+    "/images/products/tarjetero-cardon-2.jpg",
+    "/images/products/tarjetero-cardon-3.jpg",
+    "/images/products/tarjetero-cardon-4.jpg"
   ],
+  "precio": 769,
   "colores": [
-    "verde",
-    "gris",
-    "vino",
-    "cafe oscuro"
+    "verde"
   ],
-  "activo": true,
+  "descripcion": "Diseño minimalista, súper práctico para quienes andan ligeros. Especial para tarjetas esenciales y pocos billetes. Incluye bolígrafo telescópico y repuestos.",
   "categoria": "billeteras",
-  "materiales": "Cuero vegetal 100%",
-  "dimensiones": "10 cm × 7 cm",
+  "cantidad_disponible": 1,
   "stock": "disponible",
-  "resenas": [
-    {
-      "nombre": "Laura P.",
-      "puntuacion": 5,
-      "texto": "Minimalista y de gran calidad. Exactamente lo que buscaba.",
-      "fecha": "Feb 2026"
-    },
-    {
-      "nombre": "Jorge T.",
-      "puntuacion": 4,
-      "texto": "Muy buen producto, el cuero se ve y se siente increíble.",
-      "fecha": "Ene 2026"
-    }
-  ]
+  "materiales": "Cuero vacuno 100%",
+  "destacado": true,
+  "activo": true,
+  "resenas": [],
+  "dimensiones": "10 cm × 7 cm"
 }

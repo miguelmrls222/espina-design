@@ -54,7 +54,7 @@ test('envío gratis cuando el total alcanza el mínimo', async () => {
   restaurar = mock.restaurar
   const respuesta = await onRequest(contexto(peticionJson(URL_CHECKOUT, {
     ...base,
-    items: [{ slug: 'billetera-sahuaro', color: 'gris', cantidad: 3 }],
+    items: [{ slug: 'tarjetero-agave', color: 'gris', cantidad: 3 }], // sin límite de piezas y 3 × precio ≥ mínimo
   }), ENV))
   assert.equal(respuesta.status, 200)
   const params = new URLSearchParams(mock.llamadas.find(l => l.url.endsWith('/checkout/sessions'))?.body)

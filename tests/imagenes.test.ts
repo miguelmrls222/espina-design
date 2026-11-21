@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { readFileSync, readdirSync } from 'node:fs'
 // @ts-expect-error módulo .mjs sin tipos
-import { detectarTipo, revisarImagen } from '../scripts/tipo-imagen.mjs'
+import { componentesJpeg, detectarTipo, revisarImagen } from '../scripts/tipo-imagen.mjs'
 
 const ftyp = (marca: string) => Buffer.concat([Buffer.from([0, 0, 0, 24]), Buffer.from(`ftyp${marca}`), Buffer.alloc(12)])
 const config = readFileSync(new URL('../public/admin/config.yml', import.meta.url), 'utf8')
@@ -37,4 +37,17 @@ test('CMS: media_folder y public_folder apuntan a la misma carpeta', () => {
   assert.match(config, /^media_folder: "public\/images\/products"$/m)
   assert.match(config, /^public_folder: "\/images\/products"$/m)
   assert.match(config, /no HEIC de iPhone/)
+})
+
+test('un JPG en CMYK (4 componentes) se rechaza y uno RGB (3) pasa', () => {
+  const jpeg = (componentes: number) => Buffer.concat([
+    Buffer.from([0xff, 0xd8]),
+    Buffer.from([0xff, 0xe1, 0x00, 0x06, 0, 0, 0, 0]), // un segmento cualquiera (EXIF)
+    Buffer.from([0xff, 0xc0, 0x00, 0x11, 0x08, 0x00, 0x10, 0x00, 0x10, componentes]),
+    Buffer.alloc(30),
+  ])
+  assert.equal(componentesJpeg(jpeg(4)), 4)
+  assert.equal(componentesJpeg(jpeg(3)), 3)
+  assert.match(revisarImagen('foto.jpg', jpeg(4)), /CMYK/)
+  assert.equal(revisarImagen('foto.jpg', jpeg(3)), null)
 })

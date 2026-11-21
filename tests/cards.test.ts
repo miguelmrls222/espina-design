@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs'
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8')
 const css = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8')
 const js = readFileSync(new URL('../src/main.js', import.meta.url), 'utf8')
+const config = readFileSync(new URL('../public/admin/config.yml', import.meta.url), 'utf8')
 
 test('la cuadrícula estira las tarjetas para que midan lo mismo en cada fila', () => {
   assert.match(html, /id="productos-grid" class="grid [^"]*items-stretch/)
@@ -28,8 +29,10 @@ test('la tarjeta ya no muestra estrellas ni días de elaboración', () => {
   assert.doesNotMatch(css, /tarjeta-detalle/)
 })
 
-test('el sello de garantía muestra "1 año" en móvil y el texto completo en escritorio', () => {
-  assert.match(js, /<span class="sm:hidden">1 año<\/span><span class="hidden sm:inline">Garantía de 1 año<\/span>/)
+test('el sello de garantía es solo icono en móvil (abajo a la derecha) y con texto en escritorio (arriba)', () => {
+  assert.doesNotMatch(js, /<span class="sm:hidden">1 año<\/span>/)
+  assert.match(js, /warranty-badge absolute bottom-2 right-2 sm:bottom-auto sm:top-2/)
+  assert.match(js, /<span class="hidden sm:inline[^"]*"[^>]*>Garantía de 1 año<\/span>/)
   assert.match(js, /warranty-badge[^"]*"[^>]*aria-label="Garantía de 1 año"/)
 })
 
@@ -132,4 +135,11 @@ test('TIENDA vuelve a la cuadrícula fluida y los botones nunca parten el texto'
   assert.match(js, /\? `flex-shrink-0 \$\{ANCHO_TARJETA\} snap-start`\s*: ''/)
   assert.match(js, /const CLASES_BOTON = '[^']*whitespace-nowrap/)
   assert.doesNotMatch(js, /@\[11rem\]:whitespace-nowrap/)
+})
+
+test('CMS: campo opcional de texto libre "dimensiones" y se muestra en la ficha solo si tiene valor', () => {
+  const bloque = config.slice(config.indexOf('name: "dimensiones"'), config.indexOf('name: "categoria"'))
+  assert.match(bloque, /widget: "string"/)
+  assert.match(bloque, /required: false/)
+  assert.match(js, /producto\.dimensiones && String\(producto\.dimensiones\)\.trim\(\)/)
 })

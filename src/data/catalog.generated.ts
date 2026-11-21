@@ -2,25 +2,24 @@ import type { Producto } from './types'
 
 export const CATALOGO: readonly Producto[] = [
   {
-    "precio": 789,
-    "destacado": true,
     "nombre": "Billetera Sahuaro",
     "slug": "billetera-sahuaro",
-    "descripcion": "Diseño simple y elegante, muy práctico para quienes llevan consigo sus billetes y tarjetas esenciales.",
     "fotos": [
-      "/images/products/billetera-sahuaro.jpg"
+      "/images/products/billetera-bifold-sahuaro-3.jpg",
+      "/images/products/billetera-bifold-sahuaro-4.jpg",
+      "/images/products/billetera-bifold-sahuaro-2.jpg"
     ],
+    "precio": 949,
     "colores": [
-      "verde",
-      "gris",
-      "vino",
-      "cafe oscuro"
+      "negro"
     ],
-    "activo": true,
+    "descripcion": "Diseño simple y elegante, muy práctico para quienes llevan consigo sus billetes y tarjetas esenciales.",
     "categoria": "billeteras",
-    "materiales": "Cuero vegetal 100%",
-    "dimensiones": "10 cm × 8 cm",
+    "cantidad_disponible": 1,
     "stock": "disponible",
+    "materiales": "Cuero vacuno 100%",
+    "destacado": true,
+    "activo": true,
     "resenas": [
       {
         "nombre": "Carlos M.",
@@ -34,7 +33,8 @@ export const CATALOGO: readonly Producto[] = [
         "texto": "Me encantó, muy funcional y elegante. El envío fue rápido.",
         "fecha": "Feb 2026"
       }
-    ]
+    ],
+    "dimensiones": "10 cm × 8 cm"
   },
   {
     "precio": 589,
@@ -107,56 +107,47 @@ export const CATALOGO: readonly Producto[] = [
     ]
   },
   {
-    "precio": 589,
-    "destacado": true,
     "nombre": "Tarjetero Cardón",
     "slug": "tarjetero-cardon",
-    "descripcion": "Diseño minimalista, súper práctico para quienes andan ligeros. Especial para tarjetas esenciales y pocos billetes.",
     "fotos": [
-      "/images/products/tarjetero-cardon.jpg"
+      "/images/products/tarjetero-cardon-1.jpg",
+      "/images/products/tarjetero-cardon-2.jpg",
+      "/images/products/tarjetero-cardon-3.jpg",
+      "/images/products/tarjetero-cardon-4.jpg"
     ],
+    "precio": 769,
     "colores": [
-      "verde",
-      "gris",
-      "vino",
-      "cafe oscuro"
+      "verde"
     ],
-    "activo": true,
+    "descripcion": "Diseño minimalista, súper práctico para quienes andan ligeros. Especial para tarjetas esenciales y pocos billetes. Incluye bolígrafo telescópico y repuestos.",
     "categoria": "billeteras",
-    "materiales": "Cuero vegetal 100%",
-    "dimensiones": "10 cm × 7 cm",
+    "cantidad_disponible": 1,
     "stock": "disponible",
-    "resenas": [
-      {
-        "nombre": "Laura P.",
-        "puntuacion": 5,
-        "texto": "Minimalista y de gran calidad. Exactamente lo que buscaba.",
-        "fecha": "Feb 2026"
-      },
-      {
-        "nombre": "Jorge T.",
-        "puntuacion": 4,
-        "texto": "Muy buen producto, el cuero se ve y se siente increíble.",
-        "fecha": "Ene 2026"
-      }
-    ]
+    "materiales": "Cuero vacuno 100%",
+    "destacado": true,
+    "activo": true,
+    "resenas": [],
+    "dimensiones": "10 cm × 7 cm"
   },
   {
-    "precio": 780,
-    "destacado": false,
-    "nombre": "Tarjetero Desert Money Clip",
+    "nombre": "Tarjetero Desierto Money Clip",
     "slug": "tarjetero-dmc",
-    "descripcion": "Tarjetero sencillo y muy práctico. Cuenta con un moneyclip para llevar con seguridad tus billetes o tickets importantes. Capacidad para 12-16 tarjetas y algunos billetes.",
     "fotos": [
-      "/images/products/tarjetero-money-clip.jpg"
+      "/images/products/tarjetero-desierto-moneyclip-1.jpg",
+      "/images/products/tarjetero-desierto-moneyclip-2.jpg",
+      "/images/products/tarjetero-desierto-moneyclip-3.jpg"
     ],
-    "activo": true,
+    "precio": 889,
     "colores": [
       "vino"
     ],
+    "descripcion": "Tarjetero sencillo y muy práctico. Cuenta con un moneyclip para llevar con seguridad tus billetes o tickets importantes. Capacidad para 10-16 tarjetas y algunos billetes.",
     "categoria": "billeteras",
-    "materiales": "Cuero vacuno.",
-    "stock": "disponible"
+    "cantidad_disponible": 1,
+    "stock": "disponible",
+    "materiales": "Cuero vacuno 100%",
+    "destacado": false,
+    "activo": true
   }
 ]
 

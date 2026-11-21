@@ -210,9 +210,9 @@ function renderProductCard(p, index, opts = {}) {
           ${renderGaleriaTarjeta(p, fotos, carousel)}
           ${agotado ? '<span class="absolute inset-0 flex items-center justify-center text-sm tracking-widest uppercase bg-white/70">Agotado</span>' : ''}
           ${textoStock ? '<span class="absolute top-2 left-2 bg-[#DC2626] text-white text-[10px] tracking-wider uppercase px-2 py-1 rounded-full font-heading">' + textoStock + '</span>' : ''}
-          <div class="warranty-badge absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm flex items-center gap-1 pointer-events-none" role="img" aria-label="Garantía de 1 año">
-            <svg class="w-3 h-3 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-            <span class="font-heading text-[10px] tracking-wide text-green-800 font-semibold whitespace-nowrap" aria-hidden="true"><span class="sm:hidden">1 año</span><span class="hidden sm:inline">Garantía de 1 año</span></span>
+          <div class="warranty-badge absolute bottom-2 right-2 sm:bottom-auto sm:top-2 bg-white/90 backdrop-blur-sm p-1.5 sm:px-2 sm:py-1 rounded-full shadow-sm flex items-center gap-1 pointer-events-none" role="img" aria-label="Garantía de 1 año" title="Garantía de 1 año">
+            <svg class="w-3.5 h-3.5 sm:w-3 sm:h-3 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+            <span class="hidden sm:inline font-heading text-[10px] tracking-wide text-green-800 font-semibold whitespace-nowrap" aria-hidden="true">Garantía de 1 año</span>
           </div>
         </div>
         <div class="pt-3 px-1 flex-1 flex flex-col">
@@ -714,7 +714,7 @@ function openDetail(producto, trigger) {
 
   let metaHTML = ''
   if (producto.materiales) metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Materiales:</span> ${producto.materiales}</p>`
-  if (producto.dimensiones) metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Medidas:</span> ${producto.dimensiones}</p>`
+  if (producto.dimensiones && String(producto.dimensiones).trim()) metaHTML += `<p><span class="font-heading text-xs tracking-widest uppercase text-black">Medidas:</span> ${String(producto.dimensiones).trim()}</p>`
   {
     const estados = { disponible: 'Disponible', agotado: 'Agotado', 'bajo-pedido': 'Bajo pedido' }
     const n = cantidadDisponible(producto)

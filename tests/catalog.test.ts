@@ -20,8 +20,9 @@ test('todas las imágenes de producto existen en public/', () => {
   }
 })
 
-test('el Tarjetero Desert Money Clip está en el catálogo con su foto', () => {
+test('el Tarjetero Desert Money Clip está en el catálogo con al menos una foto JPG válida', () => {
   const producto = CATALOGO.find(p => p.slug === 'tarjetero-dmc')
   assert.ok(producto)
-  assert.deepEqual(producto.fotos, ['/images/products/tarjetero-money-clip.jpg'])
+  assert.ok(producto.fotos.length >= 1)
+  for (const foto of producto.fotos) assert.match(foto, /^\/images\/products\/[a-z0-9-]+\.jpg$/)
 })

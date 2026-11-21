@@ -1,0 +1,21 @@
+{
+  "nombre": "Cartera Pitahaya Mini",
+  "slug": "cartera-pm",
+  "fotos": [
+    "/images/products/cartera-pitahaya-mini-1.jpg",
+    "/images/products/cartera-pitahaya-mini-2.jpg",
+    "/images/products/cartera-pitahaya-mini-3.jpg",
+    "/images/products/cartera-pitahaya-mini-4.jpg"
+  ],
+  "precio": 1199,
+  "colores": [
+    "vino"
+  ],
+  "descripcion": "Esta cartera cuenta con cinco compartimentos; el principal que es para billetes doblados, uno con zipper para monedas, y tres mas para tarjetas. Con un diseño muy particular pero sencillo; te durara toda la vida.",
+  "categoria": "billeteras",
+  "cantidad_disponible": 1,
+  "stock": "disponible",
+  "materiales": "Cuero vacuno 100%",
+  "destacado": true,
+  "activo": true
+}

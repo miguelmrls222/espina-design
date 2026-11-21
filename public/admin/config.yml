@@ -76,6 +76,12 @@ collections:
         widget: "text"
         hint: "Un párrafo corto con lo que hace especial a la pieza."
 
+      - label: "Medidas o dimensiones"
+        name: "dimensiones"
+        widget: "string"
+        required: false
+        hint: "Texto libre, por ejemplo: 11 × 8.5 × 1.2 cm. Si lo dejas vacío no se muestra en la ficha del producto."
+
       - label: "Categoría"
         name: "categoria"
         widget: "select"

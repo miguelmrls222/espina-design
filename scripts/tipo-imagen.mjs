@@ -13,6 +13,21 @@ export function detectarTipo(buf) {
   return 'desconocido'
 }
 
+/** Número de componentes de color de un JPEG (3 = RGB, 4 = CMYK), o 0 si no se pudo leer. */
+export function componentesJpeg(buf) {
+  let i = 2
+  while (i + 9 < buf.length) {
+    if (buf[i] !== 0xff) { i++; continue }
+    const marca = buf[i + 1]
+    if (marca === 0xff) { i++; continue }
+    if (marca === 0xd8 || marca === 0x01 || (marca >= 0xd0 && marca <= 0xd7)) { i += 2; continue }
+    const largo = buf.readUInt16BE(i + 2)
+    if ([0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf].includes(marca)) return buf[i + 9]
+    i += 2 + largo
+  }
+  return 0
+}
+
 const ESPERADO = { '.jpg': 'jpeg', '.jpeg': 'jpeg', '.png': 'png', '.webp': 'webp', '.gif': 'gif', '.avif': 'avif' }
 
 /** Devuelve un mensaje de error si el contenido no corresponde a la extensión, o null si todo bien. */
@@ -21,7 +36,12 @@ export function revisarImagen(nombre, buf) {
   const esperado = ESPERADO[ext]
   if (!esperado) return null
   const real = detectarTipo(buf)
-  if (real === esperado) return null
+  if (real === esperado) {
+    if (real === 'jpeg' && componentesJpeg(buf) === 4) {
+      return `${nombre} es un JPG en CMYK (modo de impresión): se ve mal en el navegador y en el panel. Conviértela a RGB con "npm run imagenes" (ver docs/GUIA-IMAGENES.md)`
+    }
+    return null
+  }
   const que = real === 'heic' ? 'una foto HEIC de iPhone' : real === 'desconocido' ? 'un archivo que no se reconoce como imagen' : `una imagen ${real.toUpperCase()}`
   return `${nombre} dice ser ${ext} pero en realidad es ${que}. Conviértela a JPG real con "npm run imagenes" (ver docs/GUIA-IMAGENES.md)`
 }

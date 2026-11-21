@@ -1,11 +1,21 @@
 import { revisarImagen } from './tipo-imagen.mjs'
-import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
+import { closeSync, existsSync, openSync, readFileSync, readSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const raiz = join(dirname(fileURLToPath(import.meta.url)), '..')
 const carpeta = join(raiz, 'src', 'data', 'productos')
 const salida = join(raiz, 'src', 'data', 'catalog.generated.ts')
+
+function leerCabecera(ruta) {
+  const fd = openSync(ruta, 'r')
+  try {
+    const buf = Buffer.alloc(262144)
+    return buf.subarray(0, readSync(fd, buf, 0, buf.length, 0))
+  } finally {
+    closeSync(fd)
+  }
+}
 
 const archivos = readdirSync(carpeta)
   .filter(nombre => nombre.endsWith('.json'))
@@ -28,6 +38,12 @@ function leerProducto(nombreArchivo) {
   }
   if (typeof producto.nombre !== 'string' || !producto.nombre.trim()) errores.push(`${nombreArchivo}: falta el nombre`)
   if (typeof producto.precio !== 'number' || !(producto.precio > 0)) errores.push(`${nombreArchivo}: el precio debe ser un número mayor que 0`)
+  if (typeof producto.dimensiones === 'string') {
+    producto.dimensiones = producto.dimensiones.trim()
+    if (!producto.dimensiones) delete producto.dimensiones
+  } else {
+    delete producto.dimensiones
+  }
   if (producto.cantidad_disponible !== undefined && producto.cantidad_disponible !== null && producto.cantidad_disponible !== '') {
     const n = Number(producto.cantidad_disponible)
     if (!Number.isInteger(n) || n < 0) errores.push(`${nombreArchivo}: las piezas disponibles deben ser un número entero de 0 en adelante`)
@@ -40,8 +56,8 @@ function leerProducto(nombreArchivo) {
     const ruta = join(raiz, 'public', decodeURIComponent(foto))
     if (!existsSync(ruta)) {
       errores.push(`${nombreArchivo}: la imagen ${foto} no existe en public/ (revisa mayúsculas, espacios y extensión)`)
-    } else if (revisarImagen(foto, readFileSync(ruta).subarray(0, 32))) {
-      errores.push(`${nombreArchivo}: ${revisarImagen(foto, readFileSync(ruta).subarray(0, 32))}`)
+    } else if (revisarImagen(foto, leerCabecera(ruta))) {
+      errores.push(`${nombreArchivo}: ${revisarImagen(foto, leerCabecera(ruta))}`)
     } else if (statSync(ruta).size > LIMITE_AVISO_BYTES) {
       console.warn(`Aviso: ${foto} pesa ${(statSync(ruta).size / 1048576).toFixed(1)} MB; conviene reducirla a menos de 0.5 MB (ver docs/GUIA-IMAGENES.md)`)
     }
